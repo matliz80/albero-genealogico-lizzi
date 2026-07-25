@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albero Genealogico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #f2e8d5;
+    --paper-2: #e9dcbf;
+    --paper-3: #ded0ac;
+    --ink: #2b2118;
+    --ink-soft: #5c4d3a;
+    --ink-faint: #8a7a5f;
+    --accent: #a13d2b;
+    --accent-2: #4a5d3a;
+    --line: #b8a37e;
+    --gold: #9c7a34;
+    --card-w: 176px;
+    --card-h: 84px;
+    --gen-h: 190px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% 0%, #f8efdd 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, #ecdcb8 0%, transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Newsreader', serif;
+    min-height:100%;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:.05;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  header{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:48px 24px 20px;
+  }
+  .eyebrow{
+    font-family:'Courier Prime', monospace;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:500;
+    font-style:italic;
+    font-size:clamp(32px,5vw,54px);
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .subtitle{
+    font-size:15px;
+    color:var(--ink-soft);
+    max-width:520px;
+    margin:0 auto 18px;
+    line-height:1.5;
+  }
+  .rule{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    width:min(360px,80%);
+    margin:0 auto;
+  }
+  .rule .line{ flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent);}
+  .rule .diamond{ width:7px;height:7px; background:var(--accent); transform:rotate(45deg); }
+
+  #controls{
+    position:relative; z-index:2;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:10px;
+    padding:18px 20px;
+    margin:0 20px 8px;
+  }
+  .field{
+    display:flex; align-items:center; gap:8px;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:8px 14px;
+  }
+  #search{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:15px;
+    border:none; background:transparent; color:var(--ink);
+    outline:none; width:190px;
+  }
+  #search::placeholder{ color:var(--ink-faint); }
+  .btn{
+    font-family:'Courier Prime', monospace;
+    font-size:11.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:3px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .btn:hover{ background:var(--paper-3); color:var(--ink); }
+  .btn.accent{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--paper);
+  }
+  .btn.accent:hover{ background:#8a3323; }
+  .zoomgroup{ display:flex; gap:2px; }
+  .zoomgroup .btn{ padding:9px 12px; }
+  #status-line{
+    font-family:'Courier Prime', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    text-align:center;
+    padding-bottom:6px;
+    position:relative; z-index:2;
+  }
+  #status-line.error{ color:var(--accent); }
+
+  #stage{
+    position:relative; z-index:2;
+    margin:0 20px 60px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:
+      linear-gradient(var(--paper-2) 1px, transparent 1px) 0 0/100% 38px,
+      var(--paper);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.3), 0 18px 40px -20px rgba(43,33,24,.35);
+    overflow:auto;
+    height:70vh;
+    min-height:420px;
+    cursor:grab;
+  }
+  #stage.dragging{ cursor:grabbing; }
+  #stage svg{ display:block; }
+
+  .gen-label{
+    font-family:'Courier Prime', monospace;
+    font-size:10px;
+    letter-spacing:.14em;
+    fill:var(--ink-faint);
+    text-transform:uppercase;
+  }
+
+  .node-card rect.bg{ fill:var(--paper); stroke:var(--ink-soft); stroke-width:1; }
+  .node-card.male rect.bar{ fill:var(--accent); }
+  .node-card.female rect.bar{ fill:var(--accent-2); }
+  .node-card.unknown rect.bar{ fill:var(--gold); }
+  .node-card .name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:14px;
+    fill:var(--ink);
+  }
+  .node-card .meta{
+    font-family:'Courier Prime', monospace;
+    font-size:9.5px;
+    fill:var(--ink-soft);
+  }
+  .node-card{ cursor:pointer; }
+  .node-card:hover rect.bg{ stroke:var(--accent); stroke-width:1.4; }
+  .node-card.dim{ opacity:.22; }
+  .node-card.match rect.bg{ stroke:var(--accent); stroke-width:2; }
+  .node-card.focused rect.bg{ fill:#f8ecd2; stroke:var(--accent); stroke-width:2; }
+
+  .link{ fill:none; stroke:var(--line); stroke-width:1.4; }
+  .link.dim{ opacity:.15; }
+
+  #detail-panel{
+    position:fixed; top:0; right:-360px;
+    width:340px; height:100%;
+    background:var(--paper);
+    border-left:1px solid var(--line);
+    box-shadow:-16px 0 40px -20px rgba(43,33,24,.4);
+    z-index:10;
+    padding:34px 26px;
+    transition:right .28s ease;
+    overflow-y:auto;
+  }
+  #detail-panel.open{ right:0; }
+  #detail-panel .close{
+    position:absolute; top:18px; right:20px;
+    font-family:'Courier Prime',monospace;
+    background:none; border:none; color:var(--ink-faint);
+    font-size:13px; cursor:pointer; letter-spacing:.1em;
+  }
+  #detail-panel h2{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
+    font-size:26px; margin:6px 0 4px;
+  }
+  #detail-panel .tag{
+    display:inline-block; font-family:'Courier Prime',monospace; font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase;
+    color:var(--paper); background:var(--ink-soft);
+    padding:3px 8px; border-radius:2px; margin-bottom:14px;
+  }
+  .detail-row{
+    display:flex; justify-content:space-between; gap:10px;
+    padding:9px 0; border-bottom:1px dashed var(--line);
+    font-size:13.5px;
+  }
+  .detail-row .k{ color:var(--ink-faint); font-family:'Courier Prime',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
+  .detail-row .v{ text-align:right; max-width:190px; }
+  #detail-panel .actions{ margin-top:22px; display:flex; flex-direction:column; gap:8px; }
+  #detail-panel .actions .btn{ width:100%; text-align:center; }
+
+  #overlay{
+    position:fixed; inset:0; background:rgba(43,33,24,.25);
+    z-index:9; opacity:0; pointer-events:none; transition:.25s ease;
+  }
+  #overlay.open{ opacity:1; pointer-events:auto; }
+
+  footer{
+    position:relative; z-index:2;
+    text-align:center;
+    font-family:'Courier Prime', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    padding:0 20px 40px;
+    letter-spacing:.04em;
+  }
+  footer a{ color:var(--accent); }
+
+  #loading{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px;
+    font-family:'Courier Prime', monospace; font-size:12px; color:var(--ink-soft);
+  }
+  .spinner{
+    width:22px; height:22px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--accent);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  @media print{
+    header, #controls, #status-line, footer, #detail-panel, #overlay{ display:none !important; }
+    body{ background:#fff; }
+    body::before{ display:none; }
+    #stage{
+      border:none; box-shadow:none; height:auto; overflow:visible; margin:0;
+      background:none;
+    }
+    #stage svg{ width:100% !important; height:auto !important; }
+  }
+
+  @media (max-width: 640px){
+    #search{ width:120px; }
+    #detail-panel{ width:88%; right:-100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Registro di famiglia</div>
+  <h1 id="page-title">Albero Genealogico</h1>
+  <p class="subtitle" id="page-subtitle">Dati raccolti dall'archivio familiare, aggiornati direttamente dal foglio condiviso.</p>
+  <div class="rule"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+</header>
+
+<div id="controls">
+  <div class="field">
+    <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink-faint);">Cerca</span>
+    <input id="search" type="text" placeholder="nome o cognome…">
+  </div>
+  <button class="btn" id="btn-reset-view">Vista completa</button>
+  <div class="zoomgroup">
+    <button class="btn" id="btn-zoom-out">−</button>
+    <button class="btn" id="btn-zoom-reset">100%</button>
+    <button class="btn" id="btn-zoom-in">+</button>
+  </div>
+  <button class="btn" id="btn-refresh">Aggiorna dati</button>
+  <button class="btn accent" id="btn-export">Esporta PDF</button>
+</div>
+<div id="status-line">Caricamento…</div>
+
+<div id="stage">
+  <div id="loading"><div class="spinner"></div><div>Lettura del foglio Google in corso…</div></div>
+  <svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<footer>Fonte dati: Google Sheet collegato in tempo reale · le modifiche al foglio compaiono al ricaricamento della pagina</footer>
+
+<div id="overlay"></div>
+<aside id="detail-panel">
+  <button class="close" id="detail-close">CHIUDI ✕</button>
+  <div class="tag" id="detail-id">—</div>
+  <h2 id="detail-name">—</h2>
+  <div id="detail-rows"></div>
+  <div class="actions">
+    <button class="btn accent" id="detail-focus">Metti a fuoco questo ramo</button>
+    <button class="btn" id="detail-export">Esporta PDF di questo ramo</button>
+  </div>
+</aside>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ CONFIGURAZIONE ============ */
+  // ID del Google Sheet (si trova nell'URL: .../d/QUESTO_ID/edit)
+  const SHEET_ID = "12tz3Vr_gPEchYxVHoF8Ot9IqC1zvfYYdD8I2RvlWdXk";
+  // Nome del foglio (tab) da leggere. Lasciare vuoto "" per usare il primo foglio.
+  const SHEET_NAME = "";
+  // Titolo mostrato in cima alla pagina
+  const PAGE_TITLE = "Albero Genealogico";
+  const PAGE_SUBTITLE = "Dati raccolti dall'archivio familiare, aggiornati direttamente dal foglio condiviso.";
+
+  document.getElementById('page-title').textContent = PAGE_TITLE;
+  document.getElementById('page-subtitle').textContent = PAGE_SUBTITLE;
+  document.title = PAGE_TITLE;
+
+  const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv${SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : ''}`;
+
+  /* ============ CSV PARSING ============ */
+  function parseCSV(text){
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for(let i=0;i<text.length;i++){
+      const c = text[i], next = text[i+1];
+      if(inQuotes){
+        if(c === '"' && next === '"'){ field += '"'; i++; }
+        else if(c === '"'){ inQuotes = false; }
+        else { field += c; }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field=''; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+        else if(c === '\r'){ /* skip */ }
+        else { field += c; }
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows.filter(r => r.length > 1 || (r.length===1 && r[0] !== ''));
+  }
+
+  function normalize(s){
+    return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  }
+
+  function classifyHeader(h){
+    const n = normalize(h);
+    if(n.includes('padre')) return 'idPadre';
+    if(n.includes('madre')) return 'idMadre';
+    if(n.includes('coniuge') || n.includes('sposo') || n.includes('sposa')) return 'coniuge';
+    if(n.includes('cognome')) return 'cognome';
+    if(n.includes('nome')) return 'nome';
+    if(n.includes('sesso') || n.includes('genere')) return 'sesso';
+    if(n.includes('nascita') && n.includes('luogo')) return 'luogoNascita';
+    if(n.includes('nascita')) return 'dataNascita';
+    if(n.includes('morte') && n.includes('luogo')) return 'luogoMorte';
+    if(n.includes('morte') || n.includes('decesso')) return 'dataMorte';
+    if(n.includes('nota') || n.includes('annotazion')) return 'note';
+    if(n.includes('foto') || n.includes('immagine') || n.includes('photo')) return 'foto';
+    if(n.includes('id')) return 'id';
+    return null;
+  }
+
+  function rowsToPersons(rows){
+    if(!rows.length) return [];
+    const headers = rows[0].map(classifyHeader);
+    const persons = [];
+    for(let i=1;i<rows.length;i++){
+      const r = rows[i];
+      if(!r.some(v => (v||'').trim() !== '')) continue;
+      const p = {};
+      headers.forEach((field, idx) => {
+        if(field) p[field] = (r[idx] || '').trim();
+      });
+      if(!p.id){ p.id = '_row' + i; }
+      if(!p.nome && !p.cognome) continue; // riga vuota / non valida
+      persons.push(p);
+    }
+    return persons;
+  }
+
+  /* ============ STATO GLOBALE ============ */
+  let ALL_PERSONS = [];
+  let personsById = new Map();
+  let zoom = 1;
+  let focusId = null; // se impostato, mostra solo antenati+discendenti di questo id
+  let layout = null; // { width, height, positions: Map, groups: [...] }
+
+  const el = id => document.getElementById(id);
+  const statusLine = el('status-line');
+  const stage = el('stage');
+  const svg = el('tree');
+  const loading = el('loading');
+
+  function setStatus(msg, isError){
+    statusLine.textContent = msg;
+    statusLine.classList.toggle('error', !!isError);
+  }
+
+  /* ============ CARICAMENTO DATI ============ */
+  function loadData(){
+    loading.style.display = 'flex';
+    setStatus('Caricamento…');
+    fetch(DATA_URL, { cache: 'no-store' })
+      .then(res => {
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(text => {
+        const rows = parseCSV(text);
+        const persons = rowsToPersons(rows);
+        if(!persons.length) throw new Error('Nessuna riga valida trovata nel foglio.');
+        ALL_PERSONS = persons;
+        personsById = new Map(persons.map(p => [p.id, p]));
+        loading.style.display = 'none';
+        const now = new Date();
+        setStatus(`${persons.length} persone caricate · aggiornato alle ${now.toLocaleTimeString('it-IT')}`);
+        render();
+      })
+      .catch(err => {
+        loading.style.display = 'none';
+        setStatus('Errore nel caricamento del foglio: ' + err.message + ' — verifica che la condivisione sia impostata su "Chiunque abbia il link".', true);
+        console.error(err);
+      });
+  }
+
+  /* ============ LAYOUT DELL'ALBERO ============ */
+  const CARD_W = 176, CARD_H = 84, GEN_H = 190, GAP_X = 26, MARGIN = 60;
+
+  function computeLevels(persons){
+    const level = new Map();
+    function levelOf(id, visiting){
+      if(level.has(id)) return level.get(id);
+      if(visiting.has(id)) return 0; // ciclo di sicurezza
+      visiting.add(id);
+      const p = personsById.get(id);
+      const parentLevels = [];
+      if(p.idPadre && personsById.has(p.idPadre)) parentLevels.push(levelOf(p.idPadre, visiting));
+      if(p.idMadre && personsById.has(p.idMadre)) parentLevels.push(levelOf(p.idMadre, visiting));
+      const lvl = parentLevels.length ? Math.max(...parentLevels) + 1 : 0;
+      level.set(id, lvl);
+      return lvl;
+    }
+    persons.forEach(p => levelOf(p.id, new Set()));
+    return level;
+  }
+
+  function buildLayout(persons){
+    if(!persons.length) return null;
+    const level = computeLevels(persons);
+    const maxLevel = Math.max(...persons.map(p => level.get(p.id)));
+    const byLevel = [];
+    for(let l=0;l<=maxLevel;l++) byLevel.push([]);
+    persons.forEach(p => byLevel[level.get(p.id)].push(p));
+
+    const posX = new Map(); // id -> x center
+    const sortKeyName = p => normalize(p.cognome) + ' ' + normalize(p.nome);
+
+    // livello 0: ordina alfabeticamente e distribuisci
+    byLevel[0].sort((a,b) => sortKeyName(a) < sortKeyName(b) ? -1 : 1);
+    byLevel[0].forEach((p, i) => posX.set(p.id, MARGIN + i * (CARD_W + GAP_X)));
+
+    for(let l=1;l<=maxLevel;l++){
+      const nodes = byLevel[l];
+      const desired = nodes.map(p => {
+        const parents = [p.idPadre, p.idMadre].filter(pid => pid && posX.has(pid));
+        const dx = parents.length ? parents.reduce((s,pid)=>s+posX.get(pid),0)/parents.length : null;
+        return { p, dx };
+      });
+      desired.sort((a,b) => {
+        if(a.dx == null && b.dx == null) return sortKeyName(a.p) < sortKeyName(b.p) ? -1 : 1;
+        if(a.dx == null) return 1;
+        if(b.dx == null) return -1;
+        return a.dx - b.dx;
+      });
+      let prevX = -Infinity;
+      desired.forEach(({p, dx}) => {
+        let x = dx == null ? MARGIN : dx;
+        if(prevX !== -Infinity) x = Math.max(x, prevX + CARD_W + GAP_X);
+        posX.set(p.id, x);
+        prevX = x;
+      });
+    }
+
+    // normalizza offset minimo a MARGIN
+    let minX = Infinity;
+    posX.forEach(x => { if(x < minX) minX = x; });
+    const shift = MARGIN - minX;
+    if(shift !== 0) posX.forEach((x,id) => posX.set(id, x + shift));
+
+    const positions = new Map();
+    persons.forEach(p => {
+      positions.set(p.id, {
+        x: posX.get(p.id),
+        y: MARGIN + level.get(p.id) * GEN_H,
+        level: level.get(p.id)
+      });
+    });
+
+    let maxX = 0;
+    positions.forEach(pos => { if(pos.x + CARD_W > maxX) maxX = pos.x + CARD_W; });
+    const width = maxX + MARGIN;
+    const height = MARGIN + (maxLevel+1) * GEN_H + 20;
+
+    // raggruppamenti famiglia (coppia/genitore -> figli)
+    const familyGroups = new Map();
+    persons.forEach(p => {
+      if(!p.idPadre && !p.idMadre) return;
+      const padreOk = p.idPadre && personsById.has(p.idPadre);
+      const madreOk = p.idMadre && personsById.has(p.idMadre);
+      if(!padreOk && !madreOk) return;
+      const key = (padreOk?p.idPadre:'') + '|' + (madreOk?p.idMadre:'');
+      if(!familyGroups.has(key)) familyGroups.set(key, { padreId: padreOk?p.idPadre:null, madreId: madreOk?p.idMadre:null, children: [] });
+      familyGroups.get(key).children.push(p.id);
+    });
+
+    return { width, height, maxLevel, positions, byLevel, familyGroups };
+  }
+
+  /* ============ RENDER SVG ============ */
+  const svgns = 'http://www.w3.org/2000/svg';
+  function sel(tag, attrs, cls){
+    const e = document.createElementNS(svgns, tag);
+    if(attrs) for(const k in attrs) e.setAttribute(k, attrs[k]);
+    if(cls) e.setAttribute('class', cls);
+    return e;
+  }
+
+  function sexClass(p){
+    const s = normalize(p.sesso);
+    if(s === 'm' || s.startsWith('masch')) return 'male';
+    if(s === 'f' || s.startsWith('femm')) return 'female';
+    return 'unknown';
+  }
+
+  function personLabel(p){
+    return [p.nome, p.cognome].filter(Boolean).join(' ') || '(senza nome)';
+  }
+
+  function getVisibleSet(){
+    if(!focusId || !personsById.has(focusId)) return null;
+    const visible = new Set([focusId]);
+    // antenati
+    (function up(id){
+      const p = personsById.get(id);
+      if(!p) return;
+      [p.idPadre, p.idMadre].forEach(pid => {
+        if(pid && personsById.has(pid) && !visible.has(pid)){ visible.add(pid); up(pid); }
+      });
+    })(focusId);
+    // discendenti
+    const childrenOf = id => ALL_PERSONS.filter(p => p.idPadre === id || p.idMadre === id);
+    (function down(id){
+      childrenOf(id).forEach(c => {
+        if(!visible.has(c.id)){ visible.add(c.id); down(c.id); }
+      });
+    })(focusId);
+    return visible;
+  }
+
+  function render(){
+    layout = buildLayout(ALL_PERSONS);
+    svg.innerHTML = '';
+    if(!layout) return;
+
+    svg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+    applyZoom();
+
+    const visible = getVisibleSet();
+
+    // etichette generazione
+    for(let l=0;l<=layout.maxLevel;l++){
+      const t = sel('text', { x: 18, y: MARGIN + l*GEN_H + CARD_H/2, class: 'gen-label' });
+      t.textContent = 'Gen. ' + (l+1);
+      svg.appendChild(t);
+    }
+
+    // collegamenti
+    layout.familyGroups.forEach(group => {
+      const parentPts = [group.padreId, group.madreId]
+        .filter(Boolean)
+        .map(id => layout.positions.get(id))
+        .filter(Boolean);
+      if(!parentPts.length) return;
+      const childPositions = group.children.map(id => layout.positions.get(id)).filter(Boolean);
+      if(!childPositions.length) return;
+
+      const dimmed = visible && !(
+        [group.padreId, group.madreId].some(id => id && visible.has(id))
+      );
+
+      const connX = parentPts.reduce((s,p)=>s+p.x+CARD_W/2,0)/parentPts.length;
+      const connY = parentPts[0].y + CARD_H;
+      const busY = Math.min(...childPositions.map(c=>c.y)) - GAP_X;
+
+      const path = sel('path', {
+        d: `M ${connX} ${connY} L ${connX} ${busY}`,
+        class: 'link' + (dimmed ? ' dim' : '')
+      });
+      svg.appendChild(path);
+
+      if(childPositions.length > 1){
+        const xs = childPositions.map(c => c.x + CARD_W/2);
+        const bus = sel('path', {
+          d: `M ${Math.min(...xs)} ${busY} L ${Math.max(...xs)} ${busY}`,
+          class: 'link' + (dimmed ? ' dim' : '')
+        });
+        svg.appendChild(bus);
+      }
+      childPositions.forEach(c => {
+        const cx = c.x + CARD_W/2;
+        const cDim = visible && !visible.has(persons_id_for_pos(c));
+        const line = sel('path', {
+          d: `M ${cx} ${busY} L ${cx} ${c.y}`,
+          class: 'link' + ((dimmed) ? ' dim' : '')
+        });
+        svg.appendChild(line);
+      });
+    });
+
+    function persons_id_for_pos(posObj){
+      for(const [id,pos] of layout.positions){ if(pos === posObj) return id; }
+      return null;
+    }
+
+    // nodi persona
+    ALL_PERSONS.forEach(p => {
+      const pos = layout.positions.get(p.id);
+      if(!pos) return;
+      const isDim = visible && !visible.has(p.id);
+      const g = sel('g', { transform: `translate(${pos.x},${pos.y})` }, 'node-card ' + sexClass(p) + (isDim?' dim':'') + (p.id===focusId?' focused':''));
+      g.dataset.id = p.id;
+
+      g.appendChild(sel('rect', { class:'bg', x:0, y:0, width:CARD_W, height:CARD_H, rx:3 }));
+      g.appendChild(sel('rect', { class:'bar', x:0, y:0, width:5, height:CARD_H }));
+
+      const name = sel('text', { x:14, y:24, class:'name' });
+      const label = personLabel(p);
+      name.textContent = label.length > 20 ? label.slice(0,19)+'…' : label;
+      g.appendChild(name);
+
+      const meta1 = sel('text', { x:14, y:44, class:'meta' });
+      meta1.textContent = [p.dataNascita, p.dataMorte ? '– ' + p.dataMorte : ''].filter(Boolean).join(' ');
+      g.appendChild(meta1);
+
+      const meta2 = sel('text', { x:14, y:60, class:'meta' });
+      meta2.textContent = (p.luogoNascita || '').slice(0,26);
+      g.appendChild(meta2);
+
+      g.addEventListener('click', () => openDetail(p.id));
+      svg.appendChild(g);
+    });
+
+    applySearchFilter();
+  }
+
+  function applyZoom(){
+    svg.style.width = (layout.width * zoom) + 'px';
+    svg.style.height = (layout.height * zoom) + 'px';
+  }
+
+  /* ============ RICERCA ============ */
+  function applySearchFilter(){
+    const q = normalize(el('search').value);
+    const cards = svg.querySelectorAll('.node-card');
+    if(!q){
+      cards.forEach(c => c.classList.remove('match'));
+      return;
+    }
+    let first = null;
+    cards.forEach(c => {
+      const p = personsById.get(c.dataset.id);
+      const hay = normalize(personLabel(p));
+      const isMatch = hay.includes(q);
+      c.classList.toggle('match', isMatch);
+      if(isMatch && !first) first = c;
+    });
+    if(first && first.scrollIntoView){
+      first.scrollIntoView({ behavior:'smooth', block:'center', inline:'center' });
+    }
+  }
+  el('search').addEventListener('input', applySearchFilter);
+
+  /* ============ PANNELLO DETTAGLIO ============ */
+  const FIELD_LABELS = {
+    dataNascita: 'Nato/a il', luogoNascita: 'Luogo di nascita',
+    dataMorte: 'Deceduto/a il', luogoMorte: 'Luogo di decesso',
+    coniuge: 'Coniuge', note: 'Note'
+  };
+
+  function openDetail(id){
+    const p = personsById.get(id);
+    if(!p) return;
+    el('detail-id').textContent = 'ID ' + p.id;
+    el('detail-name').textContent = personLabel(p);
+    const rows = el('detail-rows');
+    rows.innerHTML = '';
+    Object.keys(FIELD_LABELS).forEach(key => {
+      if(p[key]){
+        const row = document.createElement('div');
+        row.className = 'detail-row';
+        row.innerHTML = `<span class="k">${FIELD_LABELS[key]}</span><span class="v">${p[key]}</span>`;
+        rows.appendChild(row);
+      }
+    });
+    el('detail-panel').classList.add('open');
+    el('overlay').classList.add('open');
+    el('detail-focus').onclick = () => { focusId = id; render(); closeDetail(); };
+    el('detail-export').onclick = () => { focusId = id; render(); closeDetail(); setTimeout(()=>window.print(), 200); };
+  }
+  function closeDetail(){
+    el('detail-panel').classList.remove('open');
+    el('overlay').classList.remove('open');
+  }
+  el('detail-close').addEventListener('click', closeDetail);
+  el('overlay').addEventListener('click', closeDetail);
+
+  /* ============ CONTROLLI ============ */
+  el('btn-reset-view').addEventListener('click', () => { focusId = null; render(); });
+  el('btn-zoom-in').addEventListener('click', () => { zoom = Math.min(2.5, zoom + 0.15); applyZoom(); });
+  el('btn-zoom-out').addEventListener('click', () => { zoom = Math.max(0.4, zoom - 0.15); applyZoom(); });
+  el('btn-zoom-reset').addEventListener('click', () => { zoom = 1; applyZoom(); });
+  el('btn-refresh').addEventListener('click', loadData);
+  el('btn-export').addEventListener('click', () => window.print());
+
+  // pan trascinando
+  let dragging = false, startX, startY, startLeft, startTop;
+  stage.addEventListener('mousedown', e => {
+    if(e.target.closest('.node-card')) return;
+    dragging = true;
+    stage.classList.add('dragging');
+    startX = e.clientX; startY = e.clientY;
+    startLeft = stage.scrollLeft; startTop = stage.scrollTop;
+  });
+  window.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    stage.scrollLeft = startLeft - (e.clientX - startX);
+    stage.scrollTop = startTop - (e.clientY - startY);
+  });
+  window.addEventListener('mouseup', () => { dragging = false; stage.classList.remove('dragging'); });
+
+  /* ============ AVVIO ============ */
+  loadData();
+})();
+</script>
+</body>
+</html>
