@@ -19,9 +19,9 @@
     --accent-2: #4a5d3a;
     --line: #b8a37e;
     --gold: #9c7a34;
-    --card-w: 176px;
-    --card-h: 84px;
-    --gen-h: 190px;
+    --card-w: 240px;
+    --card-h: 152px;
+    --gen-h: 230px;
   }
   *{box-sizing:border-box;}
   html,body{height:100%;}
@@ -174,8 +174,25 @@
   .node-card .name{
     font-family:'Fraunces', serif;
     font-weight:600;
-    font-size:14px;
+    font-size:16px;
+    text-anchor:middle;
     fill:var(--ink);
+  }
+  .node-card .rule{
+    stroke:var(--ink-soft);
+    stroke-width:1;
+  }
+  .node-card .date{
+    font-family:'Newsreader', serif;
+    font-size:12.5px;
+    fill:var(--ink);
+  }
+  .node-card .date.death{ text-anchor:end; }
+  .node-card .note-text{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:11px;
+    fill:var(--ink-soft);
   }
   .node-card .meta{
     font-family:'Courier Prime', monospace;
@@ -446,7 +463,41 @@
   }
 
   /* ============ LAYOUT DELL'ALBERO ============ */
-  const CARD_W = 176, CARD_H = 84, GEN_H = 190, GAP_X = 26, MARGIN = 60;
+  const CARD_W = 240, CARD_H = 152, GEN_H = 230, GAP_X = 34, MARGIN = 60;
+
+  function wrapText(str, maxChars, maxLines){
+    if(!str) return [];
+    const words = str.trim().split(/\s+/);
+    const lines = [];
+    let cur = '';
+    for(const w of words){
+      const candidate = cur ? cur + ' ' + w : w;
+      if(candidate.length > maxChars){
+        if(cur) lines.push(cur);
+        cur = w;
+        if(lines.length >= maxLines) break;
+      } else {
+        cur = candidate;
+      }
+    }
+    if(cur && lines.length < maxLines) lines.push(cur);
+    if(lines.length === maxLines){
+      const last = lines[maxLines-1];
+      const usedWords = lines.join(' ').split(/\s+/).length;
+      if(usedWords < words.length || last.length < str.length){
+        // verifica se il testo originale è stato troncato rispetto alle parole totali
+      }
+    }
+    // tronca con ellissi se il testo intero non ci sta
+    const joinedLen = lines.join(' ').length;
+    if(joinedLen < str.trim().length){
+      let lastLine = lines[lines.length-1] || '';
+      lastLine = lastLine.replace(/[.,;:]*$/, '');
+      if(lastLine.length > maxChars - 1) lastLine = lastLine.slice(0, maxChars-1);
+      lines[lines.length-1] = lastLine + '…';
+    }
+    return lines;
+  }
 
   function computeLevels(persons){
     const level = new Map();
@@ -655,18 +706,38 @@
       g.appendChild(sel('rect', { class:'bg', x:0, y:0, width:CARD_W, height:CARD_H, rx:3 }));
       g.appendChild(sel('rect', { class:'bar', x:0, y:0, width:5, height:CARD_H }));
 
-      const name = sel('text', { x:14, y:24, class:'name' });
+      const cx = CARD_W/2;
+
+      // Nome (titolo centrato)
+      const name = sel('text', { x:cx, y:26, class:'name' });
       const label = personLabel(p);
-      name.textContent = label.length > 20 ? label.slice(0,19)+'…' : label;
+      name.textContent = label.length > 28 ? label.slice(0,27)+'…' : label;
       g.appendChild(name);
 
-      const meta1 = sel('text', { x:14, y:44, class:'meta' });
-      meta1.textContent = [p.dataNascita, p.dataMorte ? '– ' + p.dataMorte : ''].filter(Boolean).join(' ');
-      g.appendChild(meta1);
+      // Riga divisoria sotto il nome
+      g.appendChild(sel('line', { x1:16, y1:38, x2:CARD_W-16, y2:38, class:'rule' }));
 
-      const meta2 = sel('text', { x:14, y:60, class:'meta' });
-      meta2.textContent = (p.luogoNascita || '').slice(0,26);
-      g.appendChild(meta2);
+      // Data di nascita (sinistra) e di morte (destra), con simbolo ✝
+      const nascitaTxt = p.dataNascita ? 'n. ' + p.dataNascita : '';
+      const morteTxt = p.dataMorte ? '✝ ' + p.dataMorte : '';
+      if(nascitaTxt){
+        const dNasc = sel('text', { x:16, y:58, class:'date birth' });
+        dNasc.textContent = nascitaTxt;
+        g.appendChild(dNasc);
+      }
+      if(morteTxt){
+        const dMorte = sel('text', { x:CARD_W-16, y:58, class:'date death' });
+        dMorte.textContent = morteTxt;
+        g.appendChild(dMorte);
+      }
+
+      // Nota (matrimonio/luogo/altro), su più righe con troncamento
+      const noteLines = wrapText(p.note || '', 30, 4);
+      noteLines.forEach((line, i) => {
+        const t = sel('text', { x:16, y: 80 + i*16, class:'note-text' });
+        t.textContent = line;
+        g.appendChild(t);
+      });
 
       g.addEventListener('click', () => openDetail(p.id));
       svg.appendChild(g);
