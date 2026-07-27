@@ -37,8 +37,26 @@
   .rule{display:flex; align-items:center; justify-content:center; gap:14px; width:min(360px,80%); margin:0 auto;}
   .rule .line{flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--frame-soft),transparent);}
   .rule .diamond{width:7px; height:7px; background:var(--frame); transform:rotate(45deg);}
-  #toolbar{flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:10px;
-    padding:10px 12px; background:rgba(242,232,213,.94); border-bottom:1px solid var(--line);}
+  .field{display:inline-flex; align-items:center; gap:10px; height:68px; box-sizing:border-box; background:#ffffff; border:1.5px solid var(--frame); border-radius:4px; padding:0 20px;}
+  #search{font-family:'Newsreader',serif; font-style:italic; font-size:20px; border:none; background:transparent; color:var(--frame); outline:none; width:200px;}
+  #search::placeholder{color:var(--frame-soft); opacity:.7;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; height:68px; box-sizing:border-box;
+    font-family:'Courier Prime',monospace; font-size:17px; letter-spacing:.06em; text-transform:uppercase;
+    background:#ffffff; border:1.5px solid var(--frame); color:var(--frame); border-radius:4px; padding:0 26px; cursor:pointer; transition:.15s ease;}
+  .btn:hover{background:var(--paper-2); color:var(--frame-dark); border-color:var(--frame-dark);}
+  .btn.accent{background:#ffffff; border-color:var(--frame); color:var(--frame);}
+  .btn.accent:hover{background:var(--paper-2); border-color:var(--frame-dark); color:var(--frame-dark);}
+  .zoomgroup{display:flex; gap:6px;}
+  .zoomgroup .btn{padding:0 20px;}
+  #btn-zoom-level{min-width:96px;}
+  #btn-fullscreen-float{padding:0 20px;}
+  #status-line{font-family:'Courier Prime',monospace; font-size:12px; color:var(--frame-soft); text-align:center; position:relative; z-index:2;}
+  #status-line:empty{display:none;}
+  #status-line.error{color:#a13d2b;}
+  footer a{color:var(--frame);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #toolbar{flex:none; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px;
+    padding:12px; background:rgba(242,232,213,.94); border-bottom:1px solid var(--line);}
   #toolbar.focus-mode > *:not(#btn-reset-view){opacity:.3; pointer-events:none; filter:grayscale(.5);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-block;}
@@ -83,7 +101,7 @@
   .detail-row .k{color:var(--frame-soft); font-family:'Courier Prime',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
   .detail-row .v{text-align:right; max-width:200px;}
   #detail-panel .actions{margin-top:22px; display:flex; flex-direction:column; gap:8px;}
-  #detail-panel .actions .btn{width:100%; text-align:center;}
+  #detail-panel .actions .btn{width:100%; height:60px; font-size:15px; padding:0 14px; text-align:center;}
   #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
   footer{position:relative; z-index:2; text-align:center; font-family:'Courier Prime',monospace; font-size:10.5px; color:var(--frame-soft); padding:0 20px 40px; letter-spacing:.04em;}
@@ -101,9 +119,10 @@
     #search{width:120px;}
     #detail-panel{width:88%; right:-100%;}
     #stage{height:82vh; margin:0 0 32px;}
-    #toolbar{gap:6px; padding:7px 8px;}
-    #toolbar .btn{padding:7px 9px; font-size:10.5px;}
-    #toolbar .field{padding:6px 10px;}
+    #toolbar{gap:8px; padding:9px 8px;}
+    #toolbar .btn{padding:0 16px; font-size:15px; height:58px;}
+    #toolbar .field{padding:0 14px; height:58px;}
+    #search{width:130px; font-size:17px;}
   }
 </style>
 </head>
@@ -121,7 +140,7 @@
 <div id="stage">
   <div id="toolbar">
     <div class="field">
-      <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--frame-soft);">Cerca</span>
+      <span style="font-family:'Courier Prime',monospace;font-size:14px;color:var(--frame-soft);">Cerca</span>
       <input id="search" type="text" placeholder="nome…">
     </div>
     <button class="btn" id="btn-fit">Adatta</button>
@@ -249,8 +268,7 @@
         ALL_PERSONS = persons;
         personsById = new Map(persons.map(p => [p.id, p]));
         loading.style.display = 'none';
-        const now = new Date();
-        setStatus('Ultimo aggiornamento: ' + now.toLocaleDateString('it-IT') + ', ' + now.toLocaleTimeString('it-IT'));
+        setStatus('');
         render(true);
       })
       .catch(err => {
