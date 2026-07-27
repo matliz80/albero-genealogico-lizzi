@@ -36,7 +36,13 @@
   .rule{display:flex; align-items:center; justify-content:center; gap:14px; width:min(360px,80%); margin:0 auto;}
   .rule .line{flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent);}
   .rule .diamond{width:7px; height:7px; background:var(--accent); transform:rotate(45deg);}
-  #controls{position:relative; z-index:2; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; padding:16px 20px; margin:0 16px 4px;}
+  #toolbar{position:absolute; top:12px; left:12px; z-index:6; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    max-width:calc(100% - 130px); background:rgba(242,232,213,.94); border:1px solid var(--line); border-radius:5px; padding:8px 10px;
+    box-shadow:0 6px 18px -12px rgba(43,33,24,.6);}
+  #toolbar.focus-mode > *:not(#btn-reset-view){opacity:.3; pointer-events:none; filter:grayscale(.5);}
+  #btn-reset-view{display:none;}
+  #toolbar.focus-mode #btn-reset-view{display:inline-block;}
+  #corner{position:absolute; top:12px; right:12px; z-index:6; display:flex; align-items:center; gap:8px;}
   .field{display:flex; align-items:center; gap:8px; background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:8px 14px;}
   #search{font-family:'Newsreader',serif; font-style:italic; font-size:15px; border:none; background:transparent; color:var(--ink); outline:none; width:190px;}
   #search::placeholder{color:var(--ink-faint);}
@@ -53,16 +59,16 @@
     border:1px solid var(--line); border-radius:4px;
     background:var(--paper);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.3), 0 18px 40px -20px rgba(43,33,24,.35);
-    overflow:auto; height:72vh; min-height:420px; cursor:grab;
-    touch-action:none; -webkit-overflow-scrolling:touch;
+    overflow:hidden; height:74vh; min-height:440px;
   }
-  #stage.dragging{cursor:grabbing;}
-  #stage svg{display:block; touch-action:none;}
+  #viewport{position:absolute; inset:0; overflow:auto; cursor:grab; touch-action:none; -webkit-overflow-scrolling:touch;}
+  #viewport.dragging{cursor:grabbing;}
+  #viewport svg{display:block; touch-action:none;}
   #stage:fullscreen{margin:0; border-radius:0; height:100vh; background:var(--paper);}
   #stage:-webkit-full-screen{margin:0; border-radius:0; height:100vh; background:var(--paper);}
-  #btn-fullscreen-float{position:absolute; top:12px; right:12px; z-index:5; width:38px; height:38px; padding:0; font-size:17px; line-height:1; display:flex; align-items:center; justify-content:center; opacity:.9;}
-  #zoom-badge{position:absolute; bottom:12px; right:12px; z-index:5; font-family:'Courier Prime',monospace; font-size:10px; color:var(--ink-faint); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:4px 8px; pointer-events:none;}
-  .link{fill:none; stroke:#9a8663; stroke-width:2.2; stroke-linecap:round;}
+  #btn-fullscreen-float{width:38px; height:38px; padding:0; font-size:17px; line-height:1; display:flex; align-items:center; justify-content:center; background:rgba(242,232,213,.94);}
+  #zoom-badge{font-family:'Courier Prime',monospace; font-size:11px; color:var(--ink-soft); background:rgba(242,232,213,.94); border:1px solid var(--line); border-radius:3px; padding:9px 10px; pointer-events:none; line-height:1;}
+  .link{fill:none; stroke:#603813; stroke-width:3.3; stroke-linecap:round; stroke-linejoin:round;}
   .link.faded{opacity:.18;}
   .card-bg{fill:#fffff3;}
   .card-frame{fill:none; stroke:#603813; stroke-linecap:round; stroke-linejoin:round;}
@@ -96,15 +102,18 @@
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation:spin .9s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   @media print{
-    header,#controls,#status-line,footer,#detail-panel,#overlay,#btn-fullscreen-float,#zoom-badge{display:none !important;}
+    header,#toolbar,#corner,#status-line,footer,#detail-panel,#overlay,#btn-fullscreen-float,#zoom-badge{display:none !important;}
     body{background:#fff;} body::before{display:none;}
     #stage{border:none; box-shadow:none; height:auto; overflow:visible; margin:0; background:none;}
+    #viewport{position:static; overflow:visible;}
     #stage svg{width:100% !important; height:auto !important;}
   }
   @media (max-width:640px){
     #search{width:120px;}
     #detail-panel{width:88%; right:-100%;}
-    #stage{height:76vh; margin:0 8px 40px;}
+    #stage{height:78vh; margin:0 8px 40px;}
+    #toolbar{max-width:calc(100% - 120px); gap:6px; padding:6px 8px;}
+    #toolbar .btn{padding:7px 9px; font-size:10.5px;}
   }
 </style>
 </head>
@@ -117,29 +126,30 @@
   <div class="rule"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
 </header>
 
-<div id="controls">
-  <div class="field">
-    <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink-faint);">Cerca</span>
-    <input id="search" type="text" placeholder="nome…">
-  </div>
-  <button class="btn" id="btn-fit">Adatta allo schermo</button>
-  <div class="zoomgroup">
-    <button class="btn" id="btn-zoom-out">−</button>
-    <button class="btn" id="btn-zoom-100">100%</button>
-    <button class="btn" id="btn-zoom-in">+</button>
-  </div>
-  <button class="btn" id="btn-reset-view">Vista completa</button>
-  <button class="btn" id="btn-refresh">Aggiorna dati</button>
-  <button class="btn" id="btn-fullscreen">⛶ Schermo intero</button>
-  <button class="btn accent" id="btn-export">Esporta PDF</button>
-</div>
 <div id="status-line">Caricamento…</div>
 
 <div id="stage">
+  <div id="viewport"><svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg></div>
   <div id="loading"><div class="spinner"></div><div>Lettura del foglio Google in corso…</div></div>
-  <svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg>
-  <button class="btn" id="btn-fullscreen-float" title="Schermo intero">⛶</button>
-  <div id="zoom-badge">100%</div>
+  <div id="toolbar">
+    <div class="field">
+      <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink-faint);">Cerca</span>
+      <input id="search" type="text" placeholder="nome…">
+    </div>
+    <button class="btn" id="btn-fit">Adatta</button>
+    <div class="zoomgroup">
+      <button class="btn" id="btn-zoom-out">−</button>
+      <button class="btn" id="btn-zoom-100">100%</button>
+      <button class="btn" id="btn-zoom-in">+</button>
+    </div>
+    <button class="btn" id="btn-refresh">Aggiorna dati</button>
+    <button class="btn" id="btn-export">Esporta PDF</button>
+    <button class="btn accent" id="btn-reset-view">↩ Vista completa</button>
+  </div>
+  <div id="corner">
+    <div id="zoom-badge">100%</div>
+    <button class="btn" id="btn-fullscreen-float" title="Schermo intero">⛶</button>
+  </div>
 </div>
 
 <footer>Dati dal Google Sheet collegato · disposizione fedele al disegno originale · pizzica con due dita per ingrandire</footer>
@@ -239,7 +249,7 @@
   let ALL_PERSONS = [], personsById = new Map();
   let zoom = 1, fitZoom = 1, focusId = null, layout = null;
   const el = id => document.getElementById(id);
-  const statusLine = el('status-line'), stage = el('stage'), svg = el('tree'), loading = el('loading');
+  const statusLine = el('status-line'), stage = el('stage'), vp = el('viewport'), svg = el('tree'), loading = el('loading');
   function setStatus(msg, isErr){ statusLine.textContent = msg; statusLine.classList.toggle('error', !!isErr); }
 
   /* ============ CARICAMENTO ============ */
@@ -463,7 +473,8 @@
       svg.appendChild(g);
     });
 
-    fitZoom = Math.max(0.02, (stage.clientWidth - 24) / layout.width);
+    updateFocusUI();
+    fitZoom = Math.max(0.02, (vp.clientWidth - 24) / layout.width);
     if(resetZoom) zoom = fitZoom;
     applyZoom();
     applySearchFilter();
@@ -477,13 +488,13 @@
   }
   function zoomAt(newZoom, cxPx, cyPx){
     newZoom = Math.max(fitZoom*0.9, Math.min(6, newZoom));
-    const contentX = (stage.scrollLeft + cxPx) / zoom;
-    const contentY = (stage.scrollTop  + cyPx) / zoom;
+    const contentX = (vp.scrollLeft + cxPx) / zoom;
+    const contentY = (vp.scrollTop  + cyPx) / zoom;
     zoom = newZoom; applyZoom();
-    stage.scrollLeft = contentX * zoom - cxPx;
-    stage.scrollTop  = contentY * zoom - cyPx;
+    vp.scrollLeft = contentX * zoom - cxPx;
+    vp.scrollTop  = contentY * zoom - cyPx;
   }
-  function zoomCenter(z){ zoomAt(z, stage.clientWidth/2, stage.clientHeight/2); }
+  function zoomCenter(z){ zoomAt(z, vp.clientWidth/2, vp.clientHeight/2); }
 
   /* ============ RICERCA ============ */
   function applySearchFilter(){
@@ -501,8 +512,8 @@
       const pos = layout.positions.get(first.dataset.id);
       if(pos){
         if(zoom < 0.45) { zoom = 0.6; applyZoom(); }
-        stage.scrollLeft = (pos.x + pos.w/2)*zoom - stage.clientWidth/2;
-        stage.scrollTop  = (pos.y + pos.h/2)*zoom - stage.clientHeight/2;
+        vp.scrollLeft = (pos.x + pos.w/2)*zoom - vp.clientWidth/2;
+        vp.scrollTop  = (pos.y + pos.h/2)*zoom - vp.clientHeight/2;
       }
     }
   }
@@ -540,8 +551,9 @@
   el('overlay').addEventListener('click', closeDetail);
 
   /* ============ CONTROLLI ============ */
+  function updateFocusUI(){ el('toolbar').classList.toggle('focus-mode', !!focusId); }
   el('btn-reset-view').addEventListener('click', () => { focusId = null; el('search').value=''; render(true); });
-  el('btn-fit').addEventListener('click', () => { zoom = fitZoom; applyZoom(); stage.scrollLeft = 0; stage.scrollTop = 0; });
+  el('btn-fit').addEventListener('click', () => { zoom = fitZoom; applyZoom(); vp.scrollLeft = 0; vp.scrollTop = 0; });
   el('btn-zoom-in').addEventListener('click', () => zoomCenter(zoom * 1.3));
   el('btn-zoom-out').addEventListener('click', () => zoomCenter(zoom / 1.3));
   el('btn-zoom-100').addEventListener('click', () => zoomCenter(1));
@@ -550,23 +562,23 @@
 
   // pan col mouse
   let dragging = false, sx, sy, sl, st;
-  stage.addEventListener('mousedown', e => {
+  vp.addEventListener('mousedown', e => {
     if(e.target.closest('.node-card')) return;
-    dragging = true; stage.classList.add('dragging');
-    sx = e.clientX; sy = e.clientY; sl = stage.scrollLeft; st = stage.scrollTop;
+    dragging = true; vp.classList.add('dragging');
+    sx = e.clientX; sy = e.clientY; sl = vp.scrollLeft; st = vp.scrollTop;
   });
   window.addEventListener('mousemove', e => {
     if(!dragging) return;
-    stage.scrollLeft = sl - (e.clientX - sx);
-    stage.scrollTop  = st - (e.clientY - sy);
+    vp.scrollLeft = sl - (e.clientX - sx);
+    vp.scrollTop  = st - (e.clientY - sy);
   });
-  window.addEventListener('mouseup', () => { dragging = false; stage.classList.remove('dragging'); });
+  window.addEventListener('mouseup', () => { dragging = false; vp.classList.remove('dragging'); });
 
   // rotellina / trackpad: ctrl+wheel = zoom
-  stage.addEventListener('wheel', e => {
+  vp.addEventListener('wheel', e => {
     if(!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
-    const r = stage.getBoundingClientRect();
+    const r = vp.getBoundingClientRect();
     zoomAt(zoom * (e.deltaY < 0 ? 1.12 : 1/1.12), e.clientX - r.left, e.clientY - r.top);
   }, { passive:false });
 
@@ -581,13 +593,12 @@
       if(exit) exit.call(document);
     }
   }
-  el('btn-fullscreen').addEventListener('click', toggleFullscreen);
   el('btn-fullscreen-float').addEventListener('click', toggleFullscreen);
   function updateFs(){
     const isFs = document.fullscreenElement || document.webkitFullscreenElement;
-    el('btn-fullscreen').textContent = isFs ? '⤓ Esci da schermo intero' : '⛶ Schermo intero';
     el('btn-fullscreen-float').textContent = isFs ? '⤓' : '⛶';
-    setTimeout(() => { fitZoom = Math.max(0.02, (stage.clientWidth - 24) / (layout ? layout.width : 1)); }, 120);
+    el('btn-fullscreen-float').title = isFs ? 'Esci da schermo intero' : 'Schermo intero';
+    setTimeout(() => { fitZoom = Math.max(0.02, (vp.clientWidth - 24) / (layout ? layout.width : 1)); }, 120);
   }
   document.addEventListener('fullscreenchange', updateFs);
   document.addEventListener('webkitfullscreenchange', updateFs);
@@ -595,42 +606,43 @@
   /* ============ TOUCH: pan a un dito, pinch-zoom a due dita ============ */
   let mode = null, tsx, tsy, tsl, tst, pd0 = 0, pz0 = 1, pcx = 0, pcy = 0;
   const dist = (a,b) => Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-  stage.addEventListener('touchstart', e => {
+  vp.addEventListener('touchstart', e => {
     if(e.touches.length === 1){
       mode = 'pan';
       tsx = e.touches[0].clientX; tsy = e.touches[0].clientY;
-      tsl = stage.scrollLeft; tst = stage.scrollTop;
+      tsl = vp.scrollLeft; tst = vp.scrollTop;
     } else if(e.touches.length === 2){
       mode = 'pinch';
       pd0 = dist(e.touches[0], e.touches[1]) || 1;
       pz0 = zoom;
-      const r = stage.getBoundingClientRect();
+      const r = vp.getBoundingClientRect();
       const mx = (e.touches[0].clientX + e.touches[1].clientX)/2 - r.left;
       const my = (e.touches[0].clientY + e.touches[1].clientY)/2 - r.top;
-      pcx = (stage.scrollLeft + mx)/zoom; pcy = (stage.scrollTop + my)/zoom;
+      pcx = (vp.scrollLeft + mx)/zoom; pcy = (vp.scrollTop + my)/zoom;
     }
   }, { passive:true });
-  stage.addEventListener('touchmove', e => {
+  vp.addEventListener('touchmove', e => {
     if(mode === 'pan' && e.touches.length === 1){
       e.preventDefault();
-      stage.scrollLeft = tsl - (e.touches[0].clientX - tsx);
-      stage.scrollTop  = tst - (e.touches[0].clientY - tsy);
+      vp.scrollLeft = tsl - (e.touches[0].clientX - tsx);
+      vp.scrollTop  = tst - (e.touches[0].clientY - tsy);
     } else if(mode === 'pinch' && e.touches.length === 2){
       e.preventDefault();
       zoom = Math.max(fitZoom*0.9, Math.min(6, pz0 * (dist(e.touches[0], e.touches[1]) / pd0)));
       applyZoom();
-      const r = stage.getBoundingClientRect();
+      const r = vp.getBoundingClientRect();
       const mx = (e.touches[0].clientX + e.touches[1].clientX)/2 - r.left;
       const my = (e.touches[0].clientY + e.touches[1].clientY)/2 - r.top;
-      stage.scrollLeft = pcx*zoom - mx;
-      stage.scrollTop  = pcy*zoom - my;
+      vp.scrollLeft = pcx*zoom - mx;
+      vp.scrollTop  = pcy*zoom - my;
     }
   }, { passive:false });
-  stage.addEventListener('touchend', e => { mode = e.touches.length === 1 ? 'pan' : null; }, { passive:true });
+  vp.addEventListener('touchend', e => { mode = e.touches.length === 1 ? 'pan' : null; }, { passive:true });
 
+  if(window.ResizeObserver){ new ResizeObserver(() => { if(layout) fitZoom = Math.max(0.02, (vp.clientWidth - 24) / layout.width); }).observe(vp); }
   window.addEventListener('resize', () => {
     if(!layout) return;
-    fitZoom = Math.max(0.02, (stage.clientWidth - 24) / layout.width);
+    fitZoom = Math.max(0.02, (vp.clientWidth - 24) / layout.width);
   });
 
   loadData();
