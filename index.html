@@ -12,6 +12,7 @@
     --paper:#f2e8d5; --paper-2:#e9dcbf; --paper-3:#ded0ac;
     --ink:#2b2118; --ink-soft:#5c4d3a; --ink-faint:#8a7a5f;
     --accent:#a13d2b; --accent-2:#4a5d3a; --line:#b8a37e; --gold:#9c7a34;
+    --frame:#603813; --frame-soft:#8a5f34; --frame-dark:#472a0e;
   }
   *{box-sizing:border-box;}
   html,body{height:100%;}
@@ -36,13 +37,15 @@
   .rule{display:flex; align-items:center; justify-content:center; gap:14px; width:min(360px,80%); margin:0 auto;}
   .rule .line{flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent);}
   .rule .diamond{width:7px; height:7px; background:var(--accent); transform:rotate(45deg);}
-  #toolbar{flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-    padding:9px 11px; background:var(--paper-2); border-bottom:1px solid var(--line);}
+  #toolbar{flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    padding:10px 12px; background:rgba(242,232,213,.94); border-bottom:1px solid var(--line);}
   #toolbar.focus-mode > *:not(#btn-reset-view){opacity:.3; pointer-events:none; filter:grayscale(.5);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-block;}
-  #btn-zoom-level{min-width:58px; text-align:center;}
-  #btn-fullscreen-float{width:36px; padding:9px 0; font-size:15px; line-height:1;}
+  #stage:fullscreen{margin:0; border:none; border-radius:0; width:100vw; height:100vh; background:var(--paper);}
+  #stage:-webkit-full-screen{margin:0; border:none; border-radius:0; width:100vw; height:100vh; background:var(--paper);}
+  #stage::backdrop{background:var(--paper);}
+  #stage:-webkit-full-screen::backdrop{background:var(--paper);}
   .link{fill:none; stroke:#603813; stroke-width:3.3; stroke-linecap:round; stroke-linejoin:round;}
   .link.faded{opacity:.18;}
   .card-bg{fill:#fffff3;}
@@ -86,7 +89,7 @@
   @media (max-width:640px){
     #search{width:120px;}
     #detail-panel{width:88%; right:-100%;}
-    #stage{height:80vh; margin:0 8px 40px;}
+    #stage{height:82vh; margin:0 0 32px;}
     #toolbar{gap:6px; padding:7px 8px;}
     #toolbar .btn{padding:7px 9px; font-size:10.5px;}
     #toolbar .field{padding:6px 10px;}
@@ -107,7 +110,7 @@
 <div id="stage">
   <div id="toolbar">
     <div class="field">
-      <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink-faint);">Cerca</span>
+      <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--frame-soft);">Cerca</span>
       <input id="search" type="text" placeholder="nome…">
     </div>
     <button class="btn" id="btn-fit">Adatta</button>
@@ -235,8 +238,8 @@
         ALL_PERSONS = persons;
         personsById = new Map(persons.map(p => [p.id, p]));
         loading.style.display = 'none';
-        const conGeo = persons.filter(p => GEO.boxes[p.id]).length;
-        setStatus(`${persons.length} persone · ${conGeo} posizionate come nel disegno originale · aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`);
+        const now = new Date();
+        setStatus('Ultimo aggiornamento: ' + now.toLocaleDateString('it-IT') + ', ' + now.toLocaleTimeString('it-IT'));
         render(true);
       })
       .catch(err => {
