@@ -279,25 +279,60 @@
 
   /* ============ LAYOUT ============ */
   const BW = GEO.bw, BH = GEO.bh;   // dimensioni casella come nel disegno
+  const ROW_STEP = BH + 105, COL_STEP = BW + 103;   // passo fra generazioni e fra fratelli, come nel disegno
+
   function buildLayout(persons){
     if(!persons.length) return null;
     const positions = new Map();
-    const extra = [];
+    let pending = [];
     persons.forEach(p => {
       const g = GEO.boxes[p.id];
       if(g) positions.set(p.id, { x:g[0], y:g[1], w:g[2], h:g[3], fixed:true });
-      else extra.push(p);
+      else pending.push(p);
     });
-    // persone aggiunte al foglio senza posizione nel disegno: righe in fondo
-    let width = GEO.w, height = GEO.h;
-    if(extra.length){
-      const perRow = Math.max(1, Math.floor((GEO.w - 80) / (BW + 30)));
-      extra.forEach((p, i) => {
-        const r = Math.floor(i / perRow), c = i % perRow;
-        positions.set(p.id, { x: 40 + c*(BW+30), y: GEO.h + 80 + r*(BH+60), w:BW, h:BH, fixed:false });
-      });
-      height = GEO.h + 80 + (Math.floor((extra.length-1)/perRow)+1)*(BH+60);
+    const extra = pending.slice();
+
+    // Le persone aggiunte al foglio non hanno una casella nel disegno originale:
+    // le sistemiamo sotto al genitore, nella riga della loro generazione.
+    function libero(x, y){
+      for(const q of positions.values()){
+        if(Math.abs(q.y - y) < BH && x < q.x + q.w + 20 && x + BW + 20 > q.x) return false;
+      }
+      return true;
     }
+    for(let pass = 0; pass < 12 && pending.length; pass++){
+      const gruppi = new Map(), resta = [];
+      pending.forEach(p => {
+        const pid = (p.idPadre && positions.has(p.idPadre)) ? p.idPadre
+                  : (p.idMadre && positions.has(p.idMadre)) ? p.idMadre : null;
+        if(pid){ if(!gruppi.has(pid)) gruppi.set(pid, []); gruppi.get(pid).push(p); }
+        else resta.push(p);
+      });
+      if(!gruppi.size) break;
+      gruppi.forEach((figli, pid) => {
+        const par = positions.get(pid);
+        const y = par.y + ROW_STEP;
+        const largh = figli.length*BW + (figli.length-1)*(COL_STEP-BW);
+        let x = par.x + par.w/2 - largh/2;
+        let scarto = 0;
+        while(scarto < 60 && !figli.every((f,i) => libero(x + scarto*COL_STEP + i*COL_STEP, y))) scarto++;
+        x += scarto*COL_STEP;
+        figli.forEach((f, i) => positions.set(f.id, { x: x + i*COL_STEP, y:y, w:BW, h:BH, fixed:false }));
+      });
+      pending = resta;
+    }
+    // eventuali persone senza genitore riconoscibile: in fondo all'albero
+    if(pending.length){
+      const perRiga = Math.max(1, Math.floor((GEO.w - 80) / COL_STEP));
+      pending.forEach((p, i) => {
+        positions.set(p.id, { x: 40 + (i % perRiga)*COL_STEP, y: GEO.h + 120 + Math.floor(i/perRiga)*ROW_STEP, w:BW, h:BH, fixed:false });
+      });
+    }
+    let width = GEO.w, height = GEO.h;
+    positions.forEach(q => {
+      if(q.x + q.w + 60 > width)  width  = q.x + q.w + 60;
+      if(q.y + q.h + 60 > height) height = q.y + q.h + 60;
+    });
     return { width, height, positions, extra };
   }
 
