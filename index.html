@@ -36,38 +36,13 @@
   .rule{display:flex; align-items:center; justify-content:center; gap:14px; width:min(360px,80%); margin:0 auto;}
   .rule .line{flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent);}
   .rule .diamond{width:7px; height:7px; background:var(--accent); transform:rotate(45deg);}
-  #toolbar{position:absolute; top:12px; left:12px; z-index:6; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-    max-width:calc(100% - 130px); background:rgba(242,232,213,.94); border:1px solid var(--line); border-radius:5px; padding:8px 10px;
-    box-shadow:0 6px 18px -12px rgba(43,33,24,.6);}
+  #toolbar{flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    padding:9px 11px; background:var(--paper-2); border-bottom:1px solid var(--line);}
   #toolbar.focus-mode > *:not(#btn-reset-view){opacity:.3; pointer-events:none; filter:grayscale(.5);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-block;}
-  #corner{position:absolute; top:12px; right:12px; z-index:6; display:flex; align-items:center; gap:8px;}
-  .field{display:flex; align-items:center; gap:8px; background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:8px 14px;}
-  #search{font-family:'Newsreader',serif; font-style:italic; font-size:15px; border:none; background:transparent; color:var(--ink); outline:none; width:190px;}
-  #search::placeholder{color:var(--ink-faint);}
-  .btn{font-family:'Courier Prime',monospace; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-soft); border-radius:3px; padding:9px 14px; cursor:pointer; transition:.15s ease;}
-  .btn:hover{background:var(--paper-3); color:var(--ink);}
-  .btn.accent{background:var(--accent); border-color:var(--accent); color:var(--paper);}
-  .btn.accent:hover{background:#8a3323;}
-  .zoomgroup{display:flex; gap:2px;}
-  .zoomgroup .btn{padding:9px 12px;}
-  #status-line{font-family:'Courier Prime',monospace; font-size:10.5px; color:var(--ink-faint); text-align:center; padding-bottom:6px; position:relative; z-index:2;}
-  #status-line.error{color:var(--accent);}
-  #stage{
-    position:relative; z-index:2; margin:0 16px 50px;
-    border:1px solid var(--line); border-radius:4px;
-    background:var(--paper);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.3), 0 18px 40px -20px rgba(43,33,24,.35);
-    overflow:hidden; height:74vh; min-height:440px;
-  }
-  #viewport{position:absolute; inset:0; overflow:auto; cursor:grab; touch-action:none; -webkit-overflow-scrolling:touch;}
-  #viewport.dragging{cursor:grabbing;}
-  #viewport svg{display:block; touch-action:none;}
-  #stage:fullscreen{margin:0; border-radius:0; height:100vh; background:var(--paper);}
-  #stage:-webkit-full-screen{margin:0; border-radius:0; height:100vh; background:var(--paper);}
-  #btn-fullscreen-float{width:38px; height:38px; padding:0; font-size:17px; line-height:1; display:flex; align-items:center; justify-content:center; background:rgba(242,232,213,.94);}
-  #zoom-badge{font-family:'Courier Prime',monospace; font-size:11px; color:var(--ink-soft); background:rgba(242,232,213,.94); border:1px solid var(--line); border-radius:3px; padding:9px 10px; pointer-events:none; line-height:1;}
+  #btn-zoom-level{min-width:58px; text-align:center;}
+  #btn-fullscreen-float{width:36px; padding:9px 0; font-size:15px; line-height:1;}
   .link{fill:none; stroke:#603813; stroke-width:3.3; stroke-linecap:round; stroke-linejoin:round;}
   .link.faded{opacity:.18;}
   .card-bg{fill:#fffff3;}
@@ -85,7 +60,7 @@
   .node-card.match .card-frame{stroke:var(--accent);}
   .node-card.focused .card-bg{fill:#f6e2ba;}
   .node-card.focused .card-frame{stroke:var(--accent);}
-  #detail-panel{position:fixed; top:0; right:-380px; width:350px; height:100%; background:var(--paper); border-left:1px solid var(--line); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); z-index:10; padding:34px 26px; transition:right .28s ease; overflow-y:auto;}
+  #detail-panel{position:absolute; top:0; right:-380px; width:350px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--line); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:34px 26px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open{right:0;}
   #detail-panel .close{position:absolute; top:18px; right:20px; font-family:'Courier Prime',monospace; background:none; border:none; color:var(--ink-faint); font-size:13px; cursor:pointer; letter-spacing:.1em;}
   #detail-panel h2{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:26px; margin:6px 0 4px;}
@@ -95,14 +70,14 @@
   .detail-row .v{text-align:right; max-width:200px;}
   #detail-panel .actions{margin-top:22px; display:flex; flex-direction:column; gap:8px;}
   #detail-panel .actions .btn{width:100%; text-align:center;}
-  #overlay{position:fixed; inset:0; background:rgba(43,33,24,.25); z-index:9; opacity:0; pointer-events:none; transition:.25s ease;}
+  #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
   footer{position:relative; z-index:2; text-align:center; font-family:'Courier Prime',monospace; font-size:10.5px; color:var(--ink-faint); padding:0 20px 40px; letter-spacing:.04em;}
   #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Courier Prime',monospace; font-size:12px; color:var(--ink-soft);}
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation:spin .9s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   @media print{
-    header,#toolbar,#corner,#status-line,footer,#detail-panel,#overlay,#btn-fullscreen-float,#zoom-badge{display:none !important;}
+    header,#toolbar,#status-line,footer,#detail-panel,#overlay,#btn-fullscreen-float,#zoom-badge{display:none !important;}
     body{background:#fff;} body::before{display:none;}
     #stage{border:none; box-shadow:none; height:auto; overflow:visible; margin:0; background:none;}
     #viewport{position:static; overflow:visible;}
@@ -111,9 +86,10 @@
   @media (max-width:640px){
     #search{width:120px;}
     #detail-panel{width:88%; right:-100%;}
-    #stage{height:78vh; margin:0 8px 40px;}
-    #toolbar{max-width:calc(100% - 120px); gap:6px; padding:6px 8px;}
+    #stage{height:80vh; margin:0 8px 40px;}
+    #toolbar{gap:6px; padding:7px 8px;}
     #toolbar .btn{padding:7px 9px; font-size:10.5px;}
+    #toolbar .field{padding:6px 10px;}
   }
 </style>
 </head>
@@ -129,8 +105,6 @@
 <div id="status-line">Caricamento…</div>
 
 <div id="stage">
-  <div id="viewport"><svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg></div>
-  <div id="loading"><div class="spinner"></div><div>Lettura del foglio Google in corso…</div></div>
   <div id="toolbar">
     <div class="field">
       <span style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink-faint);">Cerca</span>
@@ -138,33 +112,30 @@
     </div>
     <button class="btn" id="btn-fit">Adatta</button>
     <div class="zoomgroup">
-      <button class="btn" id="btn-zoom-out">−</button>
-      <button class="btn" id="btn-zoom-100">100%</button>
-      <button class="btn" id="btn-zoom-in">+</button>
+      <button class="btn" id="btn-zoom-out" title="Riduci">−</button>
+      <button class="btn" id="btn-zoom-level" title="Torna al 100%">100%</button>
+      <button class="btn" id="btn-zoom-in" title="Ingrandisci">+</button>
+      <button class="btn" id="btn-fullscreen-float" title="Schermo intero">⛶</button>
     </div>
-    <button class="btn" id="btn-refresh">Aggiorna dati</button>
     <button class="btn" id="btn-export">Esporta PDF</button>
     <button class="btn accent" id="btn-reset-view">↩ Vista completa</button>
   </div>
-  <div id="corner">
-    <div id="zoom-badge">100%</div>
-    <button class="btn" id="btn-fullscreen-float" title="Schermo intero">⛶</button>
+  <div id="viewport">
+    <svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="loading"><div class="spinner"></div><div>Lettura del foglio Google in corso…</div></div>
   </div>
+  <div id="overlay"></div>
+  <aside id="detail-panel">
+    <button class="close" id="detail-close">CHIUDI ✕</button>
+    <div class="tag" id="detail-id">—</div>
+    <h2 id="detail-name">—</h2>
+    <div id="detail-rows"></div>
+    <div class="actions">
+      <button class="btn accent" id="detail-focus">Metti a fuoco questo ramo</button>
+      <button class="btn" id="detail-export">Esporta PDF di questo ramo</button>
+    </div>
+  </aside>
 </div>
-
-<footer>Dati dal Google Sheet collegato · disposizione fedele al disegno originale · pizzica con due dita per ingrandire</footer>
-
-<div id="overlay"></div>
-<aside id="detail-panel">
-  <button class="close" id="detail-close">CHIUDI ✕</button>
-  <div class="tag" id="detail-id">—</div>
-  <h2 id="detail-name">—</h2>
-  <div id="detail-rows"></div>
-  <div class="actions">
-    <button class="btn accent" id="detail-focus">Metti a fuoco questo ramo</button>
-    <button class="btn" id="detail-export">Esporta PDF di questo ramo</button>
-  </div>
-</aside>
 
 <script>
 (function(){
@@ -354,6 +325,16 @@
     s = s.replace(/[+‡]\s*\.{2,}/g, ' ').replace(/\s*\.{3,}\s*/g, ' ').replace(/\s+/g,' ').trim();
     return { text:s, n:n, d:d };
   }
+
+  // date sempre nel formato gg.mm.aaaa (giorno e mese a due cifre, anno a quattro)
+  function fmtDate(v){
+    let t = (v == null ? '' : v).toString();
+    t = t.replace(/\b(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})\b/g,
+      (m,d,mo,y) => (d.length<2?'0':'')+d + '.' + (mo.length<2?'0':'')+mo + '.' + y);
+    t = t.replace(/^\s*(\d{1,2})\.(\d{4})\s*$/,
+      (m,mo,y) => (mo.length<2?'0':'')+mo + '.' + y);
+    return t;
+  }
   function drawCard(g, p, W, H){
     const s = W / 177.45;              // scala della cornice originale
     const px = v => +(v*s).toFixed(2);
@@ -407,11 +388,11 @@
     y += 25;
     if(p.dataNascita){
       const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18 });
-      t.textContent = 'n. ' + p.dataNascita; g.appendChild(t);
+      t.textContent = 'n. ' + fmtDate(p.dataNascita); g.appendChild(t);
     }
     if(p.dataMorte){
       const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18 });
-      t.textContent = '‡ ' + p.dataMorte; g.appendChild(t);
+      t.textContent = '‡ ' + fmtDate(p.dataMorte); g.appendChild(t);
     }
     y += 11;
     g.appendChild(sel('line', { class:'card-rule', 'stroke-width':px(.25), x1:padX, y1:y, x2:W-padX, y2:y }));
@@ -421,15 +402,15 @@
     const noteTop = y + 24;
     const limit = (hasSpouseDates ? H - 46 : H - 14);
     const maxLines = Math.max(0, Math.floor((limit - noteTop)/22) + 1);
-    const noteLines = wrap(nt.text, 36, maxLines);
+    const noteLines = wrap(fmtDate(nt.text), 36, maxLines);
     noteLines.forEach((ln, i) => {
       const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15 });
       t.textContent = ln; g.appendChild(t);
     });
     if(hasSpouseDates){
       const spouseY = Math.min(H - 16, noteTop + noteLines.length*22 + 4);
-      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16 }); t.textContent = 'n. ' + nt.n; g.appendChild(t); }
-      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16 }); t.textContent = '‡ ' + nt.d; g.appendChild(t); }
+      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
+      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
     }
   }
 
@@ -484,7 +465,7 @@
     if(!layout) return;
     svg.style.width  = (layout.width  * zoom) + 'px';
     svg.style.height = (layout.height * zoom) + 'px';
-    el('zoom-badge').textContent = Math.round(zoom*100) + '%';
+    el('btn-zoom-level').textContent = Math.round(zoom*100) + '%';
   }
   function zoomAt(newZoom, cxPx, cyPx){
     newZoom = Math.max(fitZoom*0.9, Math.min(6, newZoom));
@@ -530,7 +511,7 @@
       if(p[k]){
         const row = document.createElement('div'); row.className = 'detail-row';
         row.innerHTML = `<span class="k">${FIELD_LABELS[k]}</span><span class="v"></span>`;
-        row.querySelector('.v').textContent = p[k];
+        row.querySelector('.v').textContent = fmtDate(p[k]);
         rows.appendChild(row);
       }
     });
@@ -556,8 +537,7 @@
   el('btn-fit').addEventListener('click', () => { zoom = fitZoom; applyZoom(); vp.scrollLeft = 0; vp.scrollTop = 0; });
   el('btn-zoom-in').addEventListener('click', () => zoomCenter(zoom * 1.3));
   el('btn-zoom-out').addEventListener('click', () => zoomCenter(zoom / 1.3));
-  el('btn-zoom-100').addEventListener('click', () => zoomCenter(1));
-  el('btn-refresh').addEventListener('click', loadData);
+  el('btn-zoom-level').addEventListener('click', () => zoomCenter(1));
   el('btn-export').addEventListener('click', () => window.print());
 
   // pan col mouse
