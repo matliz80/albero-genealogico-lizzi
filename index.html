@@ -64,20 +64,21 @@
   #zoom-badge{position:absolute; bottom:12px; right:12px; z-index:5; font-family:'Courier Prime',monospace; font-size:10px; color:var(--ink-faint); background:var(--paper-2); border:1px solid var(--line); border-radius:3px; padding:4px 8px; pointer-events:none;}
   .link{fill:none; stroke:#9a8663; stroke-width:2.2; stroke-linecap:round;}
   .link.faded{opacity:.18;}
-  .node-card rect.bg{fill:#fbf5e7; stroke:var(--ink-soft); stroke-width:2;}
-  .node-card.male rect.bar{fill:var(--accent);}
-  .node-card.female rect.bar{fill:var(--accent-2);}
-  .node-card.unknown rect.bar{fill:var(--gold);}
-  .node-card .name{font-family:'Fraunces',serif; font-weight:600; font-size:21px; text-anchor:middle; fill:var(--ink);}
-  .node-card .rule{stroke:var(--ink-soft); stroke-width:1.4;}
-  .node-card .date{font-family:'Newsreader',serif; font-size:16px; fill:var(--ink);}
+  .card-bg{fill:#fffff3;}
+  .card-frame{fill:none; stroke:#603813; stroke-linecap:round; stroke-linejoin:round;}
+  .card-dot{fill:#fffff3; stroke:#603813;}
+  .card-rule{stroke:#603813;}
+  .node-card .name{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle; fill:#603813;}
+  .node-card .date{font-family:'Newsreader',serif; fill:#5b3a16;}
   .node-card .date.death{text-anchor:end;}
-  .node-card .note-text{font-family:'Newsreader',serif; font-style:italic; font-size:13.5px; fill:var(--ink-soft);}
+  .node-card .note-text{font-family:'Newsreader',serif; fill:#6b4a26;}
   .node-card{cursor:pointer;}
-  .node-card:hover rect.bg{stroke:var(--accent); stroke-width:3;}
+  .node-card:hover .card-frame{stroke:var(--accent);}
   .node-card.dim{opacity:.16;}
-  .node-card.match rect.bg{stroke:var(--accent); stroke-width:5;}
-  .node-card.focused rect.bg{fill:#f8ecd2; stroke:var(--accent); stroke-width:5;}
+  .node-card.match .card-bg{fill:#fbeccb;}
+  .node-card.match .card-frame{stroke:var(--accent);}
+  .node-card.focused .card-bg{fill:#f6e2ba;}
+  .node-card.focused .card-frame{stroke:var(--accent);}
   #detail-panel{position:fixed; top:0; right:-380px; width:350px; height:100%; background:var(--paper); border-left:1px solid var(--line); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); z-index:10; padding:34px 26px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open{right:0;}
   #detail-panel .close{position:absolute; top:18px; right:20px; font-family:'Courier Prime',monospace; background:none; border:none; color:var(--ink-faint); font-size:13px; cursor:pointer; letter-spacing:.1em;}
@@ -331,6 +332,97 @@
     return visible;
   }
 
+
+  /* --- grafica della casella, ricalcata sul modello "blocco" --- */
+  // separa dalle annotazioni le date del coniuge, che vanno su una riga propria
+  function splitNote(note){
+    let s = (note || '').toString(), n = '', d = '';
+    const mn = s.match(/\bn\.\s*([0-9][0-9.\/\- ]*)/);
+    if(mn){ n = mn[1].trim().replace(/[.\s]+$/,''); s = s.replace(mn[0], ' '); }
+    const md = s.match(/[+‡]\s*([0-9][0-9.\/\- ]*)/);
+    if(md){ d = md[1].trim().replace(/[.\s]+$/,''); s = s.replace(md[0], ' '); }
+    s = s.replace(/[+‡]\s*\.{2,}/g, ' ').replace(/\s*\.{3,}\s*/g, ' ').replace(/\s+/g,' ').trim();
+    return { text:s, n:n, d:d };
+  }
+  function drawCard(g, p, W, H){
+    const s = W / 177.45;              // scala della cornice originale
+    const px = v => +(v*s).toFixed(2);
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H }));
+
+    // gruppo ornamento superiore (poi ribaltato per quello inferiore)
+    const orn = () => {
+      const q = sel('g', null, 'card-orn');
+      q.appendChild(sel('path', { class:'card-frame', 'stroke-width':px(2),
+        d:`M${px(-9.61)} ${px(-9.39)}L${px(-4.14)} ${px(-4.86)}`
+         +`C${px(-3.07)} ${px(-3.97)} ${px(-1.72)} ${px(-3.48)} ${px(-0.32)} ${px(-3.48)}`
+         +`L${px(177.77)} ${px(-3.48)}`
+         +`C${px(179.17)} ${px(-3.48)} ${px(180.55)} ${px(-3.97)} ${px(181.62)} ${px(-4.86)}`
+         +`L${px(187.09)} ${px(-9.39)}` }));
+      q.appendChild(sel('path', { class:'card-frame', 'stroke-width':px(2),
+        d:`M${px(11.2)} ${px(-3.48)}C${px(0.25)} ${px(-3.48)} 0 ${px(-6.44)} 0 ${px(-12.17)}` }));
+      q.appendChild(sel('path', { class:'card-frame', 'stroke-width':px(2),
+        d:`M${px(166.25)} ${px(-3.48)}C${px(177.2)} ${px(-3.48)} ${px(177.45)} ${px(-6.44)} ${px(177.45)} ${px(-12.17)}` }));
+      q.appendChild(sel('path', { class:'card-frame', 'stroke-width':px(2),
+        d:`M${px(1.2)} ${px(-3.48)}C${px(-1.99)} ${px(-3.48)} ${px(-7.5)} ${px(-1.53)} ${px(-7.5)} ${px(5.21)}` }));
+      q.appendChild(sel('path', { class:'card-frame', 'stroke-width':px(2),
+        d:`M${px(176.25)} ${px(-3.48)}C${px(179.44)} ${px(-3.48)} ${px(184.95)} ${px(-1.53)} ${px(184.95)} ${px(5.21)}` }));
+      q.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.25), x1:px(13.75), y1:px(-6.5), x2:px(163.75), y2:px(-6.5) }));
+      q.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.25), x1:px(43.75), y1:px(-8.9), x2:px(133.75), y2:px(-8.9) }));
+      q.appendChild(sel('circle', { class:'card-dot', 'stroke-width':px(.9), cx:0, cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('circle', { class:'card-dot', 'stroke-width':px(.9), cx:px(177.45), cy:px(3.01), r:px(2.17) }));
+      return q;
+    };
+    g.appendChild(orn());
+    const bot = orn(); bot.setAttribute('transform', `translate(0,${H}) scale(1,-1)`); g.appendChild(bot);
+
+    // montanti verticali
+    g.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.9), x1:0, y1:px(5), x2:0, y2:H-px(5) }));
+    g.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.9), x1:W, y1:px(5), x2:W, y2:H-px(5) }));
+    g.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.25), x1:px(-2.45), y1:px(10), x2:px(-2.45), y2:H-px(10) }));
+    g.appendChild(sel('line', { class:'card-frame', 'stroke-width':px(.25), x1:W+px(2.45), y1:px(10), x2:W+px(2.45), y2:H-px(10) }));
+
+    // testo
+    const padX = px(4.05);
+    const label = personLabel(p);
+    let nameLines = wrap(label, 20, 1);
+    let fs = 28, step = 30;
+    if(label.length > 20){ nameLines = wrap(label, 26, 2); fs = 22; step = 24; }
+    let y = fs + 8;
+    nameLines.forEach((ln, i) => {
+      const t = sel('text', { x:W/2, y:y + i*step, class:'name', 'font-size':fs });
+      t.textContent = ln; g.appendChild(t);
+    });
+    y += (nameLines.length-1)*step + 12;
+    g.appendChild(sel('line', { class:'card-rule', 'stroke-width':px(.75), x1:padX, y1:y, x2:W-padX, y2:y }));
+    y += 25;
+    if(p.dataNascita){
+      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18 });
+      t.textContent = 'n. ' + p.dataNascita; g.appendChild(t);
+    }
+    if(p.dataMorte){
+      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18 });
+      t.textContent = '‡ ' + p.dataMorte; g.appendChild(t);
+    }
+    y += 11;
+    g.appendChild(sel('line', { class:'card-rule', 'stroke-width':px(.25), x1:padX, y1:y, x2:W-padX, y2:y }));
+
+    const nt = splitNote(p.note);
+    const hasSpouseDates = !!(nt.n || nt.d);
+    const noteTop = y + 24;
+    const limit = (hasSpouseDates ? H - 46 : H - 14);
+    const maxLines = Math.max(0, Math.floor((limit - noteTop)/22) + 1);
+    const noteLines = wrap(nt.text, 36, maxLines);
+    noteLines.forEach((ln, i) => {
+      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15 });
+      t.textContent = ln; g.appendChild(t);
+    });
+    if(hasSpouseDates){
+      const spouseY = Math.min(H - 16, noteTop + noteLines.length*22 + 4);
+      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16 }); t.textContent = 'n. ' + nt.n; g.appendChild(t); }
+      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16 }); t.textContent = '‡ ' + nt.d; g.appendChild(t); }
+    }
+  }
+
   function render(resetZoom){
     layout = buildLayout(ALL_PERSONS);
     svg.innerHTML = '';
@@ -358,7 +450,7 @@
       if(d2) svg.appendChild(sel('path', { d:d2 }, 'link'));
     }
 
-    // 3. caselle
+    // 3. caselle (grafica "blocco" con cornice ornata)
     ALL_PERSONS.forEach(p => {
       const pos = layout.positions.get(p.id);
       if(!pos) return;
@@ -366,29 +458,7 @@
       const g = sel('g', { transform:`translate(${pos.x},${pos.y})` },
         'node-card ' + sexClass(p) + (isDim ? ' dim' : '') + (p.id === focusId ? ' focused' : ''));
       g.dataset.id = p.id;
-      g.appendChild(sel('rect', { class:'bg', x:0, y:0, width:pos.w, height:pos.h, rx:6 }));
-      g.appendChild(sel('rect', { class:'bar', x:0, y:0, width:7, height:pos.h }));
-
-      const cx = pos.w/2;
-      const nameLines = wrap(personLabel(p), 22, 3);
-      nameLines.forEach((ln, i) => {
-        const t = sel('text', { x:cx, y: 27 + i*23, class:'name' });
-        t.textContent = ln; g.appendChild(t);
-      });
-      let y = 27 + nameLines.length*23 - 6;
-      g.appendChild(sel('line', { x1:14, y1:y, x2:pos.w-14, y2:y, class:'rule' }));
-      y += 22;
-      if(p.dataNascita){
-        const t = sel('text', { x:14, y:y, class:'date birth' }); t.textContent = 'n. ' + p.dataNascita; g.appendChild(t);
-      }
-      if(p.dataMorte){
-        const t = sel('text', { x:pos.w-14, y:y, class:'date death' }); t.textContent = '✝ ' + p.dataMorte; g.appendChild(t);
-      }
-      y += 20;
-      const maxLines = Math.max(0, Math.floor((pos.h - 10 - y)/16));
-      wrap(p.note || '', 40, maxLines).forEach((ln, i) => {
-        const t = sel('text', { x:14, y: y + i*16, class:'note-text' }); t.textContent = ln; g.appendChild(t);
-      });
+      drawCard(g, p, pos.w, pos.h);
       g.addEventListener('click', () => openDetail(p.id));
       svg.appendChild(g);
     });
