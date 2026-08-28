@@ -29,6 +29,7 @@ Colonne del file:
 | ID Padre | genitore. È il campo che decide dove finisce la casella nell'albero |
 | Annotazioni | matrimoni, luoghi, note |
 | **Colonna H** | una **X** apre un nuovo gruppo di colore: quella casella e tutte le successive nel foglio prendono la stessa tinta, fino alla X seguente. Celle vuote = si prosegue col gruppo in corso |
+| **Colonna I** | testo scritto sulla barra orizzontale sotto il cartiglio di quella persona (la barra da cui scendono i suoi figli). Vedi sezione 4ter |
 
 Il foglio deve restare condiviso con **"Chiunque abbia il link" → Visualizzatore** (pulsante Condividi). Senza questa impostazione il sito non riesce a leggere i dati.
 
@@ -65,7 +66,13 @@ Nella **colonna H** del foglio, una **X** segna l'inizio di un nuovo gruppo di c
 
 Esempio: se metti una X sulla riga di `P005` e la successiva su `P154`, tutte le persone comprese fra le due righe (nell'ordine del foglio, non dell'albero) condivideranno un colore.
 
-Le tinte sono dodici, chiare e desaturate perché il testo resti leggibile e la carta non risulti sporcata; oltre la dodicesima ricominciano da capo. Il colore tinge lo sfondo del cartiglio, la cornice e il nome, così i gruppi restano distinguibili anche stampati in bianco e nero (cambia il grigio della cornice). L'icona a tavolozza nella barra spegne e riaccende i colori senza toccare il foglio.
+Le tinte sono dodici, tutte **scure**, scelte distanti fra loro in tinta e simili in luminosità: bruno, verde bosco, terra bruciata, blu notte, prugna, oliva, ottanio, indaco, mattone, muschio, ambra, violetto. Oltre la dodicesima ricominciano da capo.
+
+Il colore si applica a **linee di collegamento, cornice del cartiglio e nome**. Lo sfondo del cartiglio resta avorio in tutti i gruppi, così il testo mantiene sempre il massimo contrasto e la carta non risulta sporcata sui grandi formati.
+
+Sulle linee la regola è: il tronco che scende dal genitore e la barra orizzontale prendono il colore del **genitore**; la calata verticale verso ciascun figlio prende il colore del **figlio**. Così il punto esatto in cui comincia un nuovo gruppo si vede a colpo d'occhio anche da lontano.
+
+L'icona a tavolozza nella barra spegne e riaccende i colori senza toccare il foglio.
 
 **Nota importante:** il gruppo segue **l'ordine delle righe nel foglio**, non la struttura dell'albero. Se vuoi che un colore corrisponda esattamente a un ramo, le righe di quel ramo devono essere contigue nel foglio.
 
@@ -85,6 +92,16 @@ Aggiungi poi una riga con un ID nuovo, il nome, la **data di nascita** (anche so
 
 Funziona a catena su tutte le generazioni: aggiungere un figlio a una persona già presente ricalcola solo il ramo sotto di lei; il resto dell'albero resta dov'era.
 
+## 4ter. Etichette sulle linee (colonna I)
+
+Il testo scritto nella **colonna I** di una persona viene stampato **sulla barra orizzontale che sta sotto il suo cartiglio**, cioè quella da cui scendono i suoi figli. La barra si interrompe e il testo si centra nel vuoto lasciato in mezzo, in **maiuscolo** e in **Cinzel bold**, un serif lapidario adatto alle diciture d'insieme.
+
+Serve a dare un nome ai rami: «CAPORIACCO», «I TRESEMAN», «RAMO DI RAGOGNA». Scrivi in minuscolo se vuoi, il sito converte da solo in maiuscolo.
+
+Il corpo del testo si adatta da solo: parte da 46 e si riduce fino a 20 se la barra è corta, così l'etichetta non sborda mai oltre i figli. Se la persona ha **un solo figlio** non esiste una barra su cui scrivere, quindi l'etichetta viene messa in corpo ridotto accanto alla calata verticale. Se la persona non ha figli, l'etichetta viene ignorata.
+
+L'etichetta è compresa anche nella ricerca: cercando «Treseman» trovi la persona che porta quell'etichetta.
+
 ## 5. Chi può modificare i dati
 
 Non serve un login sul sito: invita le persone direttamente sul Google Sheet come **Editor** (Condividi → email → ruolo Editor). Le modifiche compaiono sul sito al ricaricamento della pagina.
@@ -103,7 +120,7 @@ sostituendo l'ID con quello del nuovo foglio (si trova nell'URL tra `/d/` e `/ed
 
 Il pulsante **Stampa** apre un pannello con due regolazioni e quattro misure aggiornate in tempo reale.
 
-**Come funziona la geometria.** L'albero è largo e basso: circa 104.000 unità di larghezza contro 5.160 di altezza, cioè un rapporto di **20 a 1**. Fissata l'altezza del telo, la lunghezza è una conseguenza automatica di quel rapporto. Con un telo alto **1 m** vengono circa **20 m di lunghezza**, con cartigli di 5,7 × 4,2 cm e il nome in corpo 5,4 mm.
+**Come funziona la geometria.** L'albero è largo e basso: circa 49.300 unità di larghezza contro 5.160 di altezza, cioè un rapporto di poco meno di **10 a 1**. Fissata l'altezza del telo, la lunghezza è una conseguenza automatica di quel rapporto. Con un telo alto **1 m** vengono circa **9,6 m di lunghezza**, con cartigli di 5,7 × 4,2 cm e il nome in corpo 5,4 mm.
 
 **I due comandi:**
 
@@ -112,16 +129,18 @@ Il pulsante **Stampa** apre un pannello con due regolazioni e quattro misure agg
 
 | Distanza | Lunghezza telo | Cartiglio | Nome |
 |---|---|---|---|
-| 324 (iniziale) | 20,1 m | 5,7 × 4,2 cm | 5,4 mm |
-| 500 | 13,3 m | 3,7 × 2,8 cm | 3,6 mm |
-| 700 | 9,6 m | 2,7 × 2,0 cm | 2,6 mm |
-| 900 | 7,5 m | 2,1 × 1,6 cm | 2,0 mm |
+| 324 (iniziale) | 9,6 m | 5,7 × 4,2 cm | 5,4 mm |
+| 500 | 6,3 m | 3,7 × 2,8 cm | 3,6 mm |
+| 700 | 4,6 m | 2,7 × 2,0 cm | 2,6 mm |
+| 900 | 3,6 m | 2,1 × 1,6 cm | 2,0 mm |
 
 Il riquadro delle misure diventa rosso quando il corpo del nome scende **sotto i 2 mm**, soglia oltre la quale la stampa non è più comodamente leggibile. Il pulsante **Ripristina valori iniziali** riporta tutto ai valori di partenza.
 
 **Consiglio pratico:** prima di lanciare i 20 metri, stampa una striscia di prova di 1-2 m con le impostazioni scelte, per verificare dal vivo la leggibilità del corpo tipografico sul supporto che userai. La resa cambia molto fra carta opaca e materiale lucido.
 
-**Perché non si può accorciare di più.** La lunghezza dipende dal numero di persone "finali" (senza figli), che devono stare affiancate: circa 200, ognuna larga quanto un cartiglio. Nessuna disposizione alternativa può ridurre quel totale senza rimpicciolire i cartigli o spezzare l'albero su più teli. Rispetto alla prima versione gli spazi orizzontali sono già stati stretti (da 103 a 46 unità fra caselle non imparentate), il che ha tolto circa 3,5 m.
+**Da dove viene il risparmio.** La prima versione a layout dinamico misurava 103.900 unità (20,1 m di telo). Il passaggio al packing a contorni descritto in fondo a questo documento ha dimezzato la larghezza portandola a 49.300 unità: **53% in meno**, cioè oltre dieci metri di telo risparmiati a parità di dimensione dei cartigli.
+
+Sotto quella soglia non si scende senza rimpicciolire: la lunghezza residua è determinata dal numero di persone che devono stare fisicamente affiancate nella riga più affollata, ognuna larga quanto un cartiglio.
 
 ---
 
@@ -163,9 +182,19 @@ Da P105 a P113 sono nove fratelli: la loro barra orizzontale nel disegno finisce
 
 **Struttura del file.** Un solo `index.html`, senza compilazione né dipendenze. Dentro, nell'ordine: CSS, corpo della pagina, e uno `<script>` con: lettura/parsing del CSV, il **motore di layout dinamico**, il disegno delle caselle, e i comandi (zoom, ricerca, scheda dettaglio, focus-ramo, export). Non esiste più l'oggetto `GEO` con le coordinate incorporate: nessun file da rigenerare quando cambiano i dati.
 
-**Come funziona il motore di layout.** Per ogni persona si individua il genitore (ID Padre, o ID Madre se manca il primo) e si costruisce l'albero dei discendenti. Dentro ogni gruppo di fratelli: chi ha una data di nascita leggibile (si estrae il primo anno plausibile 1300–2099 dalla stringa, anche se scritta in modo sporco) viene riordinato cronologicamente **nelle posizioni già occupate da fratelli con data**; chi non ha data resta fermo nella posizione in cui compare nel foglio. La posizione orizzontale di ogni casella si calcola poi con un algoritmo ad albero classico (percorso in post-ordine): chi non ha figli occupa lo slot successivo libero, chi ne ha si centra sopra di loro — così due sotto-alberi non si sovrappongono mai, qualunque sia la loro forma. La posizione verticale è semplicemente la generazione (distanza dal proprio capostipite) moltiplicata per il passo fisso tra le righe. Le persone senza `ID Padre`/`ID Madre` riconosciuto diventano radici indipendenti, distanziate lateralmente le une dalle altre. Come misura di sicurezza, se un errore nel foglio creasse un ciclo (qualcuno antenato di sé stesso), il collegamento viene tagliato automaticamente invece di bloccare la pagina.
+**Come funziona il motore di layout.** Per ogni persona si individua il genitore (ID Padre, o ID Madre se manca il primo) e si costruisce l'albero dei discendenti. Dentro ogni gruppo di fratelli: chi ha una data di nascita leggibile (si estrae il primo anno plausibile 1300–2099 dalla stringa, anche se scritta in modo sporco) viene riordinato cronologicamente **nelle posizioni già occupate da fratelli con data**; chi non ha data resta fermo nella posizione in cui compare nel foglio. La posizione verticale è la generazione moltiplicata per il passo fra le righe. Le persone senza genitore riconosciuto diventano radici indipendenti. Se un errore nel foglio creasse un ciclo (qualcuno antenato di sé stesso), il collegamento viene tagliato automaticamente invece di bloccare la pagina.
 
-**Le linee di collegamento** non sono più tracciate a mano: per ogni genitore si disegna una verticale dal bordo inferiore della sua casella, una barra orizzontale che copre tutti i figli, e una verticale da quella barra a ciascuno di loro — lo schema classico "a squadra" degli organigrammi genealogici.
+**Il packing orizzontale, che è la parte delicata.** La prima versione accodava i sottoalberi uno dopo l'altro: ogni persona senza figli si prendeva una colonna intera e ogni ramo riservava tutto il proprio ingombro complessivo, anche dove era vuoto. Da qui una larghezza enorme.
+
+La versione attuale usa un **algoritmo a contorni** (della famiglia Reingold–Tilford). Ogni sottoalbero porta con sé due profili, quello destro e quello sinistro, con una voce per ciascuna riga che occupa. Quando due sottoalberi fratelli vanno affiancati, il secondo scivola verso sinistra finché i due profili non si toccano da qualche parte, invece di partire dopo l'ingombro totale del primo.
+
+La conseguenza voluta è esattamente quella richiesta: **un fratello senza figli ha un profilo alto una sola riga**, quindi vincola soltanto la propria riga e non riserva un centimetro in nessuna di quelle sottostanti. Il fratello successivo gli si accosta e fa scendere la propria discendenza sotto di lui. Nei figli di P005, per esempio, i quattro fratelli senza discendenza stanno alla distanza minima assoluta l'uno dall'altro e il primo di essi si affianca direttamente a un fratello che ha invece un ramo profondo.
+
+Le distanze minime sono tarate sugli ornamenti del cartiglio, che sporgono 12,34 unità per lato: due caselle non possono avvicinarsi oltre ~25 unità senza che le volute si tocchino. Da qui **30 unità fra fratelli**, **52 fra rami diversi alle generazioni inferiori**, **240 fra alberi senza antenato comune**.
+
+Il centraggio dei genitori sui figli è preservato: verificato su tutti i 108 genitori dell'albero, nessuno risulta fuori centro di più di mezza unità.
+
+**Le linee di collegamento** non sono più tracciate a mano: per ogni genitore si disegna una verticale dal bordo inferiore della sua casella, una barra orizzontale che copre tutti i figli, e una verticale da quella barra a ciascuno di loro — lo schema classico "a squadra". I segmenti sono raggruppati per colore e disegnati in un tracciato per tinta, così l'intero albero costa dodici elementi grafici invece di migliaia. Quando una persona ha un testo nella colonna I, la barra viene spezzata in due tronconi e l'etichetta occupa il vuoto centrale.
 
 **Grafica dei cartigli.** La cornice ornata è ricalcata curva per curva dal file `blocco.pdf` fornito da Matteo: volute agli angoli, cerchietti, montanti e filetti sottili esterni. Nome centrato in Fraunces, date in Newsreader, note in corsivo. Quando l'annotazione contiene le date del coniuge, il codice le stacca e le mette su una riga propria in fondo.
 
