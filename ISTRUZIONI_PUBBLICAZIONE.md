@@ -47,15 +47,18 @@ Non serve creare un secondo repository per poter tornare indietro: GitHub conser
 
 Tutti i comandi stanno in **un'unica barra in cima alla finestra dell'albero**: cerca · Adatta · − zoom + · ⛶ · Esporta PDF. L'albero comincia sotto la barra e non ci passa mai sopra.
 
+- **Apertura**: la pagina si apre già a una scala leggibile — **50% su computer, 58% su cellulare** — posizionata sul capostipite, non adattata all'intero albero (che a schermo intero risulterebbe illeggibile). L'icona con i quattro angoli adatta la vista a tutta la larghezza quando serve.
 - **− valore +**: il numero al centro è lo zoom in corso; cliccandolo torni al 100%. Su computer anche Ctrl+rotellina.
-- **Su cellulare**: pizzica con due dita per ingrandire e rimpicciolire, trascina con un dito per spostarti.
+- **Su cellulare**: pizzica con due dita per ingrandire e rimpicciolire, trascina con un dito per spostarti. I tre tasti dello zoom non compaiono su schermo piccolo: lo spazio va tutto alla ricerca e alle gesture.
 - **Schermo intero**: icona ⛶. La scheda della persona funziona anche a schermo intero.
 - **Cerca**: scrivi un nome, la casella viene evidenziata e la vista ci si sposta sopra.
 - **Click su una casella**: apre la scheda con tutti i dati e permette di "mettere a fuoco" solo quel ramo. In modalità ramo compare **↩ Vista completa** e gli altri comandi restano spenti finché non torni alla vista intera.
 - **Esporta PDF**: apre la stampa del browser (scegli "Salva come PDF").
 
-- **Cerca**: trova sia nomi sia date. Funzionano «Mattia», «1650», «5.1.1606», «05.01.1606», i cognomi dei coniugi citati nelle annotazioni e anche gli ID (`P154`). Sotto la barra compare il numero di risultati.
+- **Cerca**: accetta **nomi e anni nella stessa riga**. Scrivendo `Matteo 1980` trova i Matteo nati o morti nel 1980; `Matteo` da solo li trova tutti; `1980` da solo trova chiunque sia nato o morto in quell'anno. Ogni gruppo di quattro cifre viene trattato come anno e confrontato con nascita e morte, tutto il resto viene cercato nel testo (nome, annotazioni, luoghi, etichetta della colonna I, ID). Devono corrispondere tutte le parole scritte. Sotto la barra compare il numero di risultati.
+- **Click su una casella → Metti a fuoco questo ramo**: l'albero viene **ricostruito da zero con le sole persone del ramo** — antenati risalendo e discendenti scendendo. Le altre non vengono sbiadite ma tolte, e le posizioni ricalcolate, così il ramo si legge alla larghezza che gli serve davvero. Mettendo a fuoco P154, per esempio, si passa da 403 caselle a 209. Il pulsante **↩ Vista completa** ripristina tutto.
 - **Colori dei gruppi** (icona a tavolozza): accende e spegne le tinte definite dalla colonna H. Vedi sezione 4bis.
+- **Fratelli affiancati** (icona con tre blocchi allineati): cambia il criterio di disposizione. Vedi qui sotto.
 - **Stampa**: apre il pannello per il plotter. Vedi sezione 7.
 
 Le date vengono mostrate come **gg.mm.aaaa** anche se nel foglio sono scritte in forma breve (5.3.1804 → 05.03.1804). I valori ambigui presenti nel disegno originale — «21 / 22.2.1720», «1650?», «a 6 mesi» — restano invece come sono, così si vedono e si possono correggere nel foglio.
@@ -68,7 +71,7 @@ Esempio: se metti una X sulla riga di `P005` e la successiva su `P154`, tutte le
 
 Le tinte sono dodici, tutte **scure**, scelte distanti fra loro in tinta e simili in luminosità: bruno, verde bosco, terra bruciata, blu notte, prugna, oliva, ottanio, indaco, mattone, muschio, ambra, violetto. Oltre la dodicesima ricominciano da capo.
 
-Il colore si applica a **linee di collegamento, cornice del cartiglio e nome**. Lo sfondo del cartiglio resta avorio in tutti i gruppi, così il testo mantiene sempre il massimo contrasto e la carta non risulta sporcata sui grandi formati.
+Il colore si applica a **linee di collegamento, cornice del cartiglio e nome** a piena intensità, e allo **sfondo del cartiglio diluito al 10%** sull'avorio. Così ogni ramo si riconosce a colpo d'occhio anche da lontano, ma il testo mantiene quasi tutto il contrasto originale e la carta non risulta sporcata sui grandi formati.
 
 Sulle linee la regola è: il tronco che scende dal genitore e la barra orizzontale prendono il colore del **genitore**; la calata verticale verso ciascun figlio prende il colore del **figlio**. Così il punto esatto in cui comincia un nuovo gruppo si vede a colpo d'occhio anche da lontano.
 
@@ -101,6 +104,16 @@ Serve a dare un nome ai rami: «CAPORIACCO», «I TRESEMAN», «RAMO DI RAGOGNA�
 Il corpo del testo si adatta da solo: parte da 46 e si riduce fino a 20 se la barra è corta, così l'etichetta non sborda mai oltre i figli. Se la persona ha **un solo figlio** non esiste una barra su cui scrivere, quindi l'etichetta viene messa in corpo ridotto accanto alla calata verticale. Se la persona non ha figli, l'etichetta viene ignorata.
 
 L'etichetta è compresa anche nella ricerca: cercando «Treseman» trovi la persona che porta quell'etichetta.
+
+## 4quater. Due modi di disporre l'albero
+
+L'icona con i **tre blocchi allineati** commuta fra due criteri di disposizione.
+
+**Disposizione centrata** (quella di partenza). Ogni genitore sta esattamente al centro dei propri figli, e i sottoalberi si incastrano fra loro sfruttando gli spazi vuoti. È la lettura genealogica classica, dove la simmetria aiuta a seguire le discendenze. Larghezza: circa 49.300 unità.
+
+**Fratelli sempre affiancati.** I fratelli si toccano sempre, qualunque discendenza abbiano: ogni riga viene riempita da sinistra a destra e nessuno lascia spazi. Il genitore non è più centrato sui figli — sono **le linee di giunzione a spostarsi** per raggiungerli, allungandosi in orizzontale. Si perde la simmetria ma si guadagna moltissimo spazio: larghezza circa 29.500 unità, il **40% in meno**, che sul plotter da 1 m significa scendere da 9,6 a circa 5,8 metri di telo.
+
+Nessuna delle due modalità produce sovrapposizioni: in entrambe la distanza minima fra due cartigli resta di 30 unità, verificata su tutte le 403 persone.
 
 ## 5. Chi può modificare i dati
 

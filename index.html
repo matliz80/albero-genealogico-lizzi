@@ -31,7 +31,6 @@
     opacity:.05; mix-blend-mode:multiply; pointer-events:none; z-index:1;
   }
 
-  /* ===== HEADER compatto ===== */
   header{
     position:relative; z-index:2;
     display:flex; align-items:baseline; justify-content:center; gap:14px;
@@ -51,7 +50,7 @@
   }
 
   .field{display:inline-flex; align-items:center; gap:9px; height:34px; box-sizing:border-box; background:#ffffff; border:1.5px solid var(--frame); border-radius:4px; padding:0 16px;}
-  #search{font-family:'Newsreader',serif; font-style:italic; font-size:19px; border:none; background:transparent; color:var(--frame); outline:none; width:190px;}
+  #search{font-family:'Newsreader',serif; font-style:italic; font-size:19px; border:none; background:transparent; color:var(--frame); outline:none; width:200px;}
   #search::placeholder{color:var(--frame-soft); opacity:.7;}
   .btn.icon{padding:0 13px;}
   .btn.icon svg{width:18px; height:18px; display:block;}
@@ -72,15 +71,15 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   #toolbar{flex:none; display:flex; flex-wrap:nowrap; align-items:center; justify-content:center; justify-content:safe center;
     gap:11px; padding:11px; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; background:rgba(242,232,213,.94); border-bottom:1px solid var(--line);}
-  #toolbar.focus-mode > *:not(#btn-reset-view){opacity:.3; pointer-events:none; filter:grayscale(.5);}
+  #toolbar.focus-mode > *:not(#btn-reset-view):not(.field){opacity:.3; pointer-events:none; filter:grayscale(.5);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-flex;}
   #stage{
-    position:relative; z-index:2; margin:0 0 28px;
-    border-top:1px solid var(--frame-soft); border-bottom:1px solid var(--frame-soft);
+    position:relative; z-index:2; margin:0;
+    border-top:1px solid var(--frame-soft);
     background:var(--paper);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
-    overflow:hidden; height:80vh; min-height:460px;
+    overflow:hidden; height:calc(100vh - 62px); min-height:460px;
     display:flex; flex-direction:column;
   }
   #viewport{flex:1 1 0; min-height:0; min-width:0; position:relative; overflow:auto; cursor:grab; touch-action:none; -webkit-overflow-scrolling:touch;}
@@ -91,21 +90,15 @@
   #stage::backdrop{background:var(--paper);}
   #stage:-webkit-full-screen::backdrop{background:var(--paper);}
   .link{fill:none; stroke-width:3.3; stroke-linecap:round; stroke-linejoin:round;}
-  .link.faded{opacity:.18;}
-  .card-bg{fill:#fffff3;}
   .card-frame{fill:none; stroke-linecap:round; stroke-linejoin:round;}
-  .card-dot{fill:#fffff3;}
   .node-card .name{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle;}
   .node-card .date{font-family:'Newsreader',serif; fill:#5b3a16;}
   .node-card .date.death{text-anchor:end;}
   .node-card .note-text{font-family:'Newsreader',serif; fill:#6b4a26;}
   .node-card{cursor:pointer;}
-  .node-card.dim{opacity:.16;}
   .node-card.match .card-bg{fill:#fbeccb;}
   .node-card.focused .card-bg{fill:#f6e2ba;}
-  /* etichette della colonna I, scritte sulla barra orizzontale */
   .bar-label{font-family:'Cinzel',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
-  .bar-label.faded{opacity:.2;}
 
   #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open,#print-panel.open{right:0;}
@@ -131,22 +124,23 @@
 
   #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
-  footer{position:relative; z-index:2; text-align:center; font-family:'Courier Prime',monospace; font-size:10.5px; color:var(--frame-soft); padding:0 20px 34px; letter-spacing:.04em;}
   #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Courier Prime',monospace; font-size:12px; color:var(--frame-soft);}
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--frame-soft); border-top-color:var(--frame); animation:spin .9s linear infinite;}
   @media print{
-    header,#toolbar,#status-line,footer,#detail-panel,#print-panel,#overlay{display:none !important;}
+    header,#toolbar,#status-line,#detail-panel,#print-panel,#overlay{display:none !important;}
     body{background:#fff;} body::before{display:none;}
     #stage{border:none; box-shadow:none; height:auto; overflow:visible; margin:0; background:none;}
     #viewport{position:static; overflow:visible;}
     #stage svg{width:100% !important; height:auto !important;}
   }
   @media (max-width:640px){
-    #search{width:118px; font-size:16px;}
+    /* su mobile lo zoom si fa col pinch: i tre tasti spariscono e restano
+       solo schermo intero e adatta, per lasciare spazio alla barra */
+    #btn-zoom-in,#btn-zoom-out,#btn-zoom-level{display:none !important;}
+    #search{width:132px; font-size:16px;}
     #detail-panel,#print-panel{width:90%; right:-100%;}
-    #stage{height:84vh; margin:0 0 22px;}
+    #stage{height:calc(100vh - 48px);}
     #toolbar{gap:8px; padding:9px 8px;}
-    #btn-zoom-level{min-width:76px;}
     #toolbar .btn{padding:0 15px; font-size:15px; height:30px;}
     #toolbar .field{padding:0 12px; height:30px;}
   }
@@ -166,7 +160,7 @@
   <div id="toolbar">
     <div class="field">
       <span style="font-family:'Courier Prime',monospace;font-size:13px;color:var(--frame-soft);">Cerca</span>
-      <input id="search" type="text" placeholder="nome o data…">
+      <input id="search" type="text" placeholder="es. Matteo 1980">
     </div>
     <button class="btn icon" id="btn-fit" title="Adatta allo schermo" aria-label="Adatta allo schermo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <div class="zoomgroup">
@@ -175,6 +169,7 @@
       <button class="btn" id="btn-zoom-in" title="Ingrandisci">+</button>
       <button class="btn icon" id="btn-fullscreen" title="Schermo intero" aria-label="Schermo intero"><svg id="ic-fs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
     </div>
+    <button class="btn icon" id="btn-align" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9" width="4.4" height="6"/><rect x="9.8" y="9" width="4.4" height="6"/><rect x="17.1" y="9" width="4.4" height="6"/><path d="M2.5 4.5h19"/></svg></button>
     <button class="btn icon" id="btn-colors" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.6"/><circle cx="17.5" cy="10.5" r="1.6"/><circle cx="8.5" cy="7.5" r="1.6"/><circle cx="6.5" cy="12.5" r="1.6"/><path d="M12 2a10 10 0 1 0 0 20c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16a6 6 0 0 0 6-6c0-5-4.5-8.8-10-8.8z"/></svg></button>
     <button class="btn" id="btn-print" title="Stampa e plotter">Stampa</button>
     <button class="btn accent" id="btn-reset-view">↩ Vista completa</button>
@@ -228,45 +223,38 @@
   const SHEET_NAME = "";
   const PAGE_TITLE = "I Lizzi in Friuli";
 
-  /* ============ GEOMETRIA ============
-     Nessuna coordinata incorporata: tutto si ricalcola dai legami di parentela.
-
-     Gli ornamenti del cartiglio sporgono 12,34 unità per lato, quindi due
-     caselle affiancate non possono avvicinarsi oltre ~25 unità senza toccarsi:
-     SIB_GAP è tarato appena sopra quella soglia.                              */
   const BW = 291.9, BH = 219.0;
-  const SIB_GAP = 30;               // fra fratelli (stesso genitore)
-  const COUSIN_GAP = 52;            // fra rami diversi, alle generazioni sotto
-  const ROOT_GAP = 240;             // fra alberi senza antenato comune noto
+  const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
   const ROW_STEP_BASE = BH + 105;
   let ROW_STEP = ROW_STEP_BASE;
+
+  // zoom di apertura: si parte già a una scala leggibile, non adattati allo schermo
+  const isMobile = () => window.matchMedia('(max-width: 640px)').matches;
+  const initialZoom = () => isMobile() ? 0.58 : 0.50;
 
   document.getElementById('page-title').textContent = PAGE_TITLE;
   document.title = PAGE_TITLE;
 
   const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv${SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : ''}`;
 
-  /* ============ TAVOLOZZA DEI GRUPPI (colonna H) ============
-     Dodici tinte scure: si applicano alle linee di collegamento, alla cornice
-     del cartiglio e al nome. Lo sfondo del cartiglio resta avorio, così il
-     testo mantiene sempre il massimo contrasto. Sono state scelte distanti fra
-     loro in tinta e simili in luminosità, per restare distinguibili anche su
-     carta e a occhio non allenato.                                            */
+  /* ============ TAVOLOZZA (colonna H) ============
+     Dodici tinte scure per linee, cornice e nome. Lo sfondo del cartiglio usa
+     la stessa tinta ma diluita al 10% sull'avorio, così ogni ramo si riconosce
+     a colpo d'occhio senza che il testo perda contrasto.                      */
   const GROUP_COLORS = [
-    '#603813', // bruno originale
-    '#1f4f3f', // verde bosco
-    '#7a2e1e', // terra di Siena bruciata
-    '#23405e', // blu notte
-    '#5c2a52', // prugna
-    '#6b5a12', // oliva scuro
-    '#2f5d5a', // verde ottanio
-    '#3f3470', // indaco
-    '#8a2f2f', // mattone
-    '#40561f', // muschio
-    '#7a4a12', // ambra scuro
-    '#4a2f6b'  // violetto
+    '#603813','#1f4f3f','#7a2e1e','#23405e','#5c2a52','#6b5a12',
+    '#2f5d5a','#3f3470','#8a2f2f','#40561f','#7a4a12','#4a2f6b'
   ];
+  const IVORY = [255, 255, 243];
+  const TINT = 0.10;
+  function tintOf(hex){
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    const mix = (c, base) => Math.round(base*(1-TINT) + c*TINT);
+    return `rgb(${mix(r,IVORY[0])},${mix(g,IVORY[1])},${mix(b,IVORY[2])})`;
+  }
+  const GROUP_TINTS = GROUP_COLORS.map(tintOf);
   let colorsOn = true;
+  let alignSiblings = false;   // modalità "fratelli sempre affiancati"
 
   /* ============ CSV ============ */
   function parseCSV(text){
@@ -313,9 +301,6 @@
   function rowsToPersons(rows){
     if(!rows.length) return [];
     const headers = rows[0].map(classifyHeader);
-    // Colonna H (indice 7) = gruppi di colore, colonna I (indice 8) = etichetta
-    // sulla barra. Se le intestazioni non sono riconoscibili per nome, o sono
-    // vuote, si assumono comunque per posizione.
     if(!headers.includes('gruppo')    && headers.length > 7 && !headers[7]) headers[7] = 'gruppo';
     if(!headers.includes('etichetta') && headers.length > 8 && !headers[8]) headers[8] = 'etichetta';
     const persons = [];
@@ -338,12 +323,11 @@
 
   /* ============ STATO ============ */
   let ALL_PERSONS = [], personsById = new Map();
-  let zoom = 1, fitZoom = 1, focusId = null, layout = null, maxDepth = 0;
+  let zoom = 1, fitZoom = 1, focusId = null, layout = null, maxDepth = 0, shownPersons = [];
   const el = id => document.getElementById(id);
   const statusLine = el('status-line'), stage = el('stage'), vp = el('viewport'), svg = el('tree'), loading = el('loading');
   function setStatus(msg, isErr){ statusLine.textContent = msg; statusLine.classList.toggle('error', !!isErr); }
 
-  /* ============ CARICAMENTO ============ */
   function loadData(){
     loading.style.display = 'flex';
     setStatus('Caricamento…');
@@ -364,20 +348,15 @@
       });
   }
 
-  /* ============ LAYOUT: PACKING A CONTORNI ============
-     Ogni sottoalbero porta con sé il proprio profilo destro e sinistro, riga per
-     riga. Quando due sottoalberi fratelli vanno affiancati, il secondo scivola
-     verso sinistra fino al primo punto di contatto reale fra i due profili,
-     invece di accodarsi dopo l'ingombro complessivo del primo.
-
-     Conseguenza voluta: un fratello senza figli ha un profilo alto una sola
-     riga, quindi vincola soltanto la propria riga e non riserva spazio in
-     nessuna delle righe sottostanti; il fratello successivo può quindi salirgli
-     accanto e far scendere la propria discendenza sotto di lui.               */
-  function parseYear(dataNascita){
-    if(!dataNascita) return null;
-    const m = dataNascita.match(/(1[3-9]\d{2}|20\d{2})/);
+  /* ============ LAYOUT ============ */
+  function parseYear(v){
+    if(!v) return null;
+    const m = v.match(/(1[3-9]\d{2}|20\d{2})/);
     return m ? parseInt(m[1], 10) : null;
+  }
+  function allYears(v){
+    if(!v) return [];
+    return (v.match(/1[3-9]\d{2}|20\d{2}/g) || []);
   }
   function ordinaFratelli(list){
     const risultato = list.slice();
@@ -399,7 +378,6 @@
                 : (p.idMadre && localById.has(p.idMadre) && p.idMadre !== p.id) ? p.idMadre : null;
       parentOf.set(p.id, pid);
     });
-
     const stato = new Map();
     function spezzaCicli(id){
       if(stato.get(id) === 1){ parentOf.set(id, null); return; }
@@ -418,82 +396,110 @@
     });
     childrenOf.forEach((figli, pid) => childrenOf.set(pid, ordinaFratelli(figli)));
 
-    // sposta un blocco (mappa id->x, più i due profili) di 'dx' unità
-    function shiftBlock(b, dx){
-      b.xs.forEach((v, k) => b.xs.set(k, v + dx));
-      for(let i=0;i<b.left.length;i++){ b.left[i] += dx; b.right[i] += dx; }
-      b.cx += dx;
-      return b;
-    }
-    // affianca 'next' a destra di 'acc' rispettando i profili
-    function mergeBlocks(acc, next, gapTop, gapDeep){
-      let shift = 0;
-      const overlap = Math.min(acc.right.length, next.left.length);
-      for(let d=0; d<overlap; d++){
-        const gap = (d === 0) ? gapTop : gapDeep;
-        const need = acc.right[d] + BW + gap - next.left[d];
-        if(need > shift) shift = need;
-      }
-      shiftBlock(next, shift);
-      const len = Math.max(acc.left.length, next.left.length);
-      const left = new Array(len), right = new Array(len);
-      for(let d=0; d<len; d++){
-        left[d]  = (d < acc.left.length)   ? acc.left[d]   : next.left[d];
-        right[d] = (d < next.right.length) ? next.right[d] : acc.right[d];
-      }
-      next.xs.forEach((v, k) => acc.xs.set(k, v));
-      acc.left = left; acc.right = right;
-      return acc;
-    }
-
-    let deepest = 0;
-    function build(p, depth){
-      if(depth > deepest) deepest = depth;
-      const figli = childrenOf.get(p.id) || [];
-      if(figli.length === 0){
-        return { xs: new Map([[p.id, 0]]), left:[0], right:[0], cx: BW/2 };
-      }
-      let acc = null;
-      const centers = [];
-      for(const f of figli){
-        const sub = build(f, depth + 1);
-        if(!acc){ acc = sub; }
-        else { mergeBlocks(acc, sub, SIB_GAP, COUSIN_GAP); }
-        centers.push(sub.cx);
-      }
-      const cx = (centers[0] + centers[centers.length - 1]) / 2;
-      const px = cx - BW/2;
-      acc.xs.set(p.id, px);
-      acc.left  = [px].concat(acc.left);
-      acc.right = [px].concat(acc.right);
-      acc.cx = cx;
-      return acc;
-    }
-
-    // costruisce e affianca gli alberi radice
-    let whole = null;
     const depths = new Map();
-    function recordDepths(id, d){
-      depths.set(id, d);
-      (childrenOf.get(id) || []).forEach(c => recordDepths(c.id, d + 1));
-    }
-    roots.forEach(r => {
-      const b = build(r, 0);
-      recordDepths(r.id, 0);
-      if(!whole) whole = b;
-      else mergeBlocks(whole, b, ROOT_GAP, ROOT_GAP);
-    });
-    maxDepth = deepest;
+    let deepest = 0, xs = new Map();
 
-    // normalizza a partire da x = 0 e converte in posizioni assolute
+    if(alignSiblings){
+      /* --- MODO "FRATELLI AFFIANCATI" ---
+         I fratelli si toccano sempre, qualunque discendenza abbiano: ogni riga
+         ha un proprio cursore e le persone la riempiono da sinistra a destra
+         nell'ordine di visita. Il genitore NON è più centrato sui figli: sono
+         le linee di giunzione a spostarsi per raggiungerli.                   */
+      const rowCursor = [];
+      let baseline = 0;
+      function visit(p, depth){
+        if(depth > deepest) deepest = depth;
+        if(rowCursor[depth] == null) rowCursor[depth] = baseline;
+        const x = rowCursor[depth];
+        xs.set(p.id, x); depths.set(p.id, depth);
+        rowCursor[depth] = x + BW + SIB_GAP;
+        const figli = childrenOf.get(p.id) || [];
+        if(figli.length){
+          // stacca il gruppo di figli da quello del cugino precedente
+          if(rowCursor[depth+1] != null) rowCursor[depth+1] += (COUSIN_GAP - SIB_GAP);
+          figli.forEach(f => visit(f, depth+1));
+        }
+      }
+      roots.forEach((r, i) => {
+        if(i > 0){
+          let mx = baseline;
+          rowCursor.forEach(v => { if(v != null && v > mx) mx = v; });
+          baseline = mx + ROOT_GAP;
+          for(let d=0; d<rowCursor.length; d++) if(rowCursor[d] != null) rowCursor[d] = baseline;
+        }
+        visit(r, 0);
+      });
+
+    } else {
+      /* --- MODO NORMALE: packing a contorni ---
+         Ogni sottoalbero porta il proprio profilo destro e sinistro riga per
+         riga; il fratello successivo scivola a sinistra fino al primo contatto
+         reale. Un fratello senza figli occupa una riga sola e non riserva
+         spazio in quelle sottostanti.                                         */
+      function shiftBlock(b, dx){
+        b.xs.forEach((v, k) => b.xs.set(k, v + dx));
+        for(let i=0;i<b.left.length;i++){ b.left[i] += dx; b.right[i] += dx; }
+        b.cx += dx;
+        return b;
+      }
+      function mergeBlocks(acc, next, gapTop, gapDeep){
+        let shift = 0;
+        const overlap = Math.min(acc.right.length, next.left.length);
+        for(let d=0; d<overlap; d++){
+          const gap = (d === 0) ? gapTop : gapDeep;
+          const need = acc.right[d] + BW + gap - next.left[d];
+          if(need > shift) shift = need;
+        }
+        shiftBlock(next, shift);
+        const len = Math.max(acc.left.length, next.left.length);
+        const left = new Array(len), right = new Array(len);
+        for(let d=0; d<len; d++){
+          left[d]  = (d < acc.left.length)   ? acc.left[d]   : next.left[d];
+          right[d] = (d < next.right.length) ? next.right[d] : acc.right[d];
+        }
+        next.xs.forEach((v, k) => acc.xs.set(k, v));
+        acc.left = left; acc.right = right;
+        return acc;
+      }
+      function build(p, depth){
+        if(depth > deepest) deepest = depth;
+        const figli = childrenOf.get(p.id) || [];
+        if(figli.length === 0) return { xs: new Map([[p.id, 0]]), left:[0], right:[0], cx: BW/2 };
+        let acc = null; const centers = [];
+        for(const f of figli){
+          const sub = build(f, depth + 1);
+          if(!acc) acc = sub; else mergeBlocks(acc, sub, SIB_GAP, COUSIN_GAP);
+          centers.push(sub.cx);
+        }
+        const cx = (centers[0] + centers[centers.length - 1]) / 2;
+        const px = cx - BW/2;
+        acc.xs.set(p.id, px);
+        acc.left  = [px].concat(acc.left);
+        acc.right = [px].concat(acc.right);
+        acc.cx = cx;
+        return acc;
+      }
+      function recordDepths(id, d){
+        depths.set(id, d);
+        (childrenOf.get(id) || []).forEach(c => recordDepths(c.id, d + 1));
+      }
+      let whole = null;
+      roots.forEach(r => {
+        const b = build(r, 0);
+        recordDepths(r.id, 0);
+        if(!whole) whole = b; else mergeBlocks(whole, b, ROOT_GAP, ROOT_GAP);
+      });
+      xs = whole.xs;
+    }
+
+    maxDepth = deepest;
     let minX = Infinity;
-    whole.xs.forEach(v => { if(v < minX) minX = v; });
+    xs.forEach(v => { if(v < minX) minX = v; });
     const positions = new Map();
-    whole.xs.forEach((v, id) => {
+    xs.forEach((v, id) => {
       const d = depths.get(id) || 0;
       positions.set(id, { x: v - minX + 40, y: d * ROW_STEP, w: BW, h: BH, depth: d });
     });
-
     let width = 0, height = 0;
     positions.forEach(q => {
       if(q.x + q.w + 60 > width)  width  = q.x + q.w + 60;
@@ -511,7 +517,9 @@
     return e;
   }
   function personLabel(p){ return [p.nome, p.cognome].filter(Boolean).join(' ') || '(senza nome)'; }
-  function colorOf(p){ return colorsOn ? GROUP_COLORS[(p._group || 0) % GROUP_COLORS.length] : GROUP_COLORS[0]; }
+  function gidx(p){ return colorsOn ? (p._group || 0) % GROUP_COLORS.length : 0; }
+  function colorOf(p){ return GROUP_COLORS[gidx(p)]; }
+  function tintFor(p){ return GROUP_TINTS[gidx(p)]; }
 
   function wrap(str, maxChars, maxLines){
     if(!str) return [];
@@ -529,19 +537,20 @@
     return lines;
   }
 
-  function getVisibleSet(){
+  /* insieme delle persone appartenenti al ramo messo a fuoco:
+     tutti gli antenati risalendo, e tutti i discendenti scendendo */
+  function branchSet(){
     if(!focusId || !personsById.has(focusId)) return null;
-    const visible = new Set([focusId]);
+    const keep = new Set([focusId]);
     (function up(id){
       const p = personsById.get(id); if(!p) return;
-      [p.idPadre, p.idMadre].forEach(pid => { if(pid && personsById.has(pid) && !visible.has(pid)){ visible.add(pid); up(pid); } });
+      [p.idPadre, p.idMadre].forEach(pid => { if(pid && personsById.has(pid) && !keep.has(pid)){ keep.add(pid); up(pid); } });
     })(focusId);
     const kids = id => ALL_PERSONS.filter(p => p.idPadre === id || p.idMadre === id);
-    (function down(id){ kids(id).forEach(c => { if(!visible.has(c.id)){ visible.add(c.id); down(c.id); } }); })(focusId);
-    return visible;
+    (function down(id){ kids(id).forEach(c => { if(!keep.has(c.id)){ keep.add(c.id); down(c.id); } }); })(focusId);
+    return keep;
   }
 
-  /* --- cartiglio --- */
   function splitNote(note){
     let s = (note || '').toString(), n = '', d = '';
     const mn = s.match(/\bn\.\s*([0-9][0-9.\/\- ]*)/);
@@ -565,14 +574,12 @@
   function drawCard(g, p, W, H){
     const s = W / 177.45;
     const px = v => +(v*s).toFixed(2);
-    const stroke = colorOf(p);
+    const stroke = colorOf(p), bg = tintFor(p);
 
-    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H }));
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, fill:bg }));
 
     const orn = () => {
       const q = sel('g', null, 'card-orn');
-      // I quattro tratti diagonali corti agli angoli sono stati rimossi: il
-      // tracciato parte e finisce direttamente sui raccordi curvi.
       q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
         d:`M${px(-4.14)} ${px(-4.86)}`
          +`C${px(-3.07)} ${px(-3.97)} ${px(-1.72)} ${px(-3.48)} ${px(-0.32)} ${px(-3.48)}`
@@ -588,8 +595,8 @@
         d:`M${px(176.25)} ${px(-3.48)}C${px(179.44)} ${px(-3.48)} ${px(184.95)} ${px(-1.53)} ${px(184.95)} ${px(5.21)}` }));
       q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(13.75), y1:px(-6.5), x2:px(163.75), y2:px(-6.5) }));
       q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(43.75), y1:px(-8.9), x2:px(133.75), y2:px(-8.9) }));
-      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, 'stroke-width':px(.9), cx:0, cy:px(3.01), r:px(2.17) }));
-      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, 'stroke-width':px(.9), cx:px(177.45), cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:0, cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:px(177.45), cy:px(3.01), r:px(2.17) }));
       return q;
     };
     g.appendChild(orn());
@@ -641,12 +648,7 @@
     }
   }
 
-  /* ============ ETICHETTE SULLA BARRA (colonna I) ============
-     Il testo della colonna I viene scritto sulla barra orizzontale che sta
-     sotto il cartiglio di quella persona, cioè quella da cui scendono i suoi
-     figli. La barra viene spezzata in due tronconi e il testo si centra nel
-     vuoto lasciato in mezzo, in maiuscolo e in Cinzel bold.
-     Larghezza stimata del carattere: circa 0,70 em per lettera maiuscola.     */
+  /* etichette della colonna I sulla barra orizzontale */
   const CHAR_W = 0.70, LABEL_PAD = 26, LABEL_FS_MAX = 46, LABEL_FS_MIN = 20;
   function labelMetrics(text, barLen){
     let fs = LABEL_FS_MAX;
@@ -656,15 +658,13 @@
   }
 
   function render(resetZoom){
-    layout = buildLayout(ALL_PERSONS);
+    const keep = branchSet();
+    shownPersons = keep ? ALL_PERSONS.filter(p => keep.has(p.id)) : ALL_PERSONS;
+    layout = buildLayout(shownPersons);
     svg.innerHTML = '';
     if(!layout) return;
     svg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
-    const visible = getVisibleSet();
-    const fadeCls = visible ? ' faded' : '';
 
-    // i collegamenti sono raggruppati per colore: il tronco e la barra prendono
-    // il colore del genitore, la calata verso ogni figlio quello del figlio
     const byColor = new Map();
     const addSeg = (color, d) => { byColor.set(color, (byColor.get(color) || '') + d); };
     const labels = [];
@@ -679,23 +679,23 @@
       const barY = bottomP + (ROW_STEP - pp.h)/2;
       const firstX = kids[0].pos.x + kids[0].pos.w/2;
       const lastX  = kids[kids.length-1].pos.x + kids[kids.length-1].pos.w/2;
+      // la barra si allunga fino a raggiungere la verticale del genitore:
+      // serve nel modo "fratelli affiancati", dove il genitore non è centrato
+      const barL = Math.min(firstX, midP), barR = Math.max(lastX, midP);
 
       addSeg(pCol, `M${midP} ${bottomP}L${midP} ${barY}`);
 
       const text = (parent.etichetta || '').trim().toUpperCase();
-      if(text && lastX - firstX > 0){
-        const m = labelMetrics(text, lastX - firstX);
+      if(text && barR - barL > 1){
+        const m = labelMetrics(text, Math.max(lastX - firstX, barR - barL));
         const cx = (firstX + lastX) / 2;
-        const gapA = cx - m.half, gapB = cx + m.half;
-        // barra spezzata: il testo occupa il vuoto centrale
-        if(gapA > firstX) addSeg(pCol, `M${firstX} ${barY}L${gapA} ${barY}`);
-        if(lastX > gapB)  addSeg(pCol, `M${gapB} ${barY}L${lastX} ${barY}`);
+        const gA = cx - m.half, gB = cx + m.half;
+        if(gA > barL) addSeg(pCol, `M${barL} ${barY}L${gA} ${barY}`);
+        if(barR > gB) addSeg(pCol, `M${gB} ${barY}L${barR} ${barY}`);
         labels.push({ text:text, x:cx, y:barY, fs:m.fs, color:pCol });
       } else {
-        addSeg(pCol, `M${firstX} ${barY}L${lastX} ${barY}`);
-        if(text){ // genitore con un solo figlio: nessuna barra su cui scrivere
-          labels.push({ text:text, x:firstX, y:barY, fs:LABEL_FS_MIN + 8, color:pCol });
-        }
+        addSeg(pCol, `M${barL} ${barY}L${barR} ${barY}`);
+        if(text) labels.push({ text:text, x:firstX, y:barY, fs:LABEL_FS_MIN + 8, color:pCol });
       }
 
       kids.forEach(k => {
@@ -704,33 +704,34 @@
       });
     });
 
-    byColor.forEach((d, color) => {
-      svg.appendChild(sel('path', { d:d, stroke:color }, 'link' + fadeCls));
-    });
+    byColor.forEach((d, color) => svg.appendChild(sel('path', { d:d, stroke:color }, 'link')));
 
-    ALL_PERSONS.forEach(p => {
+    shownPersons.forEach(p => {
       const pos = layout.positions.get(p.id);
       if(!pos) return;
-      const isDim = visible && !visible.has(p.id);
       const g = sel('g', { transform:`translate(${pos.x},${pos.y})` },
-        'node-card' + (isDim ? ' dim' : '') + (p.id === focusId ? ' focused' : ''));
+        'node-card' + (p.id === focusId ? ' focused' : ''));
       g.dataset.id = p.id;
       drawCard(g, p, pos.w, pos.h);
       g.addEventListener('click', () => openDetail(p.id));
       svg.appendChild(g);
     });
 
-    // le etichette vanno sopra a tutto, per non essere coperte dai cartigli
     labels.forEach(L => {
-      const t = sel('text', { x:L.x, y:L.y, 'font-size':L.fs, fill:L.color }, 'bar-label' + fadeCls);
+      const t = sel('text', { x:L.x, y:L.y, 'font-size':L.fs, fill:L.color }, 'bar-label');
       t.textContent = L.text;
       svg.appendChild(t);
     });
 
     updateFocusUI();
-    fitZoom = Math.max(0.005, (vp.clientWidth - 24) / layout.width);
-    if(resetZoom) zoom = fitZoom;
-    applyZoom();
+    fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width);
+    if(resetZoom){
+      zoom = Math.max(fitZoom, initialZoom());
+      applyZoom();
+      vp.scrollLeft = 0; vp.scrollTop = 0;
+    } else {
+      applyZoom();
+    }
     applySearchFilter();
     updateMeasures();
   }
@@ -751,29 +752,45 @@
   }
   function zoomCenter(z){ zoomAt(z, vp.clientWidth/2, vp.clientHeight/2); }
 
-  /* ============ RICERCA (nomi e date) ============ */
+  /* ============ RICERCA: parole e anni insieme ============
+     La stringa viene spezzata in parole. Ogni gruppo di quattro cifre viene
+     trattato come un ANNO e confrontato con nascita e morte; tutto il resto
+     viene cercato nel testo (nome, annotazioni, luoghi, etichetta, ID).
+     Devono corrispondere tutte le parole, quindi "Matteo 1980" trova i Matteo
+     nati o morti nel 1980, non tutti i Matteo né tutti i nati nel 1980.       */
   function searchHaystack(p){
     if(p._hay) return p._hay;
-    const parts = [
+    p._hay = normalize([
       personLabel(p), p.dataNascita, fmtDate(p.dataNascita),
       p.dataMorte, fmtDate(p.dataMorte), p.note, fmtDate(p.note),
       p.coniuge, p.luogoNascita, p.luogoMorte, p.etichetta, p.id
-    ];
-    p._hay = normalize(parts.filter(Boolean).join(' | '));
+    ].filter(Boolean).join(' | '));
     return p._hay;
   }
+  function personYears(p){
+    if(p._years) return p._years;
+    p._years = allYears(p.dataNascita).concat(allYears(p.dataMorte));
+    return p._years;
+  }
+  function matches(p, tokens){
+    return tokens.every(t => {
+      if(/^\d{4}$/.test(t)) return personYears(p).indexOf(t) !== -1;
+      return searchHaystack(p).includes(t);
+    });
+  }
   function applySearchFilter(){
-    const q = normalize(el('search').value);
+    const raw = el('search').value.trim();
+    const tokens = normalize(raw).split(/\s+/).filter(Boolean);
     const cards = svg.querySelectorAll('.node-card');
-    if(!q){ cards.forEach(c => c.classList.remove('match')); setStatus(''); return; }
+    if(!tokens.length){ cards.forEach(c => c.classList.remove('match')); setStatus(''); return; }
     let first = null, count = 0;
     cards.forEach(c => {
       const p = personsById.get(c.dataset.id);
-      const isMatch = !!p && searchHaystack(p).includes(q);
-      c.classList.toggle('match', isMatch);
-      if(isMatch){ count++; if(!first) first = c; }
+      const ok = !!p && matches(p, tokens);
+      c.classList.toggle('match', ok);
+      if(ok){ count++; if(!first) first = c; }
     });
-    setStatus(count ? (count === 1 ? '1 risultato' : count + ' risultati') : 'Nessun risultato per «' + el('search').value.trim() + '»');
+    setStatus(count ? (count === 1 ? '1 risultato' : count + ' risultati') : 'Nessun risultato per «' + raw + '»');
     if(first){
       const pos = layout.positions.get(first.dataset.id);
       if(pos){
@@ -816,8 +833,8 @@
     }
     el('detail-panel').classList.add('open');
     el('overlay').classList.add('open');
-    el('detail-focus').onclick = () => { focusId = id; render(); closeDetail(); };
-    el('detail-export').onclick = () => { focusId = id; render(); closeDetail(); setTimeout(()=>window.print(), 250); };
+    el('detail-focus').onclick = () => { focusId = id; closeDetail(); render(true); };
+    el('detail-export').onclick = () => { focusId = id; closeDetail(); render(true); setTimeout(()=>window.print(), 300); };
   }
   function closeDetail(){ el('detail-panel').classList.remove('open'); el('overlay').classList.remove('open'); }
   el('detail-close').addEventListener('click', closeDetail);
@@ -833,11 +850,9 @@
     if(!layout) return;
     const hCm = parseFloat(el('print-height').value) || 100;
     const scale = hCm / layout.height;
-    const lenM = (layout.width * scale) / 100;
-    const cardW = BW * scale, cardH = BH * scale;
+    el('m-length').textContent = ((layout.width * scale)/100).toFixed(1).replace('.', ',') + ' m';
+    el('m-card').textContent = (BW*scale).toFixed(1).replace('.', ',') + ' × ' + (BH*scale).toFixed(1).replace('.', ',') + ' cm';
     const fontMm = 28 * scale * 10;
-    el('m-length').textContent = lenM.toFixed(1).replace('.', ',') + ' m';
-    el('m-card').textContent = cardW.toFixed(1).replace('.', ',') + ' × ' + cardH.toFixed(1).replace('.', ',') + ' cm';
     el('m-font').textContent = fontMm.toFixed(1).replace('.', ',') + ' mm';
     el('m-gen').textContent = (maxDepth + 1) + '';
     el('measure').classList.toggle('warn', fontMm < 2);
@@ -852,7 +867,7 @@
   });
   el('print-go').addEventListener('click', () => { closePrint(); setTimeout(() => window.print(), 250); });
 
-  /* ============ COLORI ============ */
+  /* ============ COLORI E ALLINEAMENTO ============ */
   el('btn-colors').addEventListener('click', () => {
     colorsOn = !colorsOn;
     el('btn-colors').classList.toggle('on', colorsOn);
@@ -860,6 +875,13 @@
     render();
   });
   el('btn-colors').classList.add('on');
+
+  el('btn-align').addEventListener('click', () => {
+    alignSiblings = !alignSiblings;
+    el('btn-align').classList.toggle('on', alignSiblings);
+    el('btn-align').title = alignSiblings ? 'Torna alla disposizione centrata' : 'Fratelli sempre affiancati';
+    render(true);
+  });
 
   /* ============ CONTROLLI ============ */
   function updateFocusUI(){ el('toolbar').classList.toggle('focus-mode', !!focusId); }
@@ -902,12 +924,12 @@
     const isFs = document.fullscreenElement || document.webkitFullscreenElement;
     el('ic-fs').innerHTML = isFs ? IC_EXIT : IC_ENTER;
     el('btn-fullscreen').title = isFs ? 'Esci da schermo intero' : 'Schermo intero';
-    setTimeout(() => { if(layout) fitZoom = Math.max(0.005, (vp.clientWidth - 24) / layout.width); }, 120);
+    setTimeout(() => { if(layout) fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width); }, 120);
   }
   document.addEventListener('fullscreenchange', updateFs);
   document.addEventListener('webkitfullscreenchange', updateFs);
 
-  /* ============ TOUCH ============ */
+  /* ============ TOUCH: pan a un dito, pinch a due ============ */
   let mode = null, tsx, tsy, tsl, tst, pd0 = 0, pz0 = 1, pcx = 0, pcy = 0;
   const dist = (a,b) => Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
   vp.addEventListener('touchstart', e => {
@@ -940,8 +962,8 @@
   }, { passive:false });
   vp.addEventListener('touchend', e => { mode = e.touches.length === 1 ? 'pan' : null; }, { passive:true });
 
-  if(window.ResizeObserver){ new ResizeObserver(() => { if(layout) fitZoom = Math.max(0.005, (vp.clientWidth - 24) / layout.width); }).observe(vp); }
-  window.addEventListener('resize', () => { if(layout) fitZoom = Math.max(0.005, (vp.clientWidth - 24) / layout.width); });
+  if(window.ResizeObserver){ new ResizeObserver(() => { if(layout) fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width); }).observe(vp); }
+  window.addEventListener('resize', () => { if(layout) fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width); });
 
   loadData();
 })();
