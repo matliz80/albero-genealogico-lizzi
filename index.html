@@ -6,7 +6,7 @@
 <title>I Lizzi in Friuli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f2e8d5; --paper-2:#e9dcbf; --paper-3:#ded0ac;
@@ -89,7 +89,8 @@
   #stage:-webkit-full-screen{margin:0; border:none; border-radius:0; width:100vw; height:100vh; background:var(--paper);}
   #stage::backdrop{background:var(--paper);}
   #stage:-webkit-full-screen::backdrop{background:var(--paper);}
-  .link{fill:none; stroke-width:3.3; stroke-linecap:round; stroke-linejoin:round;}
+  .link{fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:3.3;}
+  .link.thin{stroke-width:2.4;}
   .card-frame{fill:none; stroke-linecap:round; stroke-linejoin:round;}
   .node-card .name{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle;}
   .node-card .date{font-family:'Newsreader',serif; fill:#5b3a16;}
@@ -98,6 +99,9 @@
   .node-card{cursor:pointer;}
   .node-card.match .card-bg{fill:#fbeccb;}
   .node-card.focused .card-bg{fill:#f6e2ba;}
+  /* vista semplificata: nome grande, anno a capo, nessuna cornice */
+  .simple .s-name{font-family:'Fraunces',serif; font-weight:700; text-anchor:middle;}
+  .simple .s-year{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle;}
   .bar-label{font-family:'Cinzel',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
 
   #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
@@ -134,8 +138,6 @@
     #stage svg{width:100% !important; height:auto !important;}
   }
   @media (max-width:640px){
-    /* su mobile lo zoom si fa col pinch: i tre tasti spariscono e restano
-       solo schermo intero e adatta, per lasciare spazio alla barra */
     #btn-zoom-in,#btn-zoom-out,#btn-zoom-level{display:none !important;}
     #search{width:132px; font-size:16px;}
     #detail-panel,#print-panel{width:90%; right:-100%;}
@@ -169,6 +171,7 @@
       <button class="btn" id="btn-zoom-in" title="Ingrandisci">+</button>
       <button class="btn icon" id="btn-fullscreen" title="Schermo intero" aria-label="Schermo intero"><svg id="ic-fs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
     </div>
+    <button class="btn icon" id="btn-simple" title="Solo nome e anno, in grande" aria-label="Solo nome e anno"><svg id="ic-simple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h18M3 12h12M3 17.5h7"/></svg></button>
     <button class="btn icon" id="btn-align" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9" width="4.4" height="6"/><rect x="9.8" y="9" width="4.4" height="6"/><rect x="17.1" y="9" width="4.4" height="6"/><path d="M2.5 4.5h19"/></svg></button>
     <button class="btn icon" id="btn-colors" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.6"/><circle cx="17.5" cy="10.5" r="1.6"/><circle cx="8.5" cy="7.5" r="1.6"/><circle cx="6.5" cy="12.5" r="1.6"/><path d="M12 2a10 10 0 1 0 0 20c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16a6 6 0 0 0 6-6c0-5-4.5-8.8-10-8.8z"/></svg></button>
     <button class="btn" id="btn-print" title="Stampa e plotter">Stampa</button>
@@ -194,17 +197,17 @@
   <aside id="print-panel">
     <button class="close" id="print-close">CHIUDI ✕</button>
     <h2>Stampa su plotter</h2>
-    <p class="hint">L'albero si sviluppa in orizzontale. Fissata l'altezza del telo, la lunghezza dipende dalla distanza fra le generazioni: righe più larghe accorciano il telo ma rimpiccioliscono i cartigli.</p>
+    <p class="hint">L'albero si sviluppa in orizzontale. Fissata l'altezza del telo, la lunghezza dipende dalla distanza fra le generazioni: righe più larghe accorciano il telo ma rimpiccioliscono le caselle.</p>
 
     <label for="print-height">Altezza del telo (cm)</label>
     <input type="number" id="print-height" value="100" min="20" max="300" step="5">
 
     <label for="row-density">Distanza fra le generazioni</label>
-    <input type="range" id="row-density" min="324" max="900" step="10" value="324">
+    <input type="range" id="row-density" min="60" max="700" step="10" value="105">
 
     <div class="measure" id="measure">
       <div class="m-row"><span class="k">Lunghezza del telo</span><b class="big" id="m-length">—</b></div>
-      <div class="m-row"><span class="k">Cartiglio stampato</span><b id="m-card">—</b></div>
+      <div class="m-row"><span class="k">Casella stampata</span><b id="m-card">—</b></div>
       <div class="m-row"><span class="k">Corpo del nome</span><b id="m-font">—</b></div>
       <div class="m-row"><span class="k">Generazioni</span><b id="m-gen">—</b></div>
     </div>
@@ -223,12 +226,17 @@
   const SHEET_NAME = "";
   const PAGE_TITLE = "I Lizzi in Friuli";
 
-  const BW = 291.9, BH = 219.0;
+  const BW = 291.9, BH = 219.0;                 // cartiglio completo
   const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
-  const ROW_STEP_BASE = BH + 105;
-  let ROW_STEP = ROW_STEP_BASE;
+  let rowGap = 105;                              // spazio verticale fra una riga e l'altra
 
-  // zoom di apertura: si parte già a una scala leggibile, non adattati allo schermo
+  // vista semplificata: nome grande, anno a capo, nessuna cornice
+  const SIMPLE   = { nameFS:56, yearFS:40, padX:20, minW:186, maxChars:12, H:152 };
+  // vista verticale: il nome corre dal basso verso l'alto, così la casella
+  // resta stretta qualunque sia la lunghezza del nome. È la disposizione più
+  // adatta alla stampa, perché accorcia moltissimo il telo.
+  const SIMPLE_V = { nameFS:52, yearFS:36, pad:24, minH:300, maxChars:16, W:118 };
+
   const isMobile = () => window.matchMedia('(max-width: 640px)').matches;
   const initialZoom = () => isMobile() ? 0.58 : 0.50;
 
@@ -237,24 +245,36 @@
 
   const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv${SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : ''}`;
 
-  /* ============ TAVOLOZZA (colonna H) ============
-     Dodici tinte scure per linee, cornice e nome. Lo sfondo del cartiglio usa
-     la stessa tinta ma diluita al 10% sull'avorio, così ogni ramo si riconosce
-     a colpo d'occhio senza che il testo perda contrasto.                      */
+  /* ============ TAVOLOZZA (colonna H) ============ */
   const GROUP_COLORS = [
     '#603813','#1f4f3f','#7a2e1e','#23405e','#5c2a52','#6b5a12',
     '#2f5d5a','#3f3470','#8a2f2f','#40561f','#7a4a12','#4a2f6b'
   ];
   const IVORY = [255, 255, 243];
   const TINT = 0.10;
-  function tintOf(hex){
-    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-    const mix = (c, base) => Math.round(base*(1-TINT) + c*TINT);
-    return `rgb(${mix(r,IVORY[0])},${mix(g,IVORY[1])},${mix(b,IVORY[2])})`;
+  function rgbOf(hex){
+    return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
   }
-  const GROUP_TINTS = GROUP_COLORS.map(tintOf);
-  let colorsOn = true;
-  let alignSiblings = false;   // modalità "fratelli sempre affiancati"
+  function tintOf(hex, extra){
+    const c = rgbOf(hex);
+    const k = extra || 0;   // -1 schiarisce, +1 scurisce: bande alternate di lettura
+    return 'rgb(' + [0,1,2].map(i => {
+      let v = Math.round(IVORY[i]*(1-TINT) + c[i]*TINT);
+      v = Math.round(v + k * (c[i] - v) * 0.14);
+      return Math.max(0, Math.min(255, v));
+    }).join(',') + ')';
+  }
+  const GROUP_TINTS  = GROUP_COLORS.map(h => tintOf(h, 0));
+  const GROUP_TINTS2 = GROUP_COLORS.map(h => tintOf(h, 1));   // banda leggermente più carica
+
+  let colorsOn = true, alignSiblings = false;
+  // 0 = cartiglio completo, 1 = nome e anno orizzontali, 2 = nome e anno verticali
+  let cardMode = 0;
+  const isSimple = () => cardMode > 0;
+  const isVert   = () => cardMode === 2;
+  let vH = SIMPLE_V.minH;   // altezza di riga in verticale, dal nome più lungo
+  let dataWarn = '';        // errori nei dati, mostrati in rosso sotto la barra
+  let dataNote = '';        // segnalazioni non critiche, in colore normale
 
   /* ============ CSV ============ */
   function parseCSV(text){
@@ -311,14 +331,30 @@
       headers.forEach((f, idx) => { if(f) p[f] = (r[idx] || '').trim(); });
       if(!p.id) p.id = '_row' + i;
       if(!p.nome && !p.cognome) continue;
+      p._hasX = /^[xX✓✔]/.test((p.gruppo || '').trim());
       persons.push(p);
     }
-    let g = 0, seen = false;
-    persons.forEach(p => {
-      if(/^[xX✓✔]/.test((p.gruppo || '').trim())){ g = seen ? g + 1 : 1; seen = true; }
-      p._group = g;
-    });
     return persons;
+  }
+
+  /* ============ GRUPPI DI COLORE PER DISCENDENZA ============
+     Una X non colora più le righe successive del foglio, ma la persona stessa e
+     tutti i suoi discendenti: figli, nipoti e così via, fino a incontrare un
+     altro discendente marcato con una X, che apre a sua volta un gruppo nuovo.
+     Chi arriva da un altro ramo, anche se nel foglio sta in mezzo alle righe
+     marcate o nel disegno finisce sulla stessa riga, non viene toccato.        */
+  function assignGroups(persons, childrenOf, roots){
+    const marked = persons.filter(p => p._hasX);
+    const idx = new Map();
+    marked.forEach((p, i) => idx.set(p.id, (i % (GROUP_COLORS.length - 1)) + 1));
+    function paint(p, g){
+      const own = idx.has(p.id) ? idx.get(p.id) : g;
+      p._group = own;
+      (childrenOf.get(p.id) || []).forEach(c => paint(c, own));
+    }
+    roots.forEach(r => paint(r, 0));
+    // eventuali persone non raggiunte (dati incoerenti) restano al gruppo neutro
+    persons.forEach(p => { if(p._group == null) p._group = idx.has(p.id) ? idx.get(p.id) : 0; });
   }
 
   /* ============ STATO ============ */
@@ -348,22 +384,75 @@
       });
   }
 
+  /* ============ DIMENSIONI DELLE CASELLE ============
+     Nel cartiglio sono fisse. Nella vista semplificata la larghezza si adatta
+     al nome, così i nomi corti non sprecano spazio e quelli lunghi restano
+     leggibili invece di essere schiacciati.                                   */
+  function truncName(s, max){
+    s = (s || '').trim();
+    const n = max || SIMPLE.maxChars;
+    return s.length > n ? s.slice(0, n - 1).replace(/[ ,.;-]+$/,'') + '…' : s;
+  }
+  function birthLine(p){
+    const d = fmtDate(p.dataNascita);
+    if(d && d.length <= 10) return d;
+    const y = parseYear(p.dataNascita);
+    return y ? String(y) : '';
+  }
+  function nodeW(p){
+    if(cardMode === 0) return BW;
+    if(cardMode === 2) return SIMPLE_V.W;
+    const n = truncName(personLabel(p)), y = birthLine(p);
+    const wn = n.length * SIMPLE.nameFS * 0.545;
+    const wy = y.length * SIMPLE.yearFS * 0.560;
+    return Math.max(SIMPLE.minW, Math.max(wn, wy) + 2*SIMPLE.padX);
+  }
+  function nodeH(){ return cardMode === 2 ? vH : (cardMode === 1 ? SIMPLE.H : BH); }
+  // in verticale tutte le righe usano la stessa altezza, ricavata dal nome più
+  // lungo fra quelli mostrati, così le generazioni restano allineate
+  function computeVH(list){
+    let m = 0;
+    list.forEach(p => {
+      const w = truncName(personLabel(p), SIMPLE_V.maxChars).length * SIMPLE_V.nameFS * 0.545;
+      if(w > m) m = w;
+    });
+    vH = Math.max(SIMPLE_V.minH, m + 2*SIMPLE_V.pad);
+  }
+  function rowStep(){ return nodeH() + rowGap; }
+
   /* ============ LAYOUT ============ */
   function parseYear(v){
     if(!v) return null;
     const m = v.match(/(1[3-9]\d{2}|20\d{2})/);
     return m ? parseInt(m[1], 10) : null;
   }
-  function allYears(v){
-    if(!v) return [];
-    return (v.match(/1[3-9]\d{2}|20\d{2}/g) || []);
+  function allYears(v){ return v ? (v.match(/1[3-9]\d{2}|20\d{2}/g) || []) : []; }
+  /* confronto "naturale" fra ID: P115b viene prima di P115c, e P9 prima di P10,
+     perché le cifre si confrontano come numeri e le lettere come lettere */
+  function cmpId(a, b){
+    const A = String(a).match(/\d+|\D+/g) || [], B = String(b).match(/\d+|\D+/g) || [];
+    for(let i=0; i<Math.max(A.length, B.length); i++){
+      const x = A[i], y = B[i];
+      if(x === undefined) return -1;
+      if(y === undefined) return 1;
+      const nx = /^\d+$/.test(x), ny = /^\d+$/.test(y);
+      if(nx && ny){ if(+x !== +y) return +x - +y; }
+      else { const r = x.toUpperCase().localeCompare(y.toUpperCase()); if(r) return r; }
+    }
+    return 0;
   }
   function ordinaFratelli(list){
     const risultato = list.slice();
-    const slotConData = [];
-    list.forEach((p, i) => { if(p._anno != null) slotConData.push(i); });
-    const datati = slotConData.map(i => list[i]).sort((a,b) => a._anno - b._anno || a._sheetIdx - b._sheetIdx);
-    slotConData.forEach((slot, k) => { risultato[slot] = datati[k]; });
+    // chi ha una data si dispone cronologicamente nei posti già occupati da
+    // fratelli con data; chi non ce l'ha resta nei propri posti, ma fra loro
+    // si ordinano per ID, così P115a, P115b, P115c restano in sequenza anche
+    // se nel foglio sono stati inseriti alla rinfusa
+    const conData = [], senzaData = [];
+    list.forEach((p, i) => { (p._anno != null ? conData : senzaData).push(i); });
+    const datati = conData.map(i => list[i]).sort((a,b) => a._anno - b._anno || a._sheetIdx - b._sheetIdx);
+    conData.forEach((s, k) => { risultato[s] = datati[k]; });
+    const nondatati = senzaData.map(i => list[i]).sort((a,b) => cmpId(a.id, b.id));
+    senzaData.forEach((s, k) => { risultato[s] = nondatati[k]; });
     return risultato;
   }
 
@@ -372,12 +461,53 @@
     const localById = new Map(persons.map(p => [p.id, p]));
     persons.forEach((p, i) => { p._sheetIdx = i; p._anno = parseYear(p.dataNascita); });
 
+    /* Gli ID vengono confrontati senza badare a maiuscole, minuscole e spazi:
+       chi compila il foglio scrive «p115a» o «P115 a» e il collegamento deve
+       reggere lo stesso. */
+    const key = s => (s == null ? '' : String(s)).replace(/\s+/g, '').toUpperCase();
+    const byKey = new Map();
+    persons.forEach(p => { if(!byKey.has(key(p.id))) byKey.set(key(p.id), p.id); });
+    const resolve = ref => {
+      const k = key(ref);
+      return k && byKey.has(k) ? byKey.get(k) : null;
+    };
+
+    /* Deduzione della parentela dall'ID, per la convenzione a lettere:
+       i figli di P115 sono P115a, P115b, P115c…; i figli di P115d sono
+       P115da, P115db, P115dc… Togliendo l'ultima lettera si ottiene il
+       genitore, a qualsiasi profondità (P115dca -> P115dc -> P115d -> P115).
+       Vale solo quando la colonna ID Padre è vuota o punta a un ID inesistente:
+       un ID Padre scritto a mano ha sempre la precedenza. */
+    const derivaGenitore = id => {
+      const m = String(id).trim().match(/^(.+)([A-Za-z])$/);
+      if(!m) return null;
+      const cand = resolve(m[1]);
+      return (cand && cand !== id) ? cand : null;
+    };
+
     const parentOf = new Map();
+    let nDerivati = 0;
+    const idPadreRotti = [];
     persons.forEach(p => {
-      const pid = (p.idPadre && localById.has(p.idPadre) && p.idPadre !== p.id) ? p.idPadre
-                : (p.idMadre && localById.has(p.idMadre) && p.idMadre !== p.id) ? p.idMadre : null;
+      let pid = null;
+      const scritto = (p.idPadre || '').trim() || (p.idMadre || '').trim();
+      if(scritto){
+        pid = resolve(scritto);
+        if(pid === p.id) pid = null;
+        if(!pid) idPadreRotti.push(p.id + '→' + scritto);
+      }
+      if(!pid){
+        const ded = derivaGenitore(p.id);
+        if(ded){ pid = ded; nDerivati++; }
+      }
       parentOf.set(p.id, pid);
     });
+
+    dataWarn = '';
+    if(idPadreRotti.length){
+      const lista = idPadreRotti.slice(0, 6).join(', ') + (idPadreRotti.length > 6 ? ' e altri' : '');
+      dataWarn = '⚠ ' + idPadreRotti.length + ' righe hanno un ID Padre che non corrisponde a nessuna persona: ' + lista;
+    }
     const stato = new Map();
     function spezzaCicli(id){
       if(stato.get(id) === 1){ parentOf.set(id, null); return; }
@@ -396,26 +526,42 @@
     });
     childrenOf.forEach((figli, pid) => childrenOf.set(pid, ordinaFratelli(figli)));
 
+    /* Chi non ha un genitore riconosciuto e non ha nemmeno figli è una casella
+       isolata: nel disegno galleggerebbe staccata da tutto, senza una sola
+       linea che la colleghi. Viene esclusa dal disegno. Restano invece le
+       radici vere, cioè chi non ha genitore ma ha una discendenza: sono i
+       capostipiti dei rami, e vanno mostrati. */
+    const isolati = roots.filter(r => (childrenOf.get(r.id) || []).length === 0);
+    let radici = roots.filter(r => (childrenOf.get(r.id) || []).length > 0);
+    if(!radici.length) radici = roots;   // salvaguardia: non svuotare mai il disegno
+    roots.length = 0;
+    radici.forEach(r => roots.push(r));
+
+    dataNote = '';
+    if(isolati.length && isolati.length !== 0){
+      const lista = isolati.slice(0, 8).map(p => p.id).join(', ') + (isolati.length > 8 ? '…' : '');
+      dataNote = isolati.length + (isolati.length === 1
+        ? ' persona senza genitore e senza figli non è mostrata: '
+        : ' persone senza genitore e senza figli non sono mostrate: ') + lista;
+    }
+
+    persons.forEach(p => { p._group = null; });
+    assignGroups(persons, childrenOf, roots);
+
+    const RS = rowStep();
     const depths = new Map();
     let deepest = 0, xs = new Map();
 
     if(alignSiblings){
-      /* --- MODO "FRATELLI AFFIANCATI" ---
-         I fratelli si toccano sempre, qualunque discendenza abbiano: ogni riga
-         ha un proprio cursore e le persone la riempiono da sinistra a destra
-         nell'ordine di visita. Il genitore NON è più centrato sui figli: sono
-         le linee di giunzione a spostarsi per raggiungerli.                   */
-      const rowCursor = [];
-      let baseline = 0;
+      const rowCursor = []; let baseline = 0;
       function visit(p, depth){
         if(depth > deepest) deepest = depth;
         if(rowCursor[depth] == null) rowCursor[depth] = baseline;
         const x = rowCursor[depth];
         xs.set(p.id, x); depths.set(p.id, depth);
-        rowCursor[depth] = x + BW + SIB_GAP;
+        rowCursor[depth] = x + nodeW(p) + SIB_GAP;
         const figli = childrenOf.get(p.id) || [];
         if(figli.length){
-          // stacca il gruppo di figli da quello del cugino precedente
           if(rowCursor[depth+1] != null) rowCursor[depth+1] += (COUSIN_GAP - SIB_GAP);
           figli.forEach(f => visit(f, depth+1));
         }
@@ -431,11 +577,9 @@
       });
 
     } else {
-      /* --- MODO NORMALE: packing a contorni ---
-         Ogni sottoalbero porta il proprio profilo destro e sinistro riga per
-         riga; il fratello successivo scivola a sinistra fino al primo contatto
-         reale. Un fratello senza figli occupa una riga sola e non riserva
-         spazio in quelle sottostanti.                                         */
+      /* packing a contorni. I profili salvano il bordo DESTRO reale, non più il
+         bordo sinistro più una larghezza fissa: serve perché nella vista
+         semplificata ogni casella ha la sua larghezza.                        */
       function shiftBlock(b, dx){
         b.xs.forEach((v, k) => b.xs.set(k, v + dx));
         for(let i=0;i<b.left.length;i++){ b.left[i] += dx; b.right[i] += dx; }
@@ -446,8 +590,7 @@
         let shift = 0;
         const overlap = Math.min(acc.right.length, next.left.length);
         for(let d=0; d<overlap; d++){
-          const gap = (d === 0) ? gapTop : gapDeep;
-          const need = acc.right[d] + BW + gap - next.left[d];
+          const need = acc.right[d] + ((d === 0) ? gapTop : gapDeep) - next.left[d];
           if(need > shift) shift = need;
         }
         shiftBlock(next, shift);
@@ -463,8 +606,9 @@
       }
       function build(p, depth){
         if(depth > deepest) deepest = depth;
+        const w = nodeW(p);
         const figli = childrenOf.get(p.id) || [];
-        if(figli.length === 0) return { xs: new Map([[p.id, 0]]), left:[0], right:[0], cx: BW/2 };
+        if(figli.length === 0) return { xs: new Map([[p.id, 0]]), left:[0], right:[w], cx: w/2 };
         let acc = null; const centers = [];
         for(const f of figli){
           const sub = build(f, depth + 1);
@@ -472,10 +616,10 @@
           centers.push(sub.cx);
         }
         const cx = (centers[0] + centers[centers.length - 1]) / 2;
-        const px = cx - BW/2;
+        const px = cx - w/2;
         acc.xs.set(p.id, px);
         acc.left  = [px].concat(acc.left);
-        acc.right = [px].concat(acc.right);
+        acc.right = [px + w].concat(acc.right);
         acc.cx = cx;
         return acc;
       }
@@ -497,8 +641,9 @@
     xs.forEach(v => { if(v < minX) minX = v; });
     const positions = new Map();
     xs.forEach((v, id) => {
+      const p = localById.get(id);
       const d = depths.get(id) || 0;
-      positions.set(id, { x: v - minX + 40, y: d * ROW_STEP, w: BW, h: BH, depth: d });
+      positions.set(id, { x: v - minX + 40, y: d * RS, w: nodeW(p), h: nodeH(), depth: d });
     });
     let width = 0, height = 0;
     positions.forEach(q => {
@@ -519,7 +664,7 @@
   function personLabel(p){ return [p.nome, p.cognome].filter(Boolean).join(' ') || '(senza nome)'; }
   function gidx(p){ return colorsOn ? (p._group || 0) % GROUP_COLORS.length : 0; }
   function colorOf(p){ return GROUP_COLORS[gidx(p)]; }
-  function tintFor(p){ return GROUP_TINTS[gidx(p)]; }
+  function tintFor(p){ return (p._band ? GROUP_TINTS2 : GROUP_TINTS)[gidx(p)]; }
 
   function wrap(str, maxChars, maxLines){
     if(!str) return [];
@@ -537,8 +682,6 @@
     return lines;
   }
 
-  /* insieme delle persone appartenenti al ramo messo a fuoco:
-     tutti gli antenati risalendo, e tutti i discendenti scendendo */
   function branchSet(){
     if(!focusId || !personsById.has(focusId)) return null;
     const keep = new Set([focusId]);
@@ -571,6 +714,42 @@
     return t;
   }
 
+  /* --- casella semplificata: solo fondo colorato, nome e anno --- */
+  function drawSimple(g, p, W, H){
+    const stroke = colorOf(p), bg = tintFor(p);
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:6, fill:bg }));
+    const n = sel('text', { x:W/2, y:H*0.44, class:'s-name', 'font-size':SIMPLE.nameFS, fill:stroke });
+    n.textContent = truncName(personLabel(p));
+    g.appendChild(n);
+    const yr = birthLine(p);
+    if(yr){
+      const t = sel('text', { x:W/2, y:H*0.83, class:'s-year', 'font-size':SIMPLE.yearFS, fill:stroke, opacity:.78 });
+      t.textContent = yr;
+      g.appendChild(t);
+    }
+  }
+
+  /* --- casella verticale: nome e anno ruotati, letti dal basso in alto --- */
+  function drawSimpleV(g, p, W, H){
+    const stroke = colorOf(p), bg = tintFor(p);
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:6, fill:bg }));
+    const cy = H/2;
+    const nx = W*0.38;
+    const n = sel('text', { x:nx, y:cy, class:'s-name', 'font-size':SIMPLE_V.nameFS, fill:stroke,
+                            'dominant-baseline':'middle', transform:`rotate(-90 ${nx} ${cy})` });
+    n.textContent = truncName(personLabel(p), SIMPLE_V.maxChars);
+    g.appendChild(n);
+    const yr = birthLine(p);
+    if(yr){
+      const yx = W*0.76;
+      const t = sel('text', { x:yx, y:cy, class:'s-year', 'font-size':SIMPLE_V.yearFS, fill:stroke, opacity:.78,
+                              'dominant-baseline':'middle', transform:`rotate(-90 ${yx} ${cy})` });
+      t.textContent = yr;
+      g.appendChild(t);
+    }
+  }
+
+  /* --- cartiglio completo --- */
   function drawCard(g, p, W, H){
     const s = W / 177.45;
     const px = v => +(v*s).toFixed(2);
@@ -648,7 +827,6 @@
     }
   }
 
-  /* etichette della colonna I sulla barra orizzontale */
   const CHAR_W = 0.70, LABEL_PAD = 26, LABEL_FS_MAX = 46, LABEL_FS_MIN = 20;
   function labelMetrics(text, barLen){
     let fs = LABEL_FS_MAX;
@@ -660,10 +838,30 @@
   function render(resetZoom){
     const keep = branchSet();
     shownPersons = keep ? ALL_PERSONS.filter(p => keep.has(p.id)) : ALL_PERSONS;
+    if(isVert()) computeVH(shownPersons);
     layout = buildLayout(shownPersons);
     svg.innerHTML = '';
     if(!layout) return;
     svg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+    const RS = rowStep();
+
+    /* bande di lettura: le famiglie adiacenti ricevono un fondo alternato,
+       appena più carico o più tenue, per seguire meglio i gruppi di fratelli
+       nella vista affiancata, dove i genitori non stanno sopra ai figli.      */
+    let famIdx = 0;
+    const famOf = new Map();
+    shownPersons.forEach(p => { p._band = false; });
+    layout.childrenOf.forEach((figli, pid) => {
+      famOf.set(pid, famIdx);
+      // le bande servono solo dove le linee corrono lunghe e i genitori non
+      // stanno sopra ai figli: nella vista centrata sporcherebbero soltanto
+      // il colore del ramo, che deve restare uno solo per tutta la discendenza
+      if(alignSiblings){
+        const band = (famIdx % 2) === 1;
+        figli.forEach(f => { f._band = band; });
+      }
+      famIdx++;
+    });
 
     const byColor = new Map();
     const addSeg = (color, d) => { byColor.set(color, (byColor.get(color) || '') + d); };
@@ -676,11 +874,16 @@
       if(!parent || !pp || !kids.length) return;
       const pCol = colorOf(parent);
       const midP = pp.x + pp.w/2, bottomP = pp.y + pp.h;
-      const barY = bottomP + (ROW_STEP - pp.h)/2;
+
+      /* Nella vista affiancata le barre orizzontali di famiglie diverse
+         cadrebbero tutte alla stessa quota e si confonderebbero: vengono
+         quindi sfalsate su tre livelli, così ogni percorso genitore-figli
+         resta seguibile a occhio anche quando le linee corrono lunghe.        */
+      const lv = alignSiblings ? [0.26, 0.50, 0.74][famOf.get(pid) % 3] : 0.5;
+      const barY = bottomP + rowGap * lv;
+
       const firstX = kids[0].pos.x + kids[0].pos.w/2;
       const lastX  = kids[kids.length-1].pos.x + kids[kids.length-1].pos.w/2;
-      // la barra si allunga fino a raggiungere la verticale del genitore:
-      // serve nel modo "fratelli affiancati", dove il genitore non è centrato
       const barL = Math.min(firstX, midP), barR = Math.max(lastX, midP);
 
       addSeg(pCol, `M${midP} ${bottomP}L${midP} ${barY}`);
@@ -701,18 +904,24 @@
       kids.forEach(k => {
         const cx = k.pos.x + k.pos.w/2;
         addSeg(colorOf(k.p), `M${cx} ${barY}L${cx} ${k.pos.y}`);
+        // trattino di aggancio sul bordo superiore del figlio: rende evidente
+        // a quale casella arriva la calata quando le linee sono molte
+        if(alignSiblings){
+          const t = Math.min(k.pos.w*0.34, 46);
+          addSeg(colorOf(k.p), `M${cx - t} ${k.pos.y}L${cx + t} ${k.pos.y}`);
+        }
       });
     });
 
-    byColor.forEach((d, color) => svg.appendChild(sel('path', { d:d, stroke:color }, 'link')));
+    byColor.forEach((d, color) => svg.appendChild(sel('path', { d:d, stroke:color }, 'link' + (alignSiblings ? ' thin' : ''))));
 
     shownPersons.forEach(p => {
       const pos = layout.positions.get(p.id);
       if(!pos) return;
       const g = sel('g', { transform:`translate(${pos.x},${pos.y})` },
-        'node-card' + (p.id === focusId ? ' focused' : ''));
+        'node-card' + (isSimple() ? ' simple' : '') + (p.id === focusId ? ' focused' : ''));
       g.dataset.id = p.id;
-      drawCard(g, p, pos.w, pos.h);
+      (cardMode === 2 ? drawSimpleV : cardMode === 1 ? drawSimple : drawCard)(g, p, pos.w, pos.h);
       g.addEventListener('click', () => openDetail(p.id));
       svg.appendChild(g);
     });
@@ -728,12 +937,31 @@
     if(resetZoom){
       zoom = Math.max(fitZoom, initialZoom());
       applyZoom();
-      vp.scrollLeft = 0; vp.scrollTop = 0;
+      centerOn(oldestId());
     } else {
       applyZoom();
     }
     applySearchFilter();
     updateMeasures();
+  }
+
+  /* all'apertura la vista si posiziona sul capostipite, cioè la persona con la
+     data di nascita più antica fra quelle mostrate */
+  function oldestId(){
+    let best = null, by = Infinity;
+    shownPersons.forEach(p => {
+      const y = parseYear(p.dataNascita);
+      if(y != null && y < by){ by = y; best = p.id; }
+    });
+    if(!best && layout && layout.roots.length) best = layout.roots[0].id;
+    return best;
+  }
+  function centerOn(id){
+    if(!id || !layout) return;
+    const pos = layout.positions.get(id);
+    if(!pos) return;
+    vp.scrollLeft = Math.max(0, (pos.x + pos.w/2)*zoom - vp.clientWidth/2);
+    vp.scrollTop  = Math.max(0, (pos.y + pos.h/2)*zoom - vp.clientHeight/2);
   }
 
   function applyZoom(){
@@ -752,12 +980,7 @@
   }
   function zoomCenter(z){ zoomAt(z, vp.clientWidth/2, vp.clientHeight/2); }
 
-  /* ============ RICERCA: parole e anni insieme ============
-     La stringa viene spezzata in parole. Ogni gruppo di quattro cifre viene
-     trattato come un ANNO e confrontato con nascita e morte; tutto il resto
-     viene cercato nel testo (nome, annotazioni, luoghi, etichetta, ID).
-     Devono corrispondere tutte le parole, quindi "Matteo 1980" trova i Matteo
-     nati o morti nel 1980, non tutti i Matteo né tutti i nati nel 1980.       */
+  /* ============ RICERCA ============ */
   function searchHaystack(p){
     if(p._hay) return p._hay;
     p._hay = normalize([
@@ -782,7 +1005,12 @@
     const raw = el('search').value.trim();
     const tokens = normalize(raw).split(/\s+/).filter(Boolean);
     const cards = svg.querySelectorAll('.node-card');
-    if(!tokens.length){ cards.forEach(c => c.classList.remove('match')); setStatus(''); return; }
+    if(!tokens.length){
+      cards.forEach(c => c.classList.remove('match'));
+      if(dataWarn) setStatus(dataWarn, true);
+      else setStatus(dataNote, false);
+      return;
+    }
     let first = null, count = 0;
     cards.forEach(c => {
       const p = personsById.get(c.dataset.id);
@@ -792,12 +1020,8 @@
     });
     setStatus(count ? (count === 1 ? '1 risultato' : count + ' risultati') : 'Nessun risultato per «' + raw + '»');
     if(first){
-      const pos = layout.positions.get(first.dataset.id);
-      if(pos){
-        if(zoom < 0.45){ zoom = 0.6; applyZoom(); }
-        vp.scrollLeft = (pos.x + pos.w/2)*zoom - vp.clientWidth/2;
-        vp.scrollTop  = (pos.y + pos.h/2)*zoom - vp.clientHeight/2;
-      }
+      if(zoom < 0.45){ zoom = 0.6; applyZoom(); }
+      centerOn(first.dataset.id);
     }
   }
   el('search').addEventListener('input', applySearchFilter);
@@ -850,24 +1074,25 @@
     if(!layout) return;
     const hCm = parseFloat(el('print-height').value) || 100;
     const scale = hCm / layout.height;
+    let wSum = 0, n = 0;
+    layout.positions.forEach(q => { wSum += q.w; n++; });
+    const typW = n ? wSum/n : BW;
     el('m-length').textContent = ((layout.width * scale)/100).toFixed(1).replace('.', ',') + ' m';
-    el('m-card').textContent = (BW*scale).toFixed(1).replace('.', ',') + ' × ' + (BH*scale).toFixed(1).replace('.', ',') + ' cm';
-    const fontMm = 28 * scale * 10;
+    el('m-card').textContent = (typW*scale).toFixed(1).replace('.', ',') + ' × ' + (nodeH()*scale).toFixed(1).replace('.', ',') + ' cm';
+    const fontMm = (cardMode === 2 ? SIMPLE_V.nameFS : cardMode === 1 ? SIMPLE.nameFS : 28) * scale * 10;
     el('m-font').textContent = fontMm.toFixed(1).replace('.', ',') + ' mm';
     el('m-gen').textContent = (maxDepth + 1) + '';
     el('measure').classList.toggle('warn', fontMm < 2);
   }
   el('print-height').addEventListener('input', updateMeasures);
-  el('row-density').addEventListener('input', () => { ROW_STEP = parseInt(el('row-density').value, 10); render(true); });
+  el('row-density').addEventListener('input', () => { rowGap = parseInt(el('row-density').value, 10); render(true); });
   el('print-reset').addEventListener('click', () => {
-    ROW_STEP = ROW_STEP_BASE;
-    el('row-density').value = ROW_STEP_BASE;
-    el('print-height').value = 100;
+    rowGap = 105; el('row-density').value = 105; el('print-height').value = 100;
     render(true);
   });
   el('print-go').addEventListener('click', () => { closePrint(); setTimeout(() => window.print(), 250); });
 
-  /* ============ COLORI E ALLINEAMENTO ============ */
+  /* ============ MODALITÀ ============ */
   el('btn-colors').addEventListener('click', () => {
     colorsOn = !colorsOn;
     el('btn-colors').classList.toggle('on', colorsOn);
@@ -882,6 +1107,21 @@
     el('btn-align').title = alignSiblings ? 'Torna alla disposizione centrata' : 'Fratelli sempre affiancati';
     render(true);
   });
+
+  const SIMPLE_TITLES = [
+    'Solo nome e anno, in grande',
+    'Nome e anno in verticale (telo molto più corto)',
+    'Torna al cartiglio completo'
+  ];
+  el('btn-simple').addEventListener('click', () => {
+    cardMode = (cardMode + 1) % 3;                 // cartiglio -> orizzontale -> verticale
+    el('btn-simple').classList.toggle('on', cardMode > 0);
+    el('btn-simple').title = SIMPLE_TITLES[cardMode];
+    el('ic-simple').innerHTML = cardMode === 2 ? IC_SIMPLE_V : IC_SIMPLE_H;
+    render(true);
+  });
+  const IC_SIMPLE_H = '<path d="M3 6.5h18M3 12h12M3 17.5h7"/>';
+  const IC_SIMPLE_V = '<path d="M6.5 21V3M12 21V9M17.5 21v-7"/>';
 
   /* ============ CONTROLLI ============ */
   function updateFocusUI(){ el('toolbar').classList.toggle('focus-mode', !!focusId); }
@@ -929,7 +1169,7 @@
   document.addEventListener('fullscreenchange', updateFs);
   document.addEventListener('webkitfullscreenchange', updateFs);
 
-  /* ============ TOUCH: pan a un dito, pinch a due ============ */
+  /* ============ TOUCH ============ */
   let mode = null, tsx, tsy, tsl, tst, pd0 = 0, pz0 = 1, pcx = 0, pcy = 0;
   const dist = (a,b) => Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
   vp.addEventListener('touchstart', e => {
