@@ -236,15 +236,37 @@ Il riquadro delle misure diventa rosso quando il corpo del nome scende **sotto i
 
 Non serve un login sul sito: invita le persone direttamente sul Google Sheet come **Editor** (Condividi → email → ruolo Editor). Le modifiche compaiono sul sito al ricaricamento della pagina.
 
-## 12. Cambiare foglio in futuro
+## 12. Quale scheda del foglio viene letta
 
-Apri `index.html` con un editor di testo e modifica la riga vicino all'inizio dello `<script>`:
+Il foglio contiene **più schede** (in fondo alla finestra: `Albero`, `copia funzionante`, `nuovo`). Senza indicazioni il sito leggerebbe sempre la **prima**, che non è detto sia quella aggiornata: è un modo classico di perdere ore chiedendosi perché le modifiche non compaiono.
+
+La scheda da leggere è indicata da questa riga vicino all'inizio dello `<script>` in `index.html`:
+
+```js
+const SHEET_GID = "2066415243";
+```
+
+**Come trovare il numero giusto.** Apri il foglio, clicca sulla scheda che vuoi pubblicare e guarda l'indirizzo nella barra del browser: finisce con `gid=` seguito da un numero. Quello è il valore da mettere fra virgolette. Mettendo `""` il sito torna a leggere la prima scheda.
+
+⚠️ **Da verificare:** il numero attualmente impostato è quello della scheda che stavi guardando quando mi hai mandato il link. Se le persone nuove le state aggiungendo su una scheda diversa, va cambiato, altrimenti il sito continuerà a mostrare dati vecchi.
+
+Per cambiare foglio intero, invece, si modifica la riga sopra:
 
 ```js
 const SHEET_ID = "12tz3Vr_gPEchYxVHoF8Ot9IqC1zvfYYdD8I2RvlWdXk";
 ```
 
 sostituendo l'ID con quello del nuovo foglio (si trova nell'URL fra `/d/` e `/edit`).
+
+### Come vengono riconosciute le colonne
+
+Il sito non va a posizione fissa: legge le **intestazioni** della prima riga e le riconosce dalle parole che contengono. `ID Padre` → colonna del padre, `Data Nascita` → nascita, `nuovo colore da qui` → gruppi di colore, `Nome ramo` → etichetta sulla barra.
+
+Due regole di sicurezza, imparate a spese nostre:
+- Le voci **più specifiche vengono controllate prima** delle più generiche. L'intestazione reale della colonna I è `Nome ramo`, che contiene la parola «nome»: senza questa precedenza verrebbe scambiata per la colonna del nome della persona e lo sovrascriverebbe, svuotandolo. Il risultato era che **il sito non disegnava più nulla**.
+- Se due colonne finiscono comunque sullo stesso campo, **vince la prima** e le successive vengono ignorate, invece di cancellarla riga per riga.
+
+Se il foglio non produce nessuna riga utilizzabile, il messaggio d'errore sotto la barra ora elenca le intestazioni trovate, così si vede subito cosa non è stato riconosciuto.
 
 ---
 

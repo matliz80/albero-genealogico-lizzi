@@ -223,6 +223,11 @@
 
   /* ============ CONFIGURAZIONE ============ */
   const SHEET_ID = "12tz3Vr_gPEchYxVHoF8Ot9IqC1zvfYYdD8I2RvlWdXk";
+  /* Il foglio contiene più schede. Senza indicazioni il sito leggerebbe sempre
+     la PRIMA, che non è detto sia quella aggiornata. Il numero qui sotto è il
+     «gid» della scheda da leggere: si trova nell'indirizzo del foglio quando
+     quella scheda è aperta, dopo «gid=». Lasciare "" per leggere la prima. */
+  const SHEET_GID = "2066415243";
   const SHEET_NAME = "";
   const PAGE_TITLE = "I Lizzi in Friuli";
 
@@ -243,7 +248,9 @@
   document.getElementById('page-title').textContent = PAGE_TITLE;
   document.title = PAGE_TITLE;
 
-  const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv${SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : ''}`;
+  const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`
+    + (SHEET_GID ? '&gid=' + encodeURIComponent(SHEET_GID) : '')
+    + (SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : '');
 
   /* ============ TAVOLOZZA (colonna H) ============ */
   const GROUP_COLORS = [
@@ -299,28 +306,41 @@
   function normalize(s){
     return (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   }
+  /* L'ordine dei controlli conta. Le voci più specifiche vanno prima delle più
+     generiche, altrimenti si mangiano a vicenda: l'intestazione reale della
+     colonna I è «Nome ramo», che contiene la parola «nome» e finirebbe per
+     essere scambiata per la colonna del nome della persona, sovrascrivendolo. */
   function classifyHeader(h){
     const n = normalize(h);
     if(n.includes('padre')) return 'idPadre';
     if(n.includes('madre')) return 'idMadre';
     if(n.includes('coniuge') || n.includes('sposo') || n.includes('sposa')) return 'coniuge';
+    // etichetta PRIMA di nome: «Nome ramo», «Titolo ramo», «Didascalia»
+    if(n.includes('etichett') || n.includes('didascal') || n.includes('ramo') || n.includes('titolo')) return 'etichetta';
+    if(n.includes('color') || n.includes('gruppo')) return 'gruppo';
     if(n.includes('cognome')) return 'cognome';
-    if(n.includes('nome')) return 'nome';
-    if(n.includes('sesso') || n.includes('genere')) return 'sesso';
     if(n.includes('nascita') && n.includes('luogo')) return 'luogoNascita';
-    if(n.includes('nascita')) return 'dataNascita';
     if(n.includes('morte') && n.includes('luogo')) return 'luogoMorte';
+    if(n.includes('nascita')) return 'dataNascita';
     if(n.includes('morte') || n.includes('decesso')) return 'dataMorte';
     if(n.includes('nota') || n.includes('annotazion')) return 'note';
-    if(n.includes('color') || n.includes('gruppo')) return 'gruppo';
-    if(n.includes('etichett') || n.includes('titolo') || n.includes('ramo') || n.includes('didascal')) return 'etichetta';
+    if(n.includes('sesso') || n.includes('genere')) return 'sesso';
     if(n.includes('foto') || n.includes('immagine')) return 'foto';
+    if(n.includes('nome')) return 'nome';
     if(n.includes('id')) return 'id';
     return null;
   }
   function rowsToPersons(rows){
     if(!rows.length) return [];
     const headers = rows[0].map(classifyHeader);
+    /* Se due intestazioni finissero sullo stesso campo, la seconda cancellerebbe
+       la prima riga per riga. Vince la prima e le successive vengono ignorate. */
+    const visti = new Set();
+    for(let i=0;i<headers.length;i++){
+      if(!headers[i]) continue;
+      if(visti.has(headers[i])) headers[i] = null;
+      else visti.add(headers[i]);
+    }
     if(!headers.includes('gruppo')    && headers.length > 7 && !headers[7]) headers[7] = 'gruppo';
     if(!headers.includes('etichetta') && headers.length > 8 && !headers[8]) headers[8] = 'etichetta';
     const persons = [];
@@ -370,8 +390,14 @@
     fetch(DATA_URL, { cache:'no-store' })
       .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(text => {
-        const persons = rowsToPersons(parseCSV(text));
-        if(!persons.length) throw new Error('Nessuna riga valida nel foglio.');
+        const righe = parseCSV(text);
+        const persons = rowsToPersons(righe);
+        if(!persons.length){
+          const intest = (righe[0] || []).filter(Boolean).join(' | ');
+          throw new Error('nessuna riga utilizzabile. Il foglio ha ' + Math.max(0, righe.length-1)
+            + ' righe e queste intestazioni: ' + (intest || '(nessuna)')
+            + '. Servono almeno una colonna con l\'ID e una con il nome.');
+        }
         ALL_PERSONS = persons;
         personsById = new Map(persons.map(p => [p.id, p]));
         loading.style.display = 'none';
