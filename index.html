@@ -6,7 +6,7 @@
 <title>I Lizzi in Friuli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f2e8d5; --paper-2:#e9dcbf; --paper-3:#ded0ac;
@@ -22,7 +22,7 @@
       radial-gradient(ellipse at 20% 0%, #f8efdd 0%, transparent 55%),
       radial-gradient(ellipse at 100% 100%, #ecdcb8 0%, transparent 60%),
       var(--paper);
-    color:var(--ink); font-family:'Newsreader',serif; min-height:100%;
+    color:var(--ink); font-family:'Poppins',sans-serif; font-weight:500; min-height:100%;
     position:relative; overflow-x:hidden;
   }
   body::before{
@@ -38,24 +38,24 @@
     border-bottom:1px solid rgba(96,56,19,.18);
   }
   header h1{
-    font-family:'Fraunces',serif; font-weight:600; font-style:normal;
-    font-size:clamp(19px,2.4vw,27px); letter-spacing:-.015em;
+    font-family:'Cormorant',serif; font-weight:700; font-style:normal;
+    font-size:clamp(24px,3vw,34px); letter-spacing:-.005em;
     margin:0; color:var(--frame-dark); line-height:1;
   }
   header .mark{width:9px; height:9px; flex:none; border-radius:50%; border:1.6px solid var(--frame-soft); align-self:center;}
-  header .kicker{font-family:'Courier Prime',monospace; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--frame-soft); white-space:nowrap;}
+  header .kicker{font-family:'Poppins',sans-serif; font-weight:500; font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--frame-soft); white-space:nowrap;}
   @media (max-width:640px){
     header{padding:9px 14px 8px; gap:9px;}
     header .kicker{display:none;}
   }
 
   .field{display:inline-flex; align-items:center; gap:9px; height:34px; box-sizing:border-box; background:#ffffff; border:1.5px solid var(--frame); border-radius:4px; padding:0 16px;}
-  #search{font-family:'Newsreader',serif; font-style:italic; font-size:19px; border:none; background:transparent; color:var(--frame); outline:none; width:200px;}
+  #search{font-family:'Poppins',sans-serif; font-weight:500; font-size:15px; border:none; background:transparent; color:var(--frame); outline:none; width:200px;}
   #search::placeholder{color:var(--frame-soft); opacity:.7;}
   .btn.icon{padding:0 13px;}
   .btn.icon svg{width:18px; height:18px; display:block;}
   .btn{display:inline-flex; align-items:center; justify-content:center; height:34px; box-sizing:border-box;
-    font-family:'Courier Prime',monospace; font-size:16px; letter-spacing:.06em; text-transform:uppercase;
+    font-family:'Poppins',sans-serif; font-weight:500; font-size:13px; letter-spacing:.01em;
     background:#ffffff; border:1.5px solid var(--frame); color:var(--frame); border-radius:4px; padding:0 22px; cursor:pointer; transition:.15s ease;}
   .btn:hover{background:var(--paper-2); color:var(--frame-dark); border-color:var(--frame-dark);}
   .btn.accent{background:#ffffff; border-color:var(--frame); color:var(--frame);}
@@ -65,7 +65,7 @@
   .zoomgroup{display:flex; gap:6px; flex:0 0 auto;}
   .zoomgroup .btn{padding:0 17px;}
   #btn-zoom-level{min-width:92px;}
-  #status-line{font-family:'Courier Prime',monospace; font-size:12px; color:var(--frame-soft); text-align:center; position:relative; z-index:2; padding:6px 12px 0;}
+  #status-line{font-family:'Poppins',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft); text-align:center; position:relative; z-index:2; padding:6px 12px 0;}
   #status-line:empty{display:none;}
   #status-line.error{color:#a13d2b;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -74,12 +74,20 @@
   #toolbar.focus-mode > *:not(#btn-reset-view):not(.field){opacity:.3; pointer-events:none; filter:grayscale(.5);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-flex;}
+  footer{
+    flex:none; height:20px; display:flex; align-items:center; justify-content:center;
+    font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; line-height:1;
+    color:var(--frame-soft); background:rgba(242,232,213,.9);
+    border-top:1px solid var(--line); padding:0 14px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  footer:empty{display:none;}
   #stage{
     position:relative; z-index:2; margin:0;
     border-top:1px solid var(--frame-soft);
     background:var(--paper);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
-    overflow:hidden; height:calc(100vh - 62px); min-height:460px;
+    overflow:hidden; height:calc(100vh - 82px); min-height:440px;
     display:flex; flex-direction:column;
   }
   #viewport{flex:1 1 0; min-height:0; min-width:0; position:relative; overflow:auto; cursor:grab; touch-action:none; -webkit-overflow-scrolling:touch;}
@@ -92,43 +100,43 @@
   .link{fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:3.3;}
   .link.thin{stroke-width:2.4;}
   .card-frame{fill:none; stroke-linecap:round; stroke-linejoin:round;}
-  .node-card .name{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle;}
-  .node-card .date{font-family:'Newsreader',serif; fill:#5b3a16;}
+  .node-card .name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
+  .node-card .date{font-family:'Poppins',sans-serif; font-weight:500; fill:#5b3a16;}
   .node-card .date.death{text-anchor:end;}
-  .node-card .note-text{font-family:'Newsreader',serif; fill:#6b4a26;}
+  .node-card .note-text{font-family:'Poppins',sans-serif; font-weight:400; fill:#6b4a26;}
   .node-card{cursor:pointer;}
   .node-card.match .card-bg{fill:#fbeccb;}
   .node-card.focused .card-bg{fill:#f6e2ba;}
   /* vista semplificata: nome grande, anno a capo, nessuna cornice */
-  .simple .s-name{font-family:'Fraunces',serif; font-weight:700; text-anchor:middle;}
-  .simple .s-year{font-family:'Fraunces',serif; font-weight:500; text-anchor:middle;}
-  .bar-label{font-family:'Cinzel',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
+  .simple .s-name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
+  .simple .s-year{font-family:'Poppins',sans-serif; font-weight:500; text-anchor:middle;}
+  .bar-label{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
 
   #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open,#print-panel.open{right:0;}
-  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'Courier Prime',monospace; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
-  #detail-panel h2,#print-panel h2{font-family:'Fraunces',serif; font-weight:600; font-size:24px; margin:6px 0 4px; color:var(--frame-dark);}
-  #detail-panel .tag{display:inline-block; font-family:'Courier Prime',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
+  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'Poppins',sans-serif; font-weight:500; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
+  #detail-panel h2,#print-panel h2{font-family:'Cormorant',serif; font-weight:700; font-size:29px; margin:6px 0 4px; color:var(--frame-dark);}
+  #detail-panel .tag{display:inline-block; font-family:'Poppins',sans-serif; font-weight:500; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
   .detail-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px dashed var(--frame-soft); font-size:13.5px; color:var(--frame);}
-  .detail-row .k{color:var(--frame-soft); font-family:'Courier Prime',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
+  .detail-row .k{color:var(--frame-soft); font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
   .detail-row .v{text-align:right; max-width:200px;}
   #detail-panel .actions{margin-top:20px; display:flex; flex-direction:column; gap:8px;}
   #detail-panel .actions .btn{width:100%; height:30px; font-size:14px; padding:0 12px; text-align:center;}
   #print-panel p.hint{font-size:13px; line-height:1.55; color:var(--frame-soft); margin:4px 0 16px;}
-  #print-panel label{display:block; font-family:'Courier Prime',monospace; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
+  #print-panel label{display:block; font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
   #print-panel input[type=range]{width:100%; accent-color:var(--frame);}
-  #print-panel input[type=number]{width:88px; font-family:'Newsreader',serif; font-size:16px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
+  #print-panel input[type=number]{width:88px; font-family:'Poppins',sans-serif; font-weight:500; font-size:15px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
   .measure{border:1px solid var(--frame-soft); border-radius:4px; padding:12px 13px; margin-top:16px; background:rgba(255,255,255,.5);}
   .measure .m-row{display:flex; justify-content:space-between; font-size:13.5px; color:var(--frame); padding:5px 0;}
-  .measure .m-row .k{font-family:'Courier Prime',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
-  .measure .m-row b{font-family:'Fraunces',serif; font-weight:600;}
+  .measure .m-row .k{font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
+  .measure .m-row b{font-family:'Poppins',sans-serif; font-weight:600;}
   .measure.warn{border-color:#a13d2b;}
   .measure.warn .big{color:#a13d2b;}
   #print-panel .btn{width:100%; margin-top:16px; height:32px; font-size:15px;}
 
   #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
-  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Courier Prime',monospace; font-size:12px; color:var(--frame-soft);}
+  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Poppins',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);}
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--frame-soft); border-top-color:var(--frame); animation:spin .9s linear infinite;}
   @media print{
     header,#toolbar,#status-line,#detail-panel,#print-panel,#overlay{display:none !important;}
@@ -142,6 +150,7 @@
     #search{width:132px; font-size:16px;}
     #detail-panel,#print-panel{width:90%; right:-100%;}
     #stage{height:calc(100vh - 48px);}
+    footer{display:none;}
     #toolbar{gap:8px; padding:9px 8px;}
     #toolbar .btn{padding:0 15px; font-size:15px; height:30px;}
     #toolbar .field{padding:0 12px; height:30px;}
@@ -161,7 +170,7 @@
 <div id="stage">
   <div id="toolbar">
     <div class="field">
-      <span style="font-family:'Courier Prime',monospace;font-size:13px;color:var(--frame-soft);">Cerca</span>
+      <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:var(--frame-soft);">Cerca</span>
       <input id="search" type="text" placeholder="es. Matteo 1980">
     </div>
     <button class="btn icon" id="btn-fit" title="Adatta allo schermo" aria-label="Adatta allo schermo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -217,6 +226,8 @@
   </aside>
 </div>
 
+<footer id="footnote"></footer>
+
 <script>
 (function(){
   "use strict";
@@ -236,11 +247,11 @@
   let rowGap = 105;                              // spazio verticale fra una riga e l'altra
 
   // vista semplificata: nome grande, anno a capo, nessuna cornice
-  const SIMPLE   = { nameFS:56, yearFS:40, padX:20, minW:186, maxChars:12, H:152 };
+  const SIMPLE   = { nameFS:66, yearFS:34, padX:20, minW:186, maxChars:14, H:152 };
   // vista verticale: il nome corre dal basso verso l'alto, così la casella
   // resta stretta qualunque sia la lunghezza del nome. È la disposizione più
   // adatta alla stampa, perché accorcia moltissimo il telo.
-  const SIMPLE_V = { nameFS:52, yearFS:36, pad:24, minH:300, maxChars:16, W:118 };
+  const SIMPLE_V = { nameFS:60, yearFS:31, pad:24, minH:300, maxChars:18, W:112 };
 
   const isMobile = () => window.matchMedia('(max-width: 640px)').matches;
   const initialZoom = () => isMobile() ? 0.58 : 0.50;
@@ -364,7 +375,12 @@
      Chi arriva da un altro ramo, anche se nel foglio sta in mezzo alle righe
      marcate o nel disegno finisce sulla stessa riga, non viene toccato.        */
   function assignGroups(persons, childrenOf, roots){
-    const marked = persons.filter(p => p._hasX);
+    /* Una X vale solo su chi ha discendenza. Sulla riga di una persona senza
+       figli aprirebbe un gruppo composto da lei sola, che si staccherebbe dal
+       colore dei fratelli senza alcun motivo leggibile: è il caso di Anna 1656
+       e di Ferdinando 1857. In quei casi la X viene ignorata e la persona
+       eredita il colore del proprio ramo. */
+    const marked = persons.filter(p => p._hasX && (childrenOf.get(p.id) || []).length > 0);
     const idx = new Map();
     marked.forEach((p, i) => idx.set(p.id, (i % (GROUP_COLORS.length - 1)) + 1));
     function paint(p, g){
@@ -429,8 +445,8 @@
     if(cardMode === 0) return BW;
     if(cardMode === 2) return SIMPLE_V.W;
     const n = truncName(personLabel(p)), y = birthLine(p);
-    const wn = n.length * SIMPLE.nameFS * 0.545;
-    const wy = y.length * SIMPLE.yearFS * 0.560;
+    const wn = n.length * SIMPLE.nameFS * 0.455;   // Cormorant è stretto
+    const wy = y.length * SIMPLE.yearFS * 0.600;   // Poppins ha cifre larghe
     return Math.max(SIMPLE.minW, Math.max(wn, wy) + 2*SIMPLE.padX);
   }
   function nodeH(){ return cardMode === 2 ? vH : (cardMode === 1 ? SIMPLE.H : BH); }
@@ -439,7 +455,7 @@
   function computeVH(list){
     let m = 0;
     list.forEach(p => {
-      const w = truncName(personLabel(p), SIMPLE_V.maxChars).length * SIMPLE_V.nameFS * 0.545;
+      const w = truncName(personLabel(p), SIMPLE_V.maxChars).length * SIMPLE_V.nameFS * 0.455;
       if(w > m) m = w;
     });
     vH = Math.max(SIMPLE_V.minH, m + 2*SIMPLE_V.pad);
@@ -708,15 +724,30 @@
     return lines;
   }
 
+  /* Insieme delle persone mostrate quando un ramo è messo a fuoco:
+     - la persona scelta, i suoi antenati risalendo e i suoi discendenti scendendo;
+     - i suoi fratelli e i fratelli di suo padre, senza le rispettive discendenze.
+     Servono a dare contesto: da soli, gli antenati in fila fanno perdere il senso
+     di quanto fosse ampia ogni generazione. */
   function branchSet(){
     if(!focusId || !personsById.has(focusId)) return null;
     const keep = new Set([focusId]);
-    (function up(id){
-      const p = personsById.get(id); if(!p) return;
-      [p.idPadre, p.idMadre].forEach(pid => { if(pid && personsById.has(pid) && !keep.has(pid)){ keep.add(pid); up(pid); } });
-    })(focusId);
-    const kids = id => ALL_PERSONS.filter(p => p.idPadre === id || p.idMadre === id);
-    (function down(id){ kids(id).forEach(c => { if(!keep.has(c.id)){ keep.add(c.id); down(c.id); } }); })(focusId);
+    const padreDi = id => {
+      const p = personsById.get(id); if(!p) return null;
+      const a = (p.idPadre || '').trim(), b = (p.idMadre || '').trim();
+      if(a && personsById.has(a)) return a;
+      if(b && personsById.has(b)) return b;
+      return null;
+    };
+    const figliDi = id => ALL_PERSONS.filter(p => p.idPadre === id || p.idMadre === id);
+
+    (function up(id){ const q = padreDi(id); if(q && !keep.has(q)){ keep.add(q); up(q); } })(focusId);
+    (function down(id){ figliDi(id).forEach(c => { if(!keep.has(c.id)){ keep.add(c.id); down(c.id); } }); })(focusId);
+
+    const padre = padreDi(focusId);
+    if(padre) figliDi(padre).forEach(f => keep.add(f.id));      // fratelli
+    const nonno = padre ? padreDi(padre) : null;
+    if(nonno) figliDi(nonno).forEach(f => keep.add(f.id));      // fratelli del padre
     return keep;
   }
 
@@ -814,9 +845,9 @@
 
     const padX = px(4.05);
     const label = personLabel(p);
-    let nameLines = wrap(label, 20, 1);
-    let fs = 28, step = 30;
-    if(label.length > 20){ nameLines = wrap(label, 26, 2); fs = 22; step = 24; }
+    let nameLines = wrap(label, 23, 1);
+    let fs = 34, step = 34;
+    if(label.length > 23){ nameLines = wrap(label, 30, 2); fs = 27; step = 27; }
     let y = fs + 8;
     nameLines.forEach((ln, i) => {
       const t = sel('text', { x:W/2, y:y + i*step, class:'name', 'font-size':fs, fill:stroke });
@@ -853,7 +884,7 @@
     }
   }
 
-  const CHAR_W = 0.70, LABEL_PAD = 26, LABEL_FS_MAX = 46, LABEL_FS_MIN = 20;
+  const CHAR_W = 0.50, LABEL_PAD = 26, LABEL_FS_MAX = 58, LABEL_FS_MIN = 26;
   function labelMetrics(text, barLen){
     let fs = LABEL_FS_MAX;
     const width = () => text.length * fs * CHAR_W;
@@ -893,50 +924,109 @@
     const addSeg = (color, d) => { byColor.set(color, (byColor.get(color) || '') + d); };
     const labels = [];
 
+    /* Raccolgo prima tutte le famiglie, perché nella vista affiancata il
+       tracciato di una dipende da quello delle altre sulla stessa riga.       */
+    const fams = [];
     layout.childrenOf.forEach((figli, pid) => {
       const parent = personsById.get(pid);
       const pp = layout.positions.get(pid);
       const kids = figli.map(f => ({ p:f, pos:layout.positions.get(f.id) })).filter(k => k.pos);
       if(!parent || !pp || !kids.length) return;
-      const pCol = colorOf(parent);
-      const midP = pp.x + pp.w/2, bottomP = pp.y + pp.h;
-
-      /* Nella vista affiancata le barre orizzontali di famiglie diverse
-         cadrebbero tutte alla stessa quota e si confonderebbero: vengono
-         quindi sfalsate su tre livelli, così ogni percorso genitore-figli
-         resta seguibile a occhio anche quando le linee corrono lunghe.        */
-      const lv = alignSiblings ? [0.26, 0.50, 0.74][famOf.get(pid) % 3] : 0.5;
-      const barY = bottomP + rowGap * lv;
-
-      const firstX = kids[0].pos.x + kids[0].pos.w/2;
-      const lastX  = kids[kids.length-1].pos.x + kids[kids.length-1].pos.w/2;
-      const barL = Math.min(firstX, midP), barR = Math.max(lastX, midP);
-
-      addSeg(pCol, `M${midP} ${bottomP}L${midP} ${barY}`);
-
-      const text = (parent.etichetta || '').trim().toUpperCase();
-      if(text && barR - barL > 1){
-        const m = labelMetrics(text, Math.max(lastX - firstX, barR - barL));
-        const cx = (firstX + lastX) / 2;
-        const gA = cx - m.half, gB = cx + m.half;
-        if(gA > barL) addSeg(pCol, `M${barL} ${barY}L${gA} ${barY}`);
-        if(barR > gB) addSeg(pCol, `M${gB} ${barY}L${barR} ${barY}`);
-        labels.push({ text:text, x:cx, y:barY, fs:m.fs, color:pCol });
-      } else {
-        addSeg(pCol, `M${barL} ${barY}L${barR} ${barY}`);
-        if(text) labels.push({ text:text, x:firstX, y:barY, fs:LABEL_FS_MIN + 8, color:pCol });
-      }
-
-      kids.forEach(k => {
-        const cx = k.pos.x + k.pos.w/2;
-        addSeg(colorOf(k.p), `M${cx} ${barY}L${cx} ${k.pos.y}`);
-        // trattino di aggancio sul bordo superiore del figlio: rende evidente
-        // a quale casella arriva la calata quando le linee sono molte
-        if(alignSiblings){
-          const t = Math.min(k.pos.w*0.34, 46);
-          addSeg(colorOf(k.p), `M${cx - t} ${k.pos.y}L${cx + t} ${k.pos.y}`);
-        }
+      fams.push({
+        pid: pid, parent: parent, pp: pp, kids: kids,
+        midP: pp.x + pp.w/2, bottomP: pp.y + pp.h,
+        firstX: kids[0].pos.x + kids[0].pos.w/2,
+        lastX:  kids[kids.length-1].pos.x + kids[kids.length-1].pos.w/2,
+        childTop: kids[0].pos.y
       });
+    });
+
+    /* ---- CORSIE DI TRANSITO (solo vista affiancata) ----
+       Nella vista affiancata il genitore quasi mai sta sopra ai propri figli:
+       la linea deve percorrere un tratto orizzontale per raggiungerli, e con
+       centinaia di famiglie questi tratti si attraversano a vicenda.
+
+       Il tracciato viene quindi diviso in due parti distinte:
+       - il TRANSITO, il tratto lungo che porta dal genitore fino alla verticale
+         dei suoi figli, collocato in una corsia orizzontale riservata;
+       - la DISTRIBUZIONE, la barra corta appena sopra i figli, da cui scendono
+         le calate.
+       Le corsie sono assegnate riga per riga: due famiglie i cui transiti si
+       sovrappongono non possono finire nella stessa corsia. I tragitti più
+       lunghi prendono le corsie più in alto, vicino ai genitori, così i tratti
+       brevi restano liberi in basso.                                          */
+    if(alignSiblings){
+      const perRiga = new Map();
+      fams.forEach(f => {
+        f.tx = (f.firstX + f.lastX) / 2;
+        f.ra = Math.min(f.midP, f.tx);
+        f.rb = Math.max(f.midP, f.tx);
+        if(!perRiga.has(f.bottomP)) perRiga.set(f.bottomP, []);
+        perRiga.get(f.bottomP).push(f);
+      });
+      perRiga.forEach(list => {
+        list.sort((a,b) => (b.rb - b.ra) - (a.rb - a.ra));
+        const corsie = [];
+        list.forEach(f => {
+          let k = 0;
+          while(corsie[k] && corsie[k].some(g => f.ra < g.rb - 0.5 && g.ra < f.rb - 0.5)) k++;
+          (corsie[k] = corsie[k] || []).push(f);
+          f.corsia = k;
+        });
+        list.forEach(f => { f.nCorsie = corsie.length; });
+      });
+    }
+
+    fams.forEach(f => {
+      const pCol = colorOf(f.parent);
+      const text = (f.parent.etichetta || '').trim().toUpperCase();
+
+      if(alignSiblings){
+        const distY = f.childTop - rowGap * 0.20;                 // barra sopra i figli
+        const alto  = f.bottomP + rowGap * 0.14;
+        const spazio = Math.max(1, (distY - rowGap * 0.10) - alto);
+        const transY = f.nCorsie > 1 ? alto + spazio * (f.corsia / (f.nCorsie - 1)) : alto + spazio * 0.5;
+
+        addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${transY}`);
+        if(Math.abs(f.tx - f.midP) > 0.5) addSeg(pCol, `M${f.midP} ${transY}L${f.tx} ${transY}`);
+        addSeg(pCol, `M${f.tx} ${transY}L${f.tx} ${distY}`);
+
+        if(text && f.lastX - f.firstX > 1){
+          const m = labelMetrics(text, f.lastX - f.firstX);
+          const gA = f.tx - m.half, gB = f.tx + m.half;
+          if(gA > f.firstX) addSeg(pCol, `M${f.firstX} ${distY}L${gA} ${distY}`);
+          if(f.lastX > gB)  addSeg(pCol, `M${gB} ${distY}L${f.lastX} ${distY}`);
+          labels.push({ text:text, x:f.tx, y:distY, fs:m.fs, color:pCol });
+        } else {
+          addSeg(pCol, `M${f.firstX} ${distY}L${f.lastX} ${distY}`);
+          if(text) labels.push({ text:text, x:f.tx, y:distY, fs:LABEL_FS_MIN + 8, color:pCol });
+        }
+
+        f.kids.forEach(k => {
+          const cx = k.pos.x + k.pos.w/2;
+          addSeg(colorOf(k.p), `M${cx} ${distY}L${cx} ${k.pos.y}`);
+        });
+
+      } else {
+        const barY = f.bottomP + rowGap * 0.5;
+        const barL = Math.min(f.firstX, f.midP), barR = Math.max(f.lastX, f.midP);
+        addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${barY}`);
+        if(text && barR - barL > 1){
+          const m = labelMetrics(text, Math.max(f.lastX - f.firstX, barR - barL));
+          const cx = (f.firstX + f.lastX) / 2;
+          const gA = cx - m.half, gB = cx + m.half;
+          if(gA > barL) addSeg(pCol, `M${barL} ${barY}L${gA} ${barY}`);
+          if(barR > gB) addSeg(pCol, `M${gB} ${barY}L${barR} ${barY}`);
+          labels.push({ text:text, x:cx, y:barY, fs:m.fs, color:pCol });
+        } else {
+          addSeg(pCol, `M${barL} ${barY}L${barR} ${barY}`);
+          if(text) labels.push({ text:text, x:f.firstX, y:barY, fs:LABEL_FS_MIN + 8, color:pCol });
+        }
+        f.kids.forEach(k => {
+          const cx = k.pos.x + k.pos.w/2;
+          addSeg(colorOf(k.p), `M${cx} ${barY}L${cx} ${k.pos.y}`);
+        });
+      }
     });
 
     byColor.forEach((d, color) => svg.appendChild(sel('path', { d:d, stroke:color }, 'link' + (alignSiblings ? ' thin' : ''))));
@@ -969,6 +1059,8 @@
     }
     applySearchFilter();
     updateMeasures();
+    const piede = el('footnote');
+    if(piede) piede.textContent = dataNote;   // segnalazione discreta, in fondo
   }
 
   /* all'apertura la vista si posiziona sul capostipite, cioè la persona con la
@@ -1033,8 +1125,7 @@
     const cards = svg.querySelectorAll('.node-card');
     if(!tokens.length){
       cards.forEach(c => c.classList.remove('match'));
-      if(dataWarn) setStatus(dataWarn, true);
-      else setStatus(dataNote, false);
+      setStatus(dataWarn, !!dataWarn);   // solo gli errori restano in evidenza
       return;
     }
     let first = null, count = 0;

@@ -68,13 +68,21 @@ Tutti i comandi stanno in **un'unica barra in cima alla finestra dell'albero**. 
 - **Stampa** — apre il pannello per il plotter. Vedi sezione 10.
 - **Click su una casella** — apre la scheda con tutti i dati.
 
+Sotto la barra compaiono solo i **risultati della ricerca** e gli **errori** da correggere. Le segnalazioni non urgenti — per esempio l'elenco delle persone escluse perché senza legami — stanno in un **piede molto basso in fondo alla pagina**, che su cellulare non compare per non rubare spazio.
+
 Le date sono mostrate come **gg.mm.aaaa** anche se nel foglio sono scritte in forma breve (5.3.1804 → 05.03.1804). I valori ambigui presenti nel disegno originale — «21 / 22.2.1720», «1650?», «a 6 mesi» — restano come sono, così si vedono e si possono correggere nel foglio.
 
 ---
 
 ## 4. Mettere a fuoco un ramo
 
-Cliccando una casella e poi **Metti a fuoco questo ramo**, l'albero viene **ricostruito da zero con le sole persone del ramo**: gli antenati risalendo e i discendenti scendendo. Le altre non vengono sbiadite ma tolte, e le posizioni ricalcolate, così il ramo si legge alla larghezza che gli serve davvero. Mettendo a fuoco P154, per esempio, si passa da 403 caselle a 209.
+Cliccando una casella e poi **Metti a fuoco questo ramo**, l'albero viene **ricostruito da zero con le sole persone del ramo**. Le altre non vengono sbiadite ma tolte, e le posizioni ricalcolate, così il ramo si legge alla larghezza che gli serve davvero.
+
+Restano visibili:
+- la persona scelta, **tutti i suoi antenati** risalendo e **tutti i suoi discendenti** scendendo;
+- i suoi **fratelli** e i **fratelli di suo padre**, senza le rispettive discendenze.
+
+Questi ultimi due gruppi servono a dare contesto: la sola linea diretta degli antenati, in fila uno sotto l'altro, fa perdere il senso di quanto fosse ampia ogni generazione. Mettendo a fuoco Matteo (P379), per esempio, compaiono 21 persone: lui, la figlia, il fratello Giuseppe, il padre Enea Giorgio con i suoi quattro fratelli, e su fino al capostipite.
 
 Il pulsante **↩ Vista completa** ripristina tutto. Da qui si può anche esportare il PDF del solo ramo.
 
@@ -147,6 +155,8 @@ Se in futuro tutte le persone risultassero isolate — caso che può capitare so
 ## 6. Colorare i rami (colonna H)
 
 Una **X** nella colonna H apre un nuovo gruppo di colore che vale per quella persona e **tutti i suoi discendenti** — figli, nipoti, pronipoti — fermandosi dove un discendente ha a sua volta una X, che apre il gruppo successivo.
+
+**Una X su chi non ha figli viene ignorata.** Aprirebbe un gruppo composto da una persona sola, che si staccherebbe dal colore dei fratelli senza un motivo leggibile: era il caso di Anna 1656 e di Ferdinando 1857, che comparivano di un colore diverso dai propri fratelli. In quei casi la persona eredita il colore del proprio ramo. Se una X sembra non fare effetto, il motivo è quasi sempre questo: va spostata sulla persona da cui il ramo si stacca davvero.
 
 > **Attenzione, questa regola è cambiata.** In una versione precedente il gruppo seguiva l'ordine delle righe nel foglio, e finiva per colorare anche persone di altri rami che capitavano in mezzo. Ora segue **la discendenza**: chi arriva da un altro ramo non viene toccato, anche se nel foglio sta fra righe marcate o nel disegno finisce sulla stessa riga.
 
@@ -321,6 +331,10 @@ Conseguenza voluta: **un fratello senza figli ha un profilo alto una riga sola**
 I profili salvano il **bordo destro reale**, non il bordo sinistro più una larghezza fissa: serve perché nelle viste semplificate ogni casella ha la propria larghezza.
 
 Le distanze minime sono tarate sugli ornamenti del cartiglio, che sporgono 12,34 unità per lato: due caselle non possono avvicinarsi oltre ~25 unità senza che le volute si tocchino. Da qui **30 unità fra fratelli**, **52 fra rami diversi alle generazioni inferiori**, **240 fra alberi senza antenato comune**.
+
+**Caratteri.** I **nomi** sono in **Cormorant** (700), un garaldo di impronta rinascimentale coerente con l'origine cinquecentesca del documento. **Numeri e testi** — date, annotazioni, interfaccia, misure di stampa — sono in **Poppins medium** (500), una geometrica che tiene bene le cifre anche a corpo piccolo e in stampa grande.
+
+Cormorant è sensibilmente più stretto e otticamente più piccolo dei caratteri precedenti, quindi corpi e stime di larghezza sono stati ricalibrati: il nome sul cartiglio passa da 28 a 34, la stima di larghezza per carattere da 0,545 a 0,455 em, e i nomi accorciati nella vista essenziale da 12 a 14 caratteri. Senza questa ricalibratura le caselle sarebbero risultate troppo larghe e i nomi troppo piccoli.
 
 **Grafica del cartiglio.** Cornice ricalcata curva per curva dal `blocco.pdf`: volute agli angoli, cerchietti, montanti, filetti sottili esterni. Due differenze dall'originale: i **quattro tratti diagonali corti** agli angoli sono stati rimossi su richiesta, e i colori non sono fissi ma vengono dal gruppo della colonna H (il gruppo 0 coincide con i colori originali).
 
