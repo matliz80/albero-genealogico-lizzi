@@ -6,7 +6,7 @@
 <title>I Lizzi in Friuli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#f2e8d5; --paper-2:#e9dcbf; --paper-3:#ded0ac;
@@ -22,7 +22,7 @@
       radial-gradient(ellipse at 20% 0%, #f8efdd 0%, transparent 55%),
       radial-gradient(ellipse at 100% 100%, #ecdcb8 0%, transparent 60%),
       var(--paper);
-    color:var(--ink); font-family:'Poppins',sans-serif; font-weight:500; min-height:100%;
+    color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:500; min-height:100%;
     position:relative; overflow-x:hidden;
   }
   body::before{
@@ -33,50 +33,67 @@
 
   header{
     position:relative; z-index:2;
-    display:flex; align-items:baseline; justify-content:center; gap:14px;
-    padding:14px 22px 12px;
-    border-bottom:1px solid rgba(96,56,19,.18);
+    display:flex; align-items:center; justify-content:flex-start; gap:18px;
+    padding:12px 22px 11px;
+    border-bottom:1px solid rgba(96,56,19,.16);
   }
   header h1{
     font-family:'Cormorant',serif; font-weight:700; font-style:normal;
-    font-size:clamp(24px,3vw,34px); letter-spacing:-.005em;
-    margin:0; color:var(--frame-dark); line-height:1;
+    font-size:clamp(21px,2.6vw,30px); letter-spacing:-.005em;
+    margin:0; color:var(--frame-dark); line-height:1; white-space:nowrap;
   }
-  header .mark{width:9px; height:9px; flex:none; border-radius:50%; border:1.6px solid var(--frame-soft); align-self:center;}
-  header .kicker{font-family:'Poppins',sans-serif; font-weight:500; font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--frame-soft); white-space:nowrap;}
-  @media (max-width:640px){
-    header{padding:9px 14px 8px; gap:9px;}
-    header .kicker{display:none;}
-  }
+  header .mark{width:8px; height:8px; flex:none; border-radius:50%; border:1.6px solid var(--frame-soft);}
 
-  .field{display:inline-flex; align-items:center; gap:9px; height:34px; box-sizing:border-box; background:#ffffff; border:1.5px solid var(--frame); border-radius:4px; padding:0 16px;}
-  #search{font-family:'Poppins',sans-serif; font-weight:500; font-size:15px; border:none; background:transparent; color:var(--frame); outline:none; width:200px;}
-  #search::placeholder{color:var(--frame-soft); opacity:.7;}
-  .btn.icon{padding:0 13px;}
-  .btn.icon svg{width:18px; height:18px; display:block;}
-  .btn{display:inline-flex; align-items:center; justify-content:center; height:34px; box-sizing:border-box;
-    font-family:'Poppins',sans-serif; font-weight:500; font-size:13px; letter-spacing:.01em;
-    background:#ffffff; border:1.5px solid var(--frame); color:var(--frame); border-radius:4px; padding:0 22px; cursor:pointer; transition:.15s ease;}
+  /* campo di ricerca: unico comando testuale, a sinistra */
+  .field{
+    display:inline-flex; align-items:center; gap:9px; height:36px; box-sizing:border-box;
+    background:#fff; border:1.5px solid var(--frame-soft); border-radius:18px; padding:0 16px;
+    transition:border-color .15s ease;
+  }
+  .field:focus-within{border-color:var(--frame-dark);}
+  .field svg{width:15px; height:15px; flex:none; stroke:var(--frame-soft); fill:none; stroke-width:1.9;}
+  #search{font-family:'DM Sans',sans-serif; font-weight:500; font-size:14.5px; border:none;
+    background:transparent; color:var(--frame-dark); outline:none; width:210px;}
+  #search::placeholder{color:var(--frame-soft); opacity:.65;}
+
+  /* colonna dei comandi, verticale sul lato destro del disegno */
+  #toolbar{
+    position:absolute; top:16px; right:16px; z-index:6;
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+    background:rgba(242,232,213,.93); border:1px solid rgba(96,56,19,.16);
+    border-radius:22px; padding:9px 7px;
+    box-shadow:0 2px 14px -8px rgba(43,33,24,.45);
+    backdrop-filter:blur(3px);
+  }
+  .btn{
+    width:38px; height:38px; flex:none; display:inline-flex; align-items:center; justify-content:center;
+    background:#fff; border:1.5px solid var(--frame-soft); color:var(--frame); border-radius:13px;
+    cursor:pointer; padding:0; transition:.14s ease;
+  }
+  .btn svg{width:19px; height:19px; display:block; fill:none; stroke:currentColor;
+    stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
   .btn:hover{background:var(--paper-2); color:var(--frame-dark); border-color:var(--frame-dark);}
-  .btn.accent{background:#ffffff; border-color:var(--frame); color:var(--frame);}
-  .btn.accent:hover{background:var(--paper-2); border-color:var(--frame-dark); color:var(--frame-dark);}
   .btn.on{background:var(--frame); color:var(--paper); border-color:var(--frame);}
-  #toolbar > *{flex:0 0 auto;}
-  .zoomgroup{display:flex; gap:6px; flex:0 0 auto;}
-  .zoomgroup .btn{padding:0 17px;}
-  #btn-zoom-level{min-width:92px;}
-  #status-line{font-family:'Poppins',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft); text-align:center; position:relative; z-index:2; padding:6px 12px 0;}
+  .btn.accent{width:38px; border-color:var(--accent); color:var(--accent);}
+  .btn.accent:hover{background:var(--accent); color:var(--paper); border-color:var(--accent);}
+  .rail-sep{width:22px; height:1px; background:rgba(96,56,19,.2); margin:2px 0;}
+  #btn-zoom-level{
+    font-family:'DM Sans',sans-serif; font-weight:500; font-size:11px; color:var(--frame-soft);
+    background:none; border:none; cursor:pointer; padding:1px 0; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:-.01em;
+  }
+  #btn-zoom-level:hover{color:var(--frame-dark);}
+  #toolbar.focus-mode > *:not(#btn-reset-view):not(.rail-sep){opacity:.32; pointer-events:none; filter:grayscale(.6);}
+  #btn-reset-view{display:none;}
+  #toolbar.focus-mode #btn-reset-view{display:inline-flex;}
+  #status-line{font-family:'DM Sans',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);
+    text-align:center; position:relative; z-index:2; padding:6px 12px 0;}
   #status-line:empty{display:none;}
   #status-line.error{color:#a13d2b;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  #toolbar{flex:none; display:flex; flex-wrap:nowrap; align-items:center; justify-content:center; justify-content:safe center;
-    gap:11px; padding:11px; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; background:rgba(242,232,213,.94); border-bottom:1px solid var(--line);}
-  #toolbar.focus-mode > *:not(#btn-reset-view):not(.field){opacity:.3; pointer-events:none; filter:grayscale(.5);}
-  #btn-reset-view{display:none;}
-  #toolbar.focus-mode #btn-reset-view{display:inline-flex;}
   footer{
     flex:none; height:20px; display:flex; align-items:center; justify-content:center;
-    font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; line-height:1;
+    font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; line-height:1;
     color:var(--frame-soft); background:rgba(242,232,213,.9);
     border-top:1px solid var(--line); padding:0 14px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -101,42 +118,42 @@
   .link.thin{stroke-width:2.4;}
   .card-frame{fill:none; stroke-linecap:round; stroke-linejoin:round;}
   .node-card .name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
-  .node-card .date{font-family:'Poppins',sans-serif; font-weight:500; fill:#5b3a16;}
+  .node-card .date{font-family:'DM Sans',sans-serif; font-weight:500;}
   .node-card .date.death{text-anchor:end;}
-  .node-card .note-text{font-family:'Poppins',sans-serif; font-weight:400; fill:#6b4a26;}
+  .node-card .note-text{font-family:'DM Sans',sans-serif; font-weight:400;}
   .node-card{cursor:pointer;}
   .node-card.match .card-bg{fill:#fbeccb;}
   .node-card.focused .card-bg{fill:#f6e2ba;}
   /* vista semplificata: nome grande, anno a capo, nessuna cornice */
   .simple .s-name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
-  .simple .s-year{font-family:'Poppins',sans-serif; font-weight:500; text-anchor:middle;}
+  .simple .s-year{font-family:'DM Sans',sans-serif; font-weight:500; text-anchor:middle;}
   .bar-label{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
 
   #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open,#print-panel.open{right:0;}
-  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'Poppins',sans-serif; font-weight:500; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
+  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'DM Sans',sans-serif; font-weight:500; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
   #detail-panel h2,#print-panel h2{font-family:'Cormorant',serif; font-weight:700; font-size:29px; margin:6px 0 4px; color:var(--frame-dark);}
-  #detail-panel .tag{display:inline-block; font-family:'Poppins',sans-serif; font-weight:500; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
+  #detail-panel .tag{display:inline-block; font-family:'DM Sans',sans-serif; font-weight:500; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
   .detail-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px dashed var(--frame-soft); font-size:13.5px; color:var(--frame);}
-  .detail-row .k{color:var(--frame-soft); font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
+  .detail-row .k{color:var(--frame-soft); font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
   .detail-row .v{text-align:right; max-width:200px;}
   #detail-panel .actions{margin-top:20px; display:flex; flex-direction:column; gap:8px;}
   #detail-panel .actions .btn{width:100%; height:30px; font-size:14px; padding:0 12px; text-align:center;}
   #print-panel p.hint{font-size:13px; line-height:1.55; color:var(--frame-soft); margin:4px 0 16px;}
-  #print-panel label{display:block; font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
+  #print-panel label{display:block; font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
   #print-panel input[type=range]{width:100%; accent-color:var(--frame);}
-  #print-panel input[type=number]{width:88px; font-family:'Poppins',sans-serif; font-weight:500; font-size:15px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
+  #print-panel input[type=number]{width:88px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:15px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
   .measure{border:1px solid var(--frame-soft); border-radius:4px; padding:12px 13px; margin-top:16px; background:rgba(255,255,255,.5);}
   .measure .m-row{display:flex; justify-content:space-between; font-size:13.5px; color:var(--frame); padding:5px 0;}
-  .measure .m-row .k{font-family:'Poppins',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
-  .measure .m-row b{font-family:'Poppins',sans-serif; font-weight:600;}
+  .measure .m-row .k{font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
+  .measure .m-row b{font-family:'DM Sans',sans-serif; font-weight:600;}
   .measure.warn{border-color:#a13d2b;}
   .measure.warn .big{color:#a13d2b;}
   #print-panel .btn{width:100%; margin-top:16px; height:32px; font-size:15px;}
 
   #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
-  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Poppins',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);}
+  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);}
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--frame-soft); border-top-color:var(--frame); animation:spin .9s linear infinite;}
   @media print{
     header,#toolbar,#status-line,#detail-panel,#print-panel,#overlay{display:none !important;}
@@ -147,13 +164,15 @@
   }
   @media (max-width:640px){
     #btn-zoom-in,#btn-zoom-out,#btn-zoom-level{display:none !important;}
-    #search{width:132px; font-size:16px;}
+    header{padding:9px 14px 8px; gap:11px;}
+    #toolbar{top:10px; right:10px; gap:6px; padding:7px 6px; border-radius:19px;}
+    .btn{width:34px; height:34px; border-radius:11px;}
+    .btn svg{width:17px; height:17px;}
+    #search{width:118px; font-size:15px;}
+    .field{height:33px;}
     #detail-panel,#print-panel{width:90%; right:-100%;}
     #stage{height:calc(100vh - 48px);}
     footer{display:none;}
-    #toolbar{gap:8px; padding:9px 8px;}
-    #toolbar .btn{padding:0 15px; font-size:15px; height:30px;}
-    #toolbar .field{padding:0 12px; height:30px;}
   }
 </style>
 </head>
@@ -162,29 +181,53 @@
 <header>
   <span class="mark"></span>
   <h1 id="page-title">I Lizzi in Friuli</h1>
-  <span class="kicker">albero genealogico</span>
+  <div class="field">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 20.5 20.5"/></svg>
+    <input id="search" type="text" placeholder="Cerca un nome o un anno">
+  </div>
 </header>
 
 <div id="status-line">Caricamento…</div>
 
 <div id="stage">
+  <!-- Comandi in colonna sul lato destro. Icone ridisegnate con la stessa
+       impostazione: griglia 24, tratto 1,6, estremità arrotondate, nessun
+       riempimento, forme costruite su cerchi e rette per stare insieme. -->
   <div id="toolbar">
-    <div class="field">
-      <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:var(--frame-soft);">Cerca</span>
-      <input id="search" type="text" placeholder="es. Matteo 1980">
-    </div>
-    <button class="btn icon" id="btn-fit" title="Adatta allo schermo" aria-label="Adatta allo schermo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-    <div class="zoomgroup">
-      <button class="btn" id="btn-zoom-out" title="Riduci">−</button>
-      <button class="btn" id="btn-zoom-level" title="Torna al 100%">100%</button>
-      <button class="btn" id="btn-zoom-in" title="Ingrandisci">+</button>
-      <button class="btn icon" id="btn-fullscreen" title="Schermo intero" aria-label="Schermo intero"><svg id="ic-fs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
-    </div>
-    <button class="btn icon" id="btn-simple" title="Solo nome e anno, in grande" aria-label="Solo nome e anno"><svg id="ic-simple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h18M3 12h12M3 17.5h7"/></svg></button>
-    <button class="btn icon" id="btn-align" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9" width="4.4" height="6"/><rect x="9.8" y="9" width="4.4" height="6"/><rect x="17.1" y="9" width="4.4" height="6"/><path d="M2.5 4.5h19"/></svg></button>
-    <button class="btn icon" id="btn-colors" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.6"/><circle cx="17.5" cy="10.5" r="1.6"/><circle cx="8.5" cy="7.5" r="1.6"/><circle cx="6.5" cy="12.5" r="1.6"/><path d="M12 2a10 10 0 1 0 0 20c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16a6 6 0 0 0 6-6c0-5-4.5-8.8-10-8.8z"/></svg></button>
-    <button class="btn" id="btn-print" title="Stampa e plotter">Stampa</button>
-    <button class="btn accent" id="btn-reset-view">↩ Vista completa</button>
+    <button class="btn" id="btn-fit" title="Adatta allo schermo" aria-label="Adatta allo schermo">
+      <svg viewBox="0 0 24 24"><path d="M9 3.5H5.5a2 2 0 0 0-2 2V9M15 3.5h3.5a2 2 0 0 1 2 2V9M9 20.5H5.5a2 2 0 0 1-2-2V15M15 20.5h3.5a2 2 0 0 0 2-2V15"/></svg>
+    </button>
+    <button class="btn" id="btn-zoom-in" title="Ingrandisci" aria-label="Ingrandisci">
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M10.5 7.8v5.4M7.8 10.5h5.4M15.4 15.4 20.5 20.5"/></svg>
+    </button>
+    <button id="btn-zoom-level" title="Torna al 100%">100%</button>
+    <button class="btn" id="btn-zoom-out" title="Riduci" aria-label="Riduci">
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.8 10.5h5.4M15.4 15.4 20.5 20.5"/></svg>
+    </button>
+    <button class="btn" id="btn-fullscreen" title="Schermo intero" aria-label="Schermo intero">
+      <svg id="ic-fs" viewBox="0 0 24 24"><path d="M9 3.5H5.5a2 2 0 0 0-2 2V9M15 3.5h3.5a2 2 0 0 1 2 2V9M9 20.5H5.5a2 2 0 0 1-2-2V15M15 20.5h3.5a2 2 0 0 0 2-2V15"/></svg>
+    </button>
+
+    <span class="rail-sep"></span>
+
+    <button class="btn" id="btn-simple" title="Solo nome e anno, in grande" aria-label="Solo nome e anno">
+      <svg id="ic-simple" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+    </button>
+    <button class="btn" id="btn-align" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati">
+      <svg viewBox="0 0 24 24"><path d="M4 4.5h16"/><rect x="4" y="9.5" width="4.6" height="9.5" rx="1.4"/><rect x="9.7" y="9.5" width="4.6" height="9.5" rx="1.4"/><rect x="15.4" y="9.5" width="4.6" height="9.5" rx="1.4"/></svg>
+    </button>
+    <button class="btn" id="btn-colors" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><circle cx="8.2" cy="9.4" r="1.15"/><circle cx="8.2" cy="14.6" r="1.15"/><circle cx="15.8" cy="9.4" r="1.15"/><circle cx="15.8" cy="14.6" r="1.15"/></svg>
+    </button>
+
+    <span class="rail-sep"></span>
+
+    <button class="btn" id="btn-print" title="Stampa su plotter" aria-label="Stampa su plotter">
+      <svg viewBox="0 0 24 24"><path d="M7 9V4.5h10V9"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><rect x="7" y="14" width="10" height="5.5" rx="1.2"/></svg>
+    </button>
+    <button class="btn accent" id="btn-reset-view" title="Torna alla vista completa" aria-label="Torna alla vista completa">
+      <svg viewBox="0 0 24 24"><path d="M9.5 5.5 4 11l5.5 5.5"/><path d="M4 11h9.5a6.5 6.5 0 0 1 0 13H11"/></svg>
+    </button>
   </div>
   <div id="viewport">
     <svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -244,6 +287,10 @@
 
   const BW = 291.9, BH = 219.0;                 // cartiglio completo
   const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
+  /* Margine sopra la prima generazione: senza, il cartiglio del capostipite
+     resta incollato al bordo superiore del disegno e in stampa tocca la cimosa
+     del telo. Vale anche per l'esportazione in PDF. */
+  const TOP_PAD = 130;
   let rowGap = 105;                              // spazio verticale fra una riga e l'altra
 
   // vista semplificata: nome grande, anno a capo, nessuna cornice
@@ -446,7 +493,7 @@
     if(cardMode === 2) return SIMPLE_V.W;
     const n = truncName(personLabel(p)), y = birthLine(p);
     const wn = n.length * SIMPLE.nameFS * 0.455;   // Cormorant è stretto
-    const wy = y.length * SIMPLE.yearFS * 0.600;   // Poppins ha cifre larghe
+    const wy = y.length * SIMPLE.yearFS * 0.600;   // DM Sans ha cifre larghe
     return Math.max(SIMPLE.minW, Math.max(wn, wy) + 2*SIMPLE.padX);
   }
   function nodeH(){ return cardMode === 2 ? vH : (cardMode === 1 ? SIMPLE.H : BH); }
@@ -685,7 +732,7 @@
     xs.forEach((v, id) => {
       const p = localById.get(id);
       const d = depths.get(id) || 0;
-      positions.set(id, { x: v - minX + 40, y: d * RS, w: nodeW(p), h: nodeH(), depth: d });
+      positions.set(id, { x: v - minX + 40, y: TOP_PAD + d * RS, w: nodeW(p), h: nodeH(), depth: d });
     });
     let width = 0, height = 0;
     positions.forEach(q => {
@@ -857,11 +904,11 @@
     g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.75), x1:padX, y1:y, x2:W-padX, y2:y }));
     y += 25;
     if(p.dataNascita){
-      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18 });
+      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18, fill:stroke, opacity:.85 });
       t.textContent = 'n. ' + fmtDate(p.dataNascita); g.appendChild(t);
     }
     if(p.dataMorte){
-      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18 });
+      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18, fill:stroke, opacity:.85 });
       t.textContent = '‡ ' + fmtDate(p.dataMorte); g.appendChild(t);
     }
     y += 11;
@@ -874,13 +921,13 @@
     const maxLines = Math.max(0, Math.floor((limit - noteTop)/22) + 1);
     const noteLines = wrap(fmtDate(nt.text), 36, maxLines);
     noteLines.forEach((ln, i) => {
-      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15 });
+      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15, fill:stroke, opacity:.78 });
       t.textContent = ln; g.appendChild(t);
     });
     if(hasSpouseDates){
       const spouseY = Math.min(H - 16, noteTop + noteLines.length*22 + 4);
-      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
-      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
+      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16, fill:stroke, opacity:.85 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
+      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16, fill:stroke, opacity:.85 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
     }
   }
 
@@ -1237,8 +1284,8 @@
     el('ic-simple').innerHTML = cardMode === 2 ? IC_SIMPLE_V : IC_SIMPLE_H;
     render(true);
   });
-  const IC_SIMPLE_H = '<path d="M3 6.5h18M3 12h12M3 17.5h7"/>';
-  const IC_SIMPLE_V = '<path d="M6.5 21V3M12 21V9M17.5 21v-7"/>';
+  const IC_SIMPLE_H = '<path d="M4 7h16M4 12h10M4 17h6"/>';
+  const IC_SIMPLE_V = '<path d="M7 20V4M12 20v-10M17 20v-6"/>';
 
   /* ============ CONTROLLI ============ */
   function updateFocusUI(){ el('toolbar').classList.toggle('focus-mode', !!focusId); }
@@ -1269,8 +1316,8 @@
   }, { passive:false });
 
   /* ============ SCHERMO INTERO ============ */
-  const IC_ENTER = '<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>';
-  const IC_EXIT  = '<path d="M3 8h3a2 2 0 0 0 2-2V3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M21 16h-3a2 2 0 0 0-2 2v3"/>';
+  const IC_ENTER = '<path d="M9 3.5H5.5a2 2 0 0 0-2 2V9M15 3.5h3.5a2 2 0 0 1 2 2V9M9 20.5H5.5a2 2 0 0 1-2-2V15M15 20.5h3.5a2 2 0 0 0 2-2V15"/>';
+  const IC_EXIT  = '<path d="M3.5 9H7a2 2 0 0 0 2-2V3.5M20.5 9H17a2 2 0 0 1-2-2V3.5M3.5 15H7a2 2 0 0 1 2 2v3.5M20.5 15H17a2 2 0 0 0-2 2v3.5"/>';
   function toggleFullscreen(){
     const isFs = document.fullscreenElement || document.webkitFullscreenElement;
     if(!isFs){ const req = stage.requestFullscreen || stage.webkitRequestFullscreen; if(req) req.call(stage); }

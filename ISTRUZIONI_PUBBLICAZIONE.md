@@ -332,9 +332,15 @@ I profili salvano il **bordo destro reale**, non il bordo sinistro più una larg
 
 Le distanze minime sono tarate sugli ornamenti del cartiglio, che sporgono 12,34 unità per lato: due caselle non possono avvicinarsi oltre ~25 unità senza che le volute si tocchino. Da qui **30 unità fra fratelli**, **52 fra rami diversi alle generazioni inferiori**, **240 fra alberi senza antenato comune**.
 
-**Caratteri.** I **nomi** sono in **Cormorant** (700), un garaldo di impronta rinascimentale coerente con l'origine cinquecentesca del documento. **Numeri e testi** — date, annotazioni, interfaccia, misure di stampa — sono in **Poppins medium** (500), una geometrica che tiene bene le cifre anche a corpo piccolo e in stampa grande.
+**Caratteri.** I **nomi** sono in **Cormorant** (700), un garaldo di impronta rinascimentale coerente con l'origine cinquecentesca del documento. **Numeri e testi** — date, annotazioni, interfaccia, misure di stampa — sono in **DM Sans** (500), una grottesca dalle cifre ampie e leggibili anche a corpo piccolo e in stampa grande.
 
 Cormorant è sensibilmente più stretto e otticamente più piccolo dei caratteri precedenti, quindi corpi e stime di larghezza sono stati ricalibrati: il nome sul cartiglio passa da 28 a 34, la stima di larghezza per carattere da 0,545 a 0,455 em, e i nomi accorciati nella vista essenziale da 12 a 14 caratteri. Senza questa ricalibratura le caselle sarebbero risultate troppo larghe e i nomi troppo piccoli.
+
+**Colore dei testi.** Tutto il contenuto del cartiglio — nome, date, annotazioni, date del coniuge — usa **la tinta del ramo di appartenenza**, con le parti secondarie leggermente trasparenti per mantenere la gerarchia di lettura. In precedenza date e note erano fissate su due marroni indipendenti dal ramo, che stonavano contro i gruppi blu, verdi o violetti. Perché la tinta arrivi al disegno, le regole CSS che fissavano `fill` su `.date` e `.note-text` sono state rimosse: un attributo di presentazione SVG perde sempre contro una regola CSS.
+
+**Comandi.** Nell'intestazione resta il solo campo di ricerca, allineato a sinistra accanto al titolo. Tutte le funzioni sono icone in una **colonna verticale sul lato destro** del disegno, raggruppate in tre blocchi separati da filetti: vista e ingrandimento, modo di disegno, stampa e ritorno. Le icone sono state ridisegnate sulla stessa impostazione — griglia 24, tratto 1,6, estremità arrotondate, nessun riempimento, forme costruite su cerchi e rette — e i pulsanti hanno angoli arrotondati (13 px) con il campo di ricerca a pillola.
+
+**Margine superiore.** Sopra la prima generazione ci sono 130 unità di spazio: senza, il cartiglio del capostipite resta incollato al bordo del disegno e in stampa tocca la cimosa del telo.
 
 **Grafica del cartiglio.** Cornice ricalcata curva per curva dal `blocco.pdf`: volute agli angoli, cerchietti, montanti, filetti sottili esterni. Due differenze dall'originale: i **quattro tratti diagonali corti** agli angoli sono stati rimossi su richiesta, e i colori non sono fissi ma vengono dal gruppo della colonna H (il gruppo 0 coincide con i colori originali).
 
