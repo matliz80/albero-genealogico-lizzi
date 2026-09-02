@@ -6,23 +6,26 @@
 <title>I Lizzi in Friuli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f2e8d5; --paper-2:#e9dcbf; --paper-3:#ded0ac;
-    --ink:#2b2118; --ink-soft:#5c4d3a; --ink-faint:#8a7a5f;
-    --accent:#a13d2b; --accent-2:#4a5d3a; --line:#b8a37e; --gold:#9c7a34;
-    --frame:#603813; --frame-soft:#8a5f34; --frame-dark:#472a0e;
+    /* Carta fredda: con l'inchiostro blu la crema ingiallisce e stona.
+       Il bianco tende appena all'azzurro, come una carta da disegno. */
+    --paper:#e9eef5; --paper-2:#dbe4ee; --paper-3:#cad6e4;
+    --ink:#12202e; --ink-soft:#3e5468; --ink-faint:#7789a0;
+    /* L'unico caldo rimasto è l'accento: senza, il navy diventa cupo. */
+    --accent:#1d6b4a; --accent-2:#124a33; --line:#b0c1d3; --gold:#9a7c33;
+    --frame:#1b3a5c; --frame-soft:#4e6f92; --frame-dark:#0d2740;
   }
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
     margin:0;
     background:
-      radial-gradient(ellipse at 20% 0%, #f8efdd 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, #ecdcb8 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 0%, #f6f9fd 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, #d7e2ef 0%, transparent 60%),
       var(--paper);
-    color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:500; min-height:100%;
+    color:var(--ink); font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; min-height:100%;
     position:relative; overflow-x:hidden;
   }
   body::before{
@@ -35,12 +38,12 @@
     position:relative; z-index:2;
     display:flex; align-items:center; justify-content:flex-start; gap:18px;
     padding:12px 22px 11px;
-    border-bottom:1px solid rgba(96,56,19,.16);
+    border-bottom:1px solid rgba(27,58,92,.17);
   }
   header h1{
-    font-family:'Cormorant',serif; font-weight:700; font-style:normal;
-    font-size:clamp(21px,2.6vw,30px); letter-spacing:-.005em;
-    margin:0; color:var(--frame-dark); line-height:1; white-space:nowrap;
+    font-family:'Libre Baskerville',serif; font-weight:700; font-style:normal;
+    font-size:clamp(17px,2.1vw,23px); letter-spacing:-.004em;
+    margin:0; color:var(--frame); line-height:1; white-space:nowrap;
   }
   header .mark{width:8px; height:8px; flex:none; border-radius:50%; border:1.6px solid var(--frame-soft);}
 
@@ -51,18 +54,18 @@
     transition:border-color .15s ease;
   }
   .field:focus-within{border-color:var(--frame-dark);}
-  .field svg{width:15px; height:15px; flex:none; stroke:var(--frame-soft); fill:none; stroke-width:1.9;}
-  #search{font-family:'DM Sans',sans-serif; font-weight:500; font-size:14.5px; border:none;
-    background:transparent; color:var(--frame-dark); outline:none; width:210px;}
+  .field svg{width:15px; height:15px; flex:none; stroke:var(--frame); fill:none; stroke-width:1.9;}
+  #search{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:14.5px; border:none;
+    background:transparent; color:var(--frame); outline:none; width:210px;}
   #search::placeholder{color:var(--frame-soft); opacity:.65;}
 
   /* colonna dei comandi, verticale sul lato destro del disegno */
   #toolbar{
     position:absolute; top:16px; right:16px; z-index:6;
     display:flex; flex-direction:column; align-items:center; gap:7px;
-    background:rgba(242,232,213,.93); border:1px solid rgba(96,56,19,.16);
+    background:rgba(233,238,245,.94); border:1px solid rgba(27,58,92,.17);
     border-radius:22px; padding:9px 7px;
-    box-shadow:0 2px 14px -8px rgba(43,33,24,.45);
+    box-shadow:0 2px 14px -8px rgba(13,39,64,.40);
     backdrop-filter:blur(3px);
   }
   .btn{
@@ -76,9 +79,9 @@
   .btn.on{background:var(--frame); color:var(--paper); border-color:var(--frame);}
   .btn.accent{width:38px; border-color:var(--accent); color:var(--accent);}
   .btn.accent:hover{background:var(--accent); color:var(--paper); border-color:var(--accent);}
-  .rail-sep{width:22px; height:1px; background:rgba(96,56,19,.2); margin:2px 0;}
+  .rail-sep{width:22px; height:1px; background:rgba(27,58,92,.22); margin:2px 0;}
   #btn-zoom-level{
-    font-family:'DM Sans',sans-serif; font-weight:500; font-size:11px; color:var(--frame-soft);
+    font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:11px; color:var(--frame-soft);
     background:none; border:none; cursor:pointer; padding:1px 0; line-height:1;
     font-variant-numeric:tabular-nums; letter-spacing:-.01em;
   }
@@ -86,15 +89,71 @@
   #toolbar.focus-mode > *:not(#btn-reset-view):not(.rail-sep){opacity:.32; pointer-events:none; filter:grayscale(.6);}
   #btn-reset-view{display:none;}
   #toolbar.focus-mode #btn-reset-view{display:inline-flex;}
-  #status-line{font-family:'DM Sans',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);
+  #status-line{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:12px; color:var(--frame-soft);
     text-align:center; position:relative; z-index:2; padding:6px 12px 0;}
   #status-line:empty{display:none;}
-  #status-line.error{color:#a13d2b;}
+  #status-line.error{color:#a8362c;}
   @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ===== etichette dei comandi =====
+     Nove icone senza testo sono indecifrabili: il nome della funzione esce
+     a sinistra al passaggio del puntatore, come una linguetta d'archivio. */
+  .btn{position:relative;}
+  .btn::after{
+    content:attr(data-label); position:absolute; right:calc(100% + 9px); top:50%;
+    transform:translateY(-50%) translateX(5px);
+    background:var(--frame-dark); color:var(--paper);
+    font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:11.5px; letter-spacing:.005em;
+    padding:5px 10px; border-radius:9px; white-space:nowrap; pointer-events:none;
+    opacity:0; transition:opacity .16s ease, transform .16s ease;
+  }
+  .btn:hover::after{opacity:1; transform:translateY(-50%) translateX(0);}
+  @media (hover:none){ .btn::after{display:none;} }
+
+  /* ===== comparsa in sequenza all'apertura ===== */
+  @keyframes sorgi{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;}}
+  @keyframes scorri{from{opacity:0; transform:translateX(10px);} to{opacity:1; transform:none;}}
+  header > *{animation:sorgi .5s cubic-bezier(.2,.7,.3,1) backwards;}
+  header .mark{animation-delay:.02s;} header h1{animation-delay:.06s;} header .field{animation-delay:.12s;}
+  #toolbar .btn,#toolbar #btn-zoom-level{animation:scorri .42s cubic-bezier(.2,.7,.3,1) backwards;}
+  #toolbar .btn:nth-child(1){animation-delay:.16s;} #toolbar .btn:nth-child(2){animation-delay:.20s;}
+  #toolbar .btn:nth-child(4){animation-delay:.24s;} #toolbar .btn:nth-child(5){animation-delay:.28s;}
+  #toolbar .btn:nth-child(7){animation-delay:.32s;} #toolbar .btn:nth-child(8){animation-delay:.36s;}
+  #toolbar .btn:nth-child(9){animation-delay:.40s;} #toolbar .btn:nth-child(11){animation-delay:.44s;}
+  @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+
+  /* ===== fascetta del ramo a fuoco ===== */
+  #focus-tag{
+    position:absolute; top:16px; left:16px; z-index:6; display:none;
+    align-items:center; gap:11px; padding:7px 9px 7px 15px;
+    background:rgba(233,238,245,.96); border:1px solid rgba(27,58,92,.19);
+    border-radius:20px; box-shadow:0 2px 14px -8px rgba(13,39,64,.40); backdrop-filter:blur(3px);
+    animation:sorgi .3s cubic-bezier(.2,.7,.3,1);
+  }
+  #focus-tag.on{display:inline-flex;}
+  #focus-tag .k{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--frame-soft);}
+  #focus-tag .v{font-family:'Libre Baskerville',serif; font-weight:700; font-size:14px; letter-spacing:-.004em;
+    color:var(--frame-dark); line-height:1;}
+  #focus-tag button{width:26px; height:26px; border-radius:9px; border:1px solid var(--frame-soft);
+    background:#fff; color:var(--frame); cursor:pointer; display:inline-flex;
+    align-items:center; justify-content:center; padding:0; transition:.14s;}
+  #focus-tag button:hover{background:var(--frame); color:var(--paper); border-color:var(--frame);}
+  #focus-tag button svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round;}
+
+  /* ===== anteprima delle proporzioni del telo ===== */
+  .telo{margin-top:16px;}
+  .telo .strip{position:relative; width:100%; height:26px; border:1px solid var(--frame-soft);
+    border-radius:5px; background:repeating-linear-gradient(90deg,transparent 0 13px,rgba(27,58,92,.10) 13px 14px);
+    overflow:hidden;}
+  .telo .strip i{position:absolute; left:0; top:0; bottom:0; background:rgba(27,58,92,.17);
+    border-right:1.5px solid var(--frame); transition:width .2s ease;}
+  .telo .cap{display:flex; justify-content:space-between; margin-top:5px;
+    font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:10.5px; color:var(--frame-soft);}
   footer{
     flex:none; height:20px; display:flex; align-items:center; justify-content:center;
-    font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; line-height:1;
-    color:var(--frame-soft); background:rgba(242,232,213,.9);
+    font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:10.5px; line-height:1;
+    color:var(--frame-soft); background:rgba(233,238,245,.92);
     border-top:1px solid var(--line); padding:0 14px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
@@ -117,43 +176,60 @@
   .link{fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:3.3;}
   .link.thin{stroke-width:2.4;}
   .card-frame{fill:none; stroke-linecap:round; stroke-linejoin:round;}
-  .node-card .name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
-  .node-card .date{font-family:'DM Sans',sans-serif; font-weight:500;}
+  .node-card .name{font-family:'Libre Baskerville',serif; font-weight:700; text-anchor:middle; letter-spacing:-.005em;}
+  .node-card .date{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400;}
   .node-card .date.death{text-anchor:end;}
-  .node-card .note-text{font-family:'DM Sans',sans-serif; font-weight:400;}
+  .node-card .note-text{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400;}
   .node-card{cursor:pointer;}
-  .node-card.match .card-bg{fill:#fbeccb;}
-  .node-card.focused .card-bg{fill:#f6e2ba;}
+  .node-card.match .card-bg{fill:#d8e6f8;}
+  .node-card.focused .card-bg{fill:#c6dcf2;}
   /* vista semplificata: nome grande, anno a capo, nessuna cornice */
-  .simple .s-name{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle;}
-  .simple .s-year{font-family:'DM Sans',sans-serif; font-weight:500; text-anchor:middle;}
-  .bar-label{font-family:'Cormorant',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
+  .simple .s-name{font-family:'Libre Baskerville',serif; font-weight:700; text-anchor:middle; letter-spacing:-.01em;}
+  .simple .s-year{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; text-anchor:middle;}
+  .bar-label{font-family:'Libre Baskerville',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
 
-  #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(43,33,24,.4); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
+  #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(13,39,64,.36); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open,#print-panel.open{right:0;}
-  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'DM Sans',sans-serif; font-weight:500; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
-  #detail-panel h2,#print-panel h2{font-family:'Cormorant',serif; font-weight:700; font-size:29px; margin:6px 0 4px; color:var(--frame-dark);}
-  #detail-panel .tag{display:inline-block; font-family:'DM Sans',sans-serif; font-weight:500; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
+  #detail-panel .close,#print-panel .close{position:absolute; top:16px; right:18px; font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; background:none; border:none; color:var(--frame-soft); font-size:13px; cursor:pointer; letter-spacing:.1em;}
+  #detail-panel h2,#print-panel h2{font-family:'Libre Baskerville',serif; font-weight:700; font-size:21px;
+    margin:4px 0 5px; color:var(--frame-dark); line-height:1.25; letter-spacing:-.004em;}
+  #detail-panel .lifespan{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:13px;
+    color:var(--frame-soft); margin-bottom:16px; font-variant-numeric:tabular-nums;}
+  .kin{margin-top:20px;}
+  .kin h3{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.09em; color:var(--frame-soft); margin:0 0 7px;}
+  .kin a{display:block; font-family:'Libre Baskerville',serif; font-weight:700; font-size:13.5px; letter-spacing:-.004em;
+    color:var(--frame-dark); text-decoration:none; padding:4px 9px; margin:0 -9px; border-radius:8px;
+    cursor:pointer; transition:background .13s;}
+  .kin a:hover{background:var(--paper-2);}
+  .kin a small{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:12px;
+    color:var(--frame-soft); margin-left:8px; font-variant-numeric:tabular-nums;}
+  #detail-panel .tag{display:inline-block; font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); background:var(--frame); padding:3px 8px; border-radius:2px; margin-bottom:12px;}
   .detail-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px dashed var(--frame-soft); font-size:13.5px; color:var(--frame);}
-  .detail-row .k{color:var(--frame-soft); font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
+  .detail-row .k{color:var(--frame-soft); font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; padding-top:2px;}
   .detail-row .v{text-align:right; max-width:200px;}
   #detail-panel .actions{margin-top:20px; display:flex; flex-direction:column; gap:8px;}
   #detail-panel .actions .btn{width:100%; height:30px; font-size:14px; padding:0 12px; text-align:center;}
   #print-panel p.hint{font-size:13px; line-height:1.55; color:var(--frame-soft); margin:4px 0 16px;}
-  #print-panel label{display:block; font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
+  #print-panel label{display:block; font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--frame-soft); margin:16px 0 5px;}
   #print-panel input[type=range]{width:100%; accent-color:var(--frame);}
-  #print-panel input[type=number]{width:88px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:15px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
+  #print-panel input[type=number]{width:88px; font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:15px; padding:5px 8px; border:1.5px solid var(--frame); border-radius:4px; background:#fff; color:var(--frame);}
   .measure{border:1px solid var(--frame-soft); border-radius:4px; padding:12px 13px; margin-top:16px; background:rgba(255,255,255,.5);}
   .measure .m-row{display:flex; justify-content:space-between; font-size:13.5px; color:var(--frame); padding:5px 0;}
-  .measure .m-row .k{font-family:'DM Sans',sans-serif; font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
-  .measure .m-row b{font-family:'DM Sans',sans-serif; font-weight:600;}
-  .measure.warn{border-color:#a13d2b;}
-  .measure.warn .big{color:#a13d2b;}
-  #print-panel .btn{width:100%; margin-top:16px; height:32px; font-size:15px;}
+  .measure .m-row .k{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--frame-soft);}
+  .measure .m-row b{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:700;}
+  .measure.warn{border-color:#a8362c;}
+  .measure.warn .big{color:#a8362c;}
+  #print-panel .btn,#detail-panel .actions .btn{
+    width:100%; height:38px; border-radius:12px; gap:9px;
+    font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:13.5px;
+    margin-top:9px; padding:0 14px;
+  }
+  #print-panel .btn::after,#detail-panel .actions .btn::after{display:none;}
 
-  #overlay{position:absolute; inset:0; background:rgba(43,33,24,.25); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
+  #overlay{position:absolute; inset:0; background:rgba(13,39,64,.26); z-index:19; opacity:0; pointer-events:none; transition:.25s ease;}
   #overlay.open{opacity:1; pointer-events:auto;}
-  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);}
+  #loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:500; font-size:12px; color:var(--frame-soft);}
   .spinner{width:22px; height:22px; border-radius:50%; border:2px solid var(--frame-soft); border-top-color:var(--frame); animation:spin .9s linear infinite;}
   @media print{
     header,#toolbar,#status-line,#detail-panel,#print-panel,#overlay{display:none !important;}
@@ -194,41 +270,49 @@
        impostazione: griglia 24, tratto 1,6, estremità arrotondate, nessun
        riempimento, forme costruite su cerchi e rette per stare insieme. -->
   <div id="toolbar">
-    <button class="btn" id="btn-fit" title="Adatta allo schermo" aria-label="Adatta allo schermo">
-      <svg viewBox="0 0 24 24"><path d="M9 3.5H5.5a2 2 0 0 0-2 2V9M15 3.5h3.5a2 2 0 0 1 2 2V9M9 20.5H5.5a2 2 0 0 1-2-2V15M15 20.5h3.5a2 2 0 0 0 2-2V15"/></svg>
+    <button class="btn" id="btn-fit" data-label="Adatta allo schermo" title="Adatta allo schermo" aria-label="Adatta allo schermo">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.4"/><path d="M7.4 12h9.2M7.4 12l2.4-2.4M7.4 12l2.4 2.4M16.6 12l-2.4-2.4M16.6 12l-2.4 2.4"/></svg>
     </button>
-    <button class="btn" id="btn-zoom-in" title="Ingrandisci" aria-label="Ingrandisci">
+    <button class="btn" id="btn-zoom-in" data-label="Ingrandisci" title="Ingrandisci" aria-label="Ingrandisci">
       <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M10.5 7.8v5.4M7.8 10.5h5.4M15.4 15.4 20.5 20.5"/></svg>
     </button>
     <button id="btn-zoom-level" title="Torna al 100%">100%</button>
-    <button class="btn" id="btn-zoom-out" title="Riduci" aria-label="Riduci">
+    <button class="btn" id="btn-zoom-out" data-label="Riduci" title="Riduci" aria-label="Riduci">
       <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7.8 10.5h5.4M15.4 15.4 20.5 20.5"/></svg>
     </button>
-    <button class="btn" id="btn-fullscreen" title="Schermo intero" aria-label="Schermo intero">
+    <button class="btn" id="btn-fullscreen" data-label="Schermo intero" title="Schermo intero" aria-label="Schermo intero">
       <svg id="ic-fs" viewBox="0 0 24 24"><path d="M9 3.5H5.5a2 2 0 0 0-2 2V9M15 3.5h3.5a2 2 0 0 1 2 2V9M9 20.5H5.5a2 2 0 0 1-2-2V15M15 20.5h3.5a2 2 0 0 0 2-2V15"/></svg>
     </button>
 
     <span class="rail-sep"></span>
 
-    <button class="btn" id="btn-simple" title="Solo nome e anno, in grande" aria-label="Solo nome e anno">
+    <button class="btn" id="btn-simple" data-label="Solo nome e anno" title="Solo nome e anno, in grande" aria-label="Solo nome e anno">
       <svg id="ic-simple" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
     </button>
-    <button class="btn" id="btn-align" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati">
+    <button class="btn" id="btn-align" data-label="Fratelli affiancati" title="Fratelli sempre affiancati" aria-label="Fratelli sempre affiancati">
       <svg viewBox="0 0 24 24"><path d="M4 4.5h16"/><rect x="4" y="9.5" width="4.6" height="9.5" rx="1.4"/><rect x="9.7" y="9.5" width="4.6" height="9.5" rx="1.4"/><rect x="15.4" y="9.5" width="4.6" height="9.5" rx="1.4"/></svg>
     </button>
-    <button class="btn" id="btn-colors" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi">
+    <button class="btn" id="btn-colors" data-label="Colori dei rami" title="Colora i gruppi (colonna H)" aria-label="Colora i gruppi">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><circle cx="8.2" cy="9.4" r="1.15"/><circle cx="8.2" cy="14.6" r="1.15"/><circle cx="15.8" cy="9.4" r="1.15"/><circle cx="15.8" cy="14.6" r="1.15"/></svg>
     </button>
 
     <span class="rail-sep"></span>
 
-    <button class="btn" id="btn-print" title="Stampa su plotter" aria-label="Stampa su plotter">
+    <button class="btn" id="btn-print" data-label="Stampa su plotter" title="Stampa su plotter" aria-label="Stampa su plotter">
       <svg viewBox="0 0 24 24"><path d="M7 9V4.5h10V9"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><rect x="7" y="14" width="10" height="5.5" rx="1.2"/></svg>
     </button>
-    <button class="btn accent" id="btn-reset-view" title="Torna alla vista completa" aria-label="Torna alla vista completa">
+    <button class="btn accent" id="btn-reset-view" data-label="Vista completa" title="Torna alla vista completa" aria-label="Torna alla vista completa">
       <svg viewBox="0 0 24 24"><path d="M9.5 5.5 4 11l5.5 5.5"/><path d="M4 11h9.5a6.5 6.5 0 0 1 0 13H11"/></svg>
     </button>
   </div>
+  <div id="focus-tag">
+    <span class="k">Ramo di</span>
+    <span class="v" id="focus-name">—</span>
+    <button id="focus-exit" title="Torna alla vista completa" aria-label="Torna alla vista completa">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
   <div id="viewport">
     <svg id="tree" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="loading"><div class="spinner"></div><div>Lettura del foglio Google in corso…</div></div>
@@ -239,7 +323,9 @@
     <button class="close" id="detail-close">CHIUDI ✕</button>
     <div class="tag" id="detail-id">—</div>
     <h2 id="detail-name">—</h2>
+    <div class="lifespan" id="detail-life"></div>
     <div id="detail-rows"></div>
+    <div class="kin" id="detail-kin"></div>
     <div class="actions">
       <button class="btn accent" id="detail-focus">Metti a fuoco questo ramo</button>
       <button class="btn" id="detail-export">Esporta PDF di questo ramo</button>
@@ -262,6 +348,11 @@
       <div class="m-row"><span class="k">Casella stampata</span><b id="m-card">—</b></div>
       <div class="m-row"><span class="k">Corpo del nome</span><b id="m-font">—</b></div>
       <div class="m-row"><span class="k">Generazioni</span><b id="m-gen">—</b></div>
+    </div>
+
+    <div class="telo">
+      <div class="strip"><i id="telo-fill"></i></div>
+      <div class="cap"><span id="telo-h">alta 1 m</span><span id="telo-w">lunga 9,6 m</span></div>
     </div>
 
     <button class="btn accent" id="print-go">Esporta PDF</button>
@@ -294,11 +385,11 @@
   let rowGap = 105;                              // spazio verticale fra una riga e l'altra
 
   // vista semplificata: nome grande, anno a capo, nessuna cornice
-  const SIMPLE   = { nameFS:66, yearFS:34, padX:20, minW:186, maxChars:14, H:152 };
+  const SIMPLE   = { nameFS:44, yearFS:31, padX:22, minW:190, maxChars:12, H:152 };
   // vista verticale: il nome corre dal basso verso l'alto, così la casella
   // resta stretta qualunque sia la lunghezza del nome. È la disposizione più
   // adatta alla stampa, perché accorcia moltissimo il telo.
-  const SIMPLE_V = { nameFS:60, yearFS:31, pad:24, minH:300, maxChars:18, W:112 };
+  const SIMPLE_V = { nameFS:40, yearFS:27, pad:26, minH:300, maxChars:14, W:116 };
 
   const isMobile = () => window.matchMedia('(max-width: 640px)').matches;
   const initialZoom = () => isMobile() ? 0.58 : 0.50;
@@ -311,11 +402,23 @@
     + (SHEET_NAME ? '&sheet=' + encodeURIComponent(SHEET_NAME) : '');
 
   /* ============ TAVOLOZZA (colonna H) ============ */
+  /* Dodici tinte scure riaccordate attorno al navy: il gruppo 0 è il blu di
+     base del sito, gli altri se ne allontanano in tinta restando vicini per
+     luminosità, così nessun ramo pesa più degli altri. Due sole tinte calde
+     — sienna e bronzo — fanno da contrappunto e impediscono che l'insieme
+     scivoli nel monocromo. */
+  /* Dodici tinte scure a tinte equidistanti sul cerchio cromatico, con la
+     luminosità calibrata sul contrasto invece che scelta a occhio: il nome sta
+     sempre sopra 6,6:1 contro il proprio fondo e le annotazioni sopra 5,5:1.
+     Due tinte calde — sienna e bronzo — impediscono che l'insieme scivoli nel
+     monocromo. Sotto queste condizioni la distanza reciproca massima ottenibile
+     è di 36 unità: il gamut delle tinte scure ad alto contrasto è stretto, e
+     due rami lontani nell'albero possono risultare simili se guardati isolati. */
   const GROUP_COLORS = [
-    '#603813','#1f4f3f','#7a2e1e','#23405e','#5c2a52','#6b5a12',
-    '#2f5d5a','#3f3470','#8a2f2f','#40561f','#7a4a12','#4a2f6b'
+    '#2d547b','#1d208c','#4d1d8c','#65286c','#6a164b','#831b2c',
+    '#4e2d1d','#6a4d0c','#4b521e','#245d19','#0f5c38','#205056'
   ];
-  const IVORY = [255, 255, 243];
+  const IVORY = [252, 253, 255];   // bianco appena azzurrato
   const TINT = 0.10;
   function rgbOf(hex){
     return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
@@ -492,8 +595,8 @@
     if(cardMode === 0) return BW;
     if(cardMode === 2) return SIMPLE_V.W;
     const n = truncName(personLabel(p)), y = birthLine(p);
-    const wn = n.length * SIMPLE.nameFS * 0.455;   // Cormorant è stretto
-    const wy = y.length * SIMPLE.yearFS * 0.600;   // DM Sans ha cifre larghe
+    const wn = n.length * SIMPLE.nameFS * 0.630;   // Libre Baskerville è largo
+    const wy = y.length * SIMPLE.yearFS * 0.580;
     return Math.max(SIMPLE.minW, Math.max(wn, wy) + 2*SIMPLE.padX);
   }
   function nodeH(){ return cardMode === 2 ? vH : (cardMode === 1 ? SIMPLE.H : BH); }
@@ -502,7 +605,7 @@
   function computeVH(list){
     let m = 0;
     list.forEach(p => {
-      const w = truncName(personLabel(p), SIMPLE_V.maxChars).length * SIMPLE_V.nameFS * 0.455;
+      const w = truncName(personLabel(p), SIMPLE_V.maxChars).length * SIMPLE_V.nameFS * 0.630;
       if(w > m) m = w;
     });
     vH = Math.max(SIMPLE_V.minH, m + 2*SIMPLE_V.pad);
@@ -821,13 +924,13 @@
   /* --- casella semplificata: solo fondo colorato, nome e anno --- */
   function drawSimple(g, p, W, H){
     const stroke = colorOf(p), bg = tintFor(p);
-    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:6, fill:bg }));
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:Math.min(W,H)*0.40, fill:bg }));
     const n = sel('text', { x:W/2, y:H*0.44, class:'s-name', 'font-size':SIMPLE.nameFS, fill:stroke });
     n.textContent = truncName(personLabel(p));
     g.appendChild(n);
     const yr = birthLine(p);
     if(yr){
-      const t = sel('text', { x:W/2, y:H*0.83, class:'s-year', 'font-size':SIMPLE.yearFS, fill:stroke, opacity:.78 });
+      const t = sel('text', { x:W/2, y:H*0.83, class:'s-year', 'font-size':SIMPLE.yearFS, fill:stroke, opacity:.86 });
       t.textContent = yr;
       g.appendChild(t);
     }
@@ -836,7 +939,7 @@
   /* --- casella verticale: nome e anno ruotati, letti dal basso in alto --- */
   function drawSimpleV(g, p, W, H){
     const stroke = colorOf(p), bg = tintFor(p);
-    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:6, fill:bg }));
+    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:Math.min(W,H)*0.40, fill:bg }));
     const cy = H/2;
     const nx = W*0.38;
     const n = sel('text', { x:nx, y:cy, class:'s-name', 'font-size':SIMPLE_V.nameFS, fill:stroke,
@@ -892,9 +995,9 @@
 
     const padX = px(4.05);
     const label = personLabel(p);
-    let nameLines = wrap(label, 23, 1);
-    let fs = 34, step = 34;
-    if(label.length > 23){ nameLines = wrap(label, 30, 2); fs = 27; step = 27; }
+    let nameLines = wrap(label, 16, 1);
+    let fs = 24, step = 28;
+    if(label.length > 16){ nameLines = wrap(label, 22, 2); fs = 18; step = 21; }
     let y = fs + 8;
     nameLines.forEach((ln, i) => {
       const t = sel('text', { x:W/2, y:y + i*step, class:'name', 'font-size':fs, fill:stroke });
@@ -904,11 +1007,11 @@
     g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.75), x1:padX, y1:y, x2:W-padX, y2:y }));
     y += 25;
     if(p.dataNascita){
-      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18, fill:stroke, opacity:.85 });
+      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18, fill:stroke, opacity:.95 });
       t.textContent = 'n. ' + fmtDate(p.dataNascita); g.appendChild(t);
     }
     if(p.dataMorte){
-      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18, fill:stroke, opacity:.85 });
+      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18, fill:stroke, opacity:.95 });
       t.textContent = '‡ ' + fmtDate(p.dataMorte); g.appendChild(t);
     }
     y += 11;
@@ -921,17 +1024,19 @@
     const maxLines = Math.max(0, Math.floor((limit - noteTop)/22) + 1);
     const noteLines = wrap(fmtDate(nt.text), 36, maxLines);
     noteLines.forEach((ln, i) => {
-      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15, fill:stroke, opacity:.78 });
+      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15, fill:stroke, opacity:.92 });
       t.textContent = ln; g.appendChild(t);
     });
     if(hasSpouseDates){
       const spouseY = Math.min(H - 16, noteTop + noteLines.length*22 + 4);
-      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16, fill:stroke, opacity:.85 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
-      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16, fill:stroke, opacity:.85 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
+      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16, fill:stroke, opacity:.95 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
+      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16, fill:stroke, opacity:.95 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
     }
   }
 
-  const CHAR_W = 0.50, LABEL_PAD = 26, LABEL_FS_MAX = 58, LABEL_FS_MIN = 26;
+  /* Corpo del nome del ramo dimezzato: prima dominava la barra e rubava
+     l'attenzione ai nomi delle persone. */
+  const CHAR_W = 0.74, LABEL_PAD = 18, LABEL_FS_MAX = 29, LABEL_FS_MIN = 13;
   function labelMetrics(text, barLen){
     let fs = LABEL_FS_MAX;
     const width = () => text.length * fs * CHAR_W;
@@ -1197,6 +1302,9 @@
     closePrint();
     el('detail-id').textContent = 'ID ' + p.id;
     el('detail-name').textContent = personLabel(p);
+    const an = parseYear(p.dataNascita), am = parseYear(p.dataMorte);
+    const arco = el('detail-life');
+    if(arco) arco.textContent = an ? (am ? an + ' – ' + am : 'nato/a nel ' + an) : (am ? '† ' + am : '');
     const rows = el('detail-rows'); rows.innerHTML = '';
     Object.keys(FIELD_LABELS).forEach(k => {
       if(p[k]){
@@ -1206,12 +1314,28 @@
         rows.appendChild(row);
       }
     });
+    /* Parentele navigabili: da qui si salta al padre o a un figlio senza dover
+       ritrovare la casella a occhio in mezzo a quattrocento. */
+    const kin = el('detail-kin'); kin.innerHTML = '';
+    const voce = (persona, etichetta) => {
+      const a = document.createElement('a');
+      a.textContent = personLabel(persona);
+      const y = parseYear(persona.dataNascita);
+      if(y){ const s = document.createElement('small'); s.textContent = '\u00a0' + y; a.appendChild(s); }
+      a.addEventListener('click', () => openDetail(persona.id));
+      return a;
+    };
     const padre = p.idPadre && personsById.get(p.idPadre);
     if(padre){
-      const row = document.createElement('div'); row.className = 'detail-row';
-      row.innerHTML = `<span class="k">Figlio/a di</span><span class="v"></span>`;
-      row.querySelector('.v').textContent = personLabel(padre);
-      rows.appendChild(row);
+      const h = document.createElement('h3'); h.textContent = 'Figlio/a di'; kin.appendChild(h);
+      kin.appendChild(voce(padre));
+    }
+    const figli = ALL_PERSONS.filter(q => q.idPadre === p.id || q.idMadre === p.id);
+    if(figli.length){
+      const h = document.createElement('h3');
+      h.textContent = figli.length === 1 ? 'Un figlio' : figli.length + ' figli';
+      kin.appendChild(h);
+      figli.forEach(f => kin.appendChild(voce(f)));
     }
     if(colorsOn && p._group > 0){
       const row = document.createElement('div'); row.className = 'detail-row';
@@ -1247,6 +1371,15 @@
     el('m-font').textContent = fontMm.toFixed(1).replace('.', ',') + ' mm';
     el('m-gen').textContent = (maxDepth + 1) + '';
     el('measure').classList.toggle('warn', fontMm < 2);
+    /* Anteprima delle proporzioni: «9,6 m» è astratto, una striscia che mostra
+       il rapporto fra altezza e lunghezza si capisce a colpo d'occhio. */
+    const lung = (layout.width * scale) / 100, altM = hCm / 100;
+    const fill = el('telo-fill');
+    if(fill){
+      fill.style.width = Math.max(1.5, Math.min(100, (altM / lung) * 100)) + '%';
+      el('telo-h').textContent = 'alta ' + altM.toFixed(2).replace('.', ',') + ' m';
+      el('telo-w').textContent = 'lunga ' + lung.toFixed(1).replace('.', ',') + ' m';
+    }
   }
   el('print-height').addEventListener('input', updateMeasures);
   el('row-density').addEventListener('input', () => { rowGap = parseInt(el('row-density').value, 10); render(true); });
@@ -1288,8 +1421,21 @@
   const IC_SIMPLE_V = '<path d="M7 20V4M12 20v-10M17 20v-6"/>';
 
   /* ============ CONTROLLI ============ */
-  function updateFocusUI(){ el('toolbar').classList.toggle('focus-mode', !!focusId); }
-  el('btn-reset-view').addEventListener('click', () => { focusId = null; el('search').value=''; render(true); });
+  function updateFocusUI(){
+    const attivo = !!focusId;
+    el('toolbar').classList.toggle('focus-mode', attivo);
+    const tag = el('focus-tag');
+    if(tag){
+      tag.classList.toggle('on', attivo);
+      if(attivo){
+        const p = personsById.get(focusId);
+        el('focus-name').textContent = p ? personLabel(p) : '—';
+      }
+    }
+  }
+  function tornaAllaVistaCompleta(){ focusId = null; el('search').value = ''; render(true); }
+  el('btn-reset-view').addEventListener('click', tornaAllaVistaCompleta);
+  el('focus-exit').addEventListener('click', tornaAllaVistaCompleta);
   el('btn-fit').addEventListener('click', () => { zoom = fitZoom; applyZoom(); vp.scrollLeft = 0; vp.scrollTop = 0; });
   el('btn-zoom-in').addEventListener('click', () => zoomCenter(zoom * 1.3));
   el('btn-zoom-out').addEventListener('click', () => zoomCenter(zoom / 1.3));

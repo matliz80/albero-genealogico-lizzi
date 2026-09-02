@@ -66,7 +66,8 @@ Tutti i comandi stanno in **un'unica barra in cima alla finestra dell'albero**. 
 - **Icona a tre blocchi allineati** — cambia il criterio di disposizione. Vedi sezione 9.
 - **Icona a tavolozza** — accende e spegne i colori dei gruppi.
 - **Stampa** — apre il pannello per il plotter. Vedi sezione 10.
-- **Click su una casella** — apre la scheda con tutti i dati.
+- **Click su una casella** — apre la scheda della persona: nome, arco di vita, tutti i dati, e l'elenco di **padre e figli su cui si può cliccare** per saltare da una scheda all'altra senza dover ritrovare la casella a occhio in mezzo a quattrocento.
+- **Etichette dei comandi** — le icone della colonna non hanno testo: passandoci sopra col puntatore il nome della funzione esce a sinistra. Su cellulare, dove non esiste il passaggio del puntatore, le etichette non compaiono.
 
 Sotto la barra compaiono solo i **risultati della ricerca** e gli **errori** da correggere. Le segnalazioni non urgenti — per esempio l'elenco delle persone escluse perché senza legami — stanno in un **piede molto basso in fondo alla pagina**, che su cellulare non compare per non rubare spazio.
 
@@ -84,7 +85,7 @@ Restano visibili:
 
 Questi ultimi due gruppi servono a dare contesto: la sola linea diretta degli antenati, in fila uno sotto l'altro, fa perdere il senso di quanto fosse ampia ogni generazione. Mettendo a fuoco Matteo (P379), per esempio, compaiono 21 persone: lui, la figlia, il fratello Giuseppe, il padre Enea Giorgio con i suoi quattro fratelli, e su fino al capostipite.
 
-Il pulsante **↩ Vista completa** ripristina tutto. Da qui si può anche esportare il PDF del solo ramo.
+Quando un ramo è a fuoco compare in alto a sinistra una **fascetta con il nome della persona** e una ✕ per uscire; la stessa cosa fa il pulsante in fondo alla colonna dei comandi, che resta l'unico acceso. Da qui si può anche esportare il PDF del solo ramo.
 
 ---
 
@@ -160,7 +161,11 @@ Una **X** nella colonna H apre un nuovo gruppo di colore che vale per quella per
 
 > **Attenzione, questa regola è cambiata.** In una versione precedente il gruppo seguiva l'ordine delle righe nel foglio, e finiva per colorare anche persone di altri rami che capitavano in mezzo. Ora segue **la discendenza**: chi arriva da un altro ramo non viene toccato, anche se nel foglio sta fra righe marcate o nel disegno finisce sulla stessa riga.
 
-Le tinte sono **dodici, scure**, scelte distanti fra loro in tinta e simili in luminosità: bruno, verde bosco, terra bruciata, blu notte, prugna, oliva, ottanio, indaco, mattone, muschio, ambra, violetto. Oltre la dodicesima ricominciano da capo.
+Le tinte sono **dodici, scure**, disposte a distanza regolare sul cerchio cromatico: navy, indaco, violetto, ametista, prugna, granata, sienna, bronzo, oliva, bosco, ottanio, petrolio. Oltre la dodicesima ricominciano da capo.
+
+Non sono scelte a occhio: la luminosità di ciascuna è calcolata perché il nome stia sempre **sopra 6,6:1** di contrasto contro il proprio fondo e le annotazioni **sopra 5,5:1**, ben oltre la soglia di leggibilità. Sienna e bronzo sono le uniche due calde e servono a impedire che l'insieme scivoli nel monocromo.
+
+Un limite da conoscere: sotto questi vincoli la distanza reciproca massima ottenibile fra dodici tinte è di 36 unità. Il gamut dei colori scuri ad alto contrasto è stretto, quindi due rami molto lontani nell'albero possono risultare simili se osservati isolatamente. Nella pratica non è un problema, perché rami vicini nel disegno ricevono numeri di gruppo diversi.
 
 Il colore si applica a piena intensità a **linee di collegamento, cornice e nome**, e **diluito al 10%** allo sfondo della casella. Così ogni ramo si riconosce da lontano, ma il testo mantiene quasi tutto il contrasto e la carta non risulta sporcata sui grandi formati.
 
@@ -332,13 +337,27 @@ I profili salvano il **bordo destro reale**, non il bordo sinistro più una larg
 
 Le distanze minime sono tarate sugli ornamenti del cartiglio, che sporgono 12,34 unità per lato: due caselle non possono avvicinarsi oltre ~25 unità senza che le volute si tocchino. Da qui **30 unità fra fratelli**, **52 fra rami diversi alle generazioni inferiori**, **240 fra alberi senza antenato comune**.
 
-**Caratteri.** I **nomi** sono in **Cormorant** (700), un garaldo di impronta rinascimentale coerente con l'origine cinquecentesca del documento. **Numeri e testi** — date, annotazioni, interfaccia, misure di stampa — sono in **DM Sans** (500), una grottesca dalle cifre ampie e leggibili anche a corpo piccolo e in stampa grande.
+**Colore generale.** L'intero sito è impostato sul **blu navy** (`#1b3a5c`), non più sul bruno ferrogallico. Il cambio non è stato una sostituzione meccanica: la carta crema esisteva perché l'inchiostro era marrone, e sotto il blu ingialliva. Il fondo è quindi diventato una carta fredda appena azzurrata (`#e9eef5`), il bianco del cartiglio è passato da avorio a `#fcfdff`, e le dodici tinte dei rami sono state rigenerate attorno al navy. L'unico caldo rimasto è l'accento (`#a5622b`): senza, il navy diventa cupo.
 
-Cormorant è sensibilmente più stretto e otticamente più piccolo dei caratteri precedenti, quindi corpi e stime di larghezza sono stati ricalibrati: il nome sul cartiglio passa da 28 a 34, la stima di larghezza per carattere da 0,545 a 0,455 em, e i nomi accorciati nella vista essenziale da 12 a 14 caratteri. Senza questa ricalibratura le caselle sarebbero risultate troppo larghe e i nomi troppo piccoli.
+**Caratteri.** I **nomi** — persone, rami, titoli — sono in **Libre Baskerville bold**, una transizionale con grazie marcate che regge bene la stampa grande. Tutti gli altri testi sono in **Source Sans**, che a corpo piccolo resta leggibile dove una serif si impasterebbe.
+
+Ogni cambio di carattere obbliga a ricalibrare le metriche, perché la larghezza delle caselle nelle viste essenziali si calcola contando i caratteri. Libre Baskerville è largo e ha l'occhio grande, quindi la stima è passata a 0,630 em per carattere, il corpo del nome sul cartiglio da 27 a 24, e i nomi accorciati nella vista essenziale da 13 a 12 caratteri. Con l'occhio più grande i corpi scendono ma la leggibilità resta la stessa.
+
+**Nome del ramo (colonna I).** Il corpo è stato dimezzato, da 58 a 29 al massimo: prima dominava la barra e rubava l'attenzione ai nomi delle persone, che è il contrario di quello che deve fare un'etichetta d'insieme.
+
+**Vista essenziale.** Il fondo colorato ha gli angoli molto arrotondati — raggio pari al 40% del lato corto, quindi 61 unità su caselle alte 152 e 46 su quelle verticali larghe 116. La forma a lozenge distingue a colpo d'occhio questa vista dal cartiglio ornato.
+
+**Verde al posto del rame.** Il pulsante di ritorno alla vista completa usava un accento rame che, accanto al navy, si leggeva come marrone. È stato sostituito da un verde profondo (`#1d6b4a`), che con il blu forma una coppia fredda coerente.
+
+**Icona «adatta allo schermo».** Era identica a quella dello schermo intero, quattro angoli in entrambi i casi: due funzioni diverse con lo stesso simbolo. Ora è un rettangolo con una doppia freccia orizzontale, che dice quello che fa davvero — allargare il disegno fino ai bordi.
 
 **Colore dei testi.** Tutto il contenuto del cartiglio — nome, date, annotazioni, date del coniuge — usa **la tinta del ramo di appartenenza**, con le parti secondarie leggermente trasparenti per mantenere la gerarchia di lettura. In precedenza date e note erano fissate su due marroni indipendenti dal ramo, che stonavano contro i gruppi blu, verdi o violetti. Perché la tinta arrivi al disegno, le regole CSS che fissavano `fill` su `.date` e `.note-text` sono state rimosse: un attributo di presentazione SVG perde sempre contro una regola CSS.
 
 **Comandi.** Nell'intestazione resta il solo campo di ricerca, allineato a sinistra accanto al titolo. Tutte le funzioni sono icone in una **colonna verticale sul lato destro** del disegno, raggruppate in tre blocchi separati da filetti: vista e ingrandimento, modo di disegno, stampa e ritorno. Le icone sono state ridisegnate sulla stessa impostazione — griglia 24, tratto 1,6, estremità arrotondate, nessun riempimento, forme costruite su cerchi e rette — e i pulsanti hanno angoli arrotondati (13 px) con il campo di ricerca a pillola.
+
+**Anteprima del telo.** Nel pannello di stampa una striscia mostra il rapporto fra altezza e lunghezza: «9,6 m» è un numero astratto, la proporzione vista si capisce a colpo d'occhio.
+
+**Movimento.** All'apertura testata e comandi entrano in sequenza, con ritardi scalati di quattro centesimi. È l'unico movimento del sito, e viene disattivato del tutto se il sistema operativo dichiara di preferire animazioni ridotte.
 
 **Margine superiore.** Sopra la prima generazione ci sono 130 unità di spazio: senza, il cartiglio del capostipite resta incollato al bordo del disegno e in stampa tocca la cimosa del telo.
 
