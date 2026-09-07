@@ -62,7 +62,7 @@ Tutti i comandi stanno in **un'unica barra in cima alla finestra dell'albero**. 
 - **Icona a quattro angoli** — adatta la vista a tutta la larghezza dell'albero.
 - **− valore +** — il numero al centro è lo zoom in corso; cliccandolo torni al 100%. Su computer anche Ctrl+rotellina. **Su cellulare questi tre tasti non compaiono**: lo zoom si fa col pinch a due dita e lo spostamento trascinando con un dito.
 - **Icona schermo intero** — cambia verso quando entri ed esci.
-- **Icona a righe decrescenti** — cambia il modo di disegnare le caselle, ciclando su tre stati. Vedi sezione 8.
+- **Icona a righe decrescenti** — cambia il modo di disegnare l'albero, ciclando su sette viste. Vedi sezione 8.
 - **Icona a tre blocchi allineati** — cambia il criterio di disposizione. Vedi sezione 9.
 - **Icona a tavolozza** — accende e spegne i colori dei gruppi.
 - **Stampa** — apre il pannello per il plotter. Vedi sezione 10.
@@ -187,25 +187,51 @@ Le etichette rientrano anche nella ricerca.
 
 ---
 
-## 8. Tre modi di disegnare le caselle
+## 8. Sette modi di disegnare l'albero
 
-L'icona con le **righe decrescenti** cicla su tre stati.
+L'icona con le **righe decrescenti** cicla su sette viste. L'icona cambia a ogni pressione e mostra la forma che si otterrà; passandoci sopra col puntatore compare il nome.
 
-**1 — Cartiglio completo.** Cornice ornata ricalcata dal `blocco.pdf`, nome, entrambe le date, annotazioni, date del coniuge. È la vista più ricca, adatta a leggere da vicino. Casella 292 × 219.
+### Viste in riga (1–3)
 
-**2 — Nome e anno, orizzontali.** Nessuna cornice, solo fondo colorato: nome grande in corpo 56 e data di nascita a capo in corpo 40. La larghezza si adatta al nome, i nomi oltre 12 caratteri vengono accorciati con i puntini. Serve a leggere nomi e date **a zoom basso**, quando il cartiglio diventa un francobollo illeggibile.
+**1 — Cartiglio completo.** Cornice ornata ricalcata dal `blocco.pdf`, nome, entrambe le date, annotazioni, date del coniuge. La più ricca, adatta a leggere da vicino.
 
-**3 — Nome e anno, verticali.** Come sopra ma con il testo che corre dal basso verso l'alto. Siccome la larghezza non dipende più dalla lunghezza del nome, la casella resta larga 118 unità sempre. Tutte le righe usano la stessa altezza, ricavata dal nome più lungo, così le generazioni restano allineate.
+**2 — Nome e anno, orizzontali.** Nessuna cornice, solo fondo colorato con bordi molto arrotondati e un filo nella tinta piena del ramo. Nome grande, data di nascita a capo. Serve a leggere **a zoom basso**, quando il cartiglio diventa un francobollo.
 
-Il verticale è di gran lunga il più efficiente per la stampa — vedi la tabella nella sezione 10. Il prezzo è che leggere nomi ruotati è meno immediato che scorrerli in orizzontale; per un telo da appendere, dove ci si avvicina a leggere una casella per volta, è però una scelta ragionevole.
+**3 — Nome e anno, verticali.** Come sopra ma con il testo che corre dal basso verso l'alto. La casella resta stretta qualunque sia il nome, quindi è la vista più efficiente per la stampa.
 
----
+### Ventagli a settori (4–5)
+
+Il capostipite al centro, un anello per generazione, ogni persona è un **settore di corona** largo in proporzione alla discendenza che contiene. **4** occupa il giro intero, **5** si apre a mezzaluna verso l'alto.
+
+I nomi corrono lungo l'arco quando il settore è largo, in direzione radiale quando è stretto. Il corpo cresce avvicinandosi al centro.
+
+> **Limite noto.** Poiché l'ampiezza dipende dalla discendenza, chi muore senza figli vale una foglia sola e diventa una scheggia schiacciata fra i fratelli fecondi: è il caso di Domenica 1641 fra i figli di Pietro. Le viste 6 e 7 risolvono il problema.
+
+### Alberi radiali (6–7)
+
+Qui le persone non sono settori ma **punti su un anello**, come nei dendrogrammi radiali. Cambia una cosa sostanziale: l'ampiezza angolare non dipende più dalla discendenza, ma **ogni foglia riceve uno spazio proprio**. Domenica passa da 44 a 79 unità di arco, e la spaziatura si uniforma su tutte le generazioni.
+
+La separazione fra due foglie contigue vale 1 se hanno lo stesso padre e 2 se vengono da rami diversi, il tutto diviso per la profondità: così gli anelli interni, che hanno poca circonferenza, ricevono proporzionalmente più spazio di quelli esterni.
+
+**6** occupa il giro intero, **7** si apre a mezzaluna. Nella mezzaluna l'ingombro viene misurato davvero invece di assumere un quadrato: 7169 × 6026 invece di 8487 × 8531, proporzione molto più vicina a un foglio.
+
+**Collegamenti a gomito.** Un arco concentrico corre sulla circonferenza del padre e raccoglie tutti i figli; da lì un raggio dritto scende verso ciascuno. Ottantasette archi e trecentottantasei raggi.
+
+**Rami richiudibili.** Cliccando il **pallino** di una persona si richiude la sua discendenza; il pallino diventa pieno per segnalare che sotto c'è dell'altro. Cliccando il **nome** si apre la scheda. Con 385 persone aperte tutte insieme conviene richiudere i rami che non interessano.
+
+**Collocazione dei nomi.** Chi non ha figli scrive verso l'esterno, dove ha campo libero e può tenersi l'anno. Chi ha discendenza scrive verso il centro, appoggiato sul ramo che lo lega al padre — verso l'esterno finirebbe addosso ai figli — e **il ramo viene interrotto** sotto il nome. Le prime tre generazioni, che sono una fila unica al centro, hanno il nome ruotato di 90° e posto prima del pallino, altrimenti si accavallerebbero fra loro.
+
+**Nomi lunghi.** «Giobatta (treseman)» va a capo su due righe invece di essere mozzato. La procedura tenta nell'ordine: una riga con anno, una riga senza anno, due righe con anno, due righe senza anno, e solo alla fine accorcia. Su 385 nomi, 13 vanno a capo e appena 4 vengono accorciati.
+
+> **Perché la misura del testo viene rifatta.** Il carattere web arriva dalla rete in modo asincrono: al primo disegno il browser misura con quello di ripiego, che ha metriche diverse, e i nomi che sembravano stare poi sbordano. Senza il ricalcolo a `document.fonts.ready`, **219 nomi su 385 uscivano dal proprio spazio**.
 
 ## 9. Due modi di disporre l'albero
 
 L'icona con i **tre blocchi allineati** commuta fra due criteri.
 
 **Disposizione centrata** (quella di partenza). Ogni genitore sta esattamente al centro dei propri figli, e i sottoalberi si incastrano fra loro sfruttando gli spazi vuoti. È la lettura genealogica classica, dove la simmetria aiuta a seguire le discendenze.
+
+Questa scelta vale per le tre viste in riga; nelle quattro viste circolari il pulsante è spento perché non ci sono righe da affiancare.
 
 **Fratelli sempre affiancati.** I fratelli si toccano sempre, qualunque discendenza abbiano: ogni riga si riempie da sinistra a destra senza lasciare vuoti. Il genitore non è più centrato sui figli — sono **le linee di giunzione a spostarsi** per raggiungerli. Si perde la simmetria ma si guadagna circa il **40% di larghezza**.
 

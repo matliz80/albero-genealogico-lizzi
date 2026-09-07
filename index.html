@@ -6,7 +6,7 @@
 <title>I Lizzi in Friuli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
     /* Carta fredda: con l'inchiostro blu la crema ingiallisce e stona.
@@ -182,11 +182,18 @@
   .node-card .note-text{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400;}
   .node-card{cursor:pointer;}
   .node-card.match .card-bg{fill:#d8e6f8;}
+  .simple.match .card-bg{stroke-width:3.6;}
   .node-card.focused .card-bg{fill:#c6dcf2;}
   /* vista semplificata: nome grande, anno a capo, nessuna cornice */
   .simple .s-name{font-family:'Libre Baskerville',serif; font-weight:700; text-anchor:middle; letter-spacing:-.01em;}
   .simple .s-year{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:400; text-anchor:middle;}
-  .bar-label{font-family:'Libre Baskerville',serif; font-weight:700; text-anchor:middle; dominant-baseline:middle; letter-spacing:.06em;}
+  .fan-name{font-family:'Libre Baskerville',serif; font-weight:700; letter-spacing:-.004em;}
+  /* I nomi dei genitori si appoggiano sul ramo: un alone del colore della carta
+     li stacca dalla linea senza doverla interrompere. */
+  .tidy-name{paint-order:stroke fill; stroke:var(--paper); stroke-width:5; stroke-linejoin:round;}
+  .node-card.fan{cursor:pointer;}
+  .bar-label{font-family:'Source Sans 3','Source Sans Pro',sans-serif; font-weight:800;
+    text-anchor:middle; dominant-baseline:middle; letter-spacing:.045em;}
 
   #detail-panel,#print-panel{position:absolute; top:0; right:-400px; width:352px; height:100%; z-index:20; background:var(--paper); border-left:1px solid var(--frame); box-shadow:-16px 0 40px -20px rgba(13,39,64,.36); padding:30px 24px; transition:right .28s ease; overflow-y:auto;}
   #detail-panel.open,#print-panel.open{right:0;}
@@ -436,10 +443,22 @@
   const GROUP_TINTS2 = GROUP_COLORS.map(h => tintOf(h, 1));   // banda leggermente più carica
 
   let colorsOn = true, alignSiblings = false;
-  // 0 = cartiglio completo, 1 = nome e anno orizzontali, 2 = nome e anno verticali
+  /* 0 cartiglio · 1 nome e anno orizzontali · 2 verticali · 3 ventaglio intero
+     · 4 ventaglio a mezzaluna */
   let cardMode = 0;
-  const isSimple = () => cardMode > 0;
+  const isSimple = () => cardMode === 1 || cardMode === 2;
   const isVert   = () => cardMode === 2;
+  const isFan    = () => cardMode === 3 || cardMode === 4;
+  const fanMezzo = () => cardMode === 4;
+  const isTidy    = () => cardMode === 5 || cardMode === 6;   // albero radiale
+  const tidyMezzo = () => cardMode === 6;                     // aperto a 180°
+  const collassati = new Set();
+  let tidyAvviato = false;
+  const TIDY_HUB = 300, TIDY_RING = 320;
+  /* Un anello per generazione; ogni settore è largo in proporzione alla
+     discendenza che contiene. FAN_SEP è lo stacco fra un anello e il successivo,
+     l'equivalente radiale dei 30 punti che separano due caselle affiancate. */
+  const FAN_HUB = 340, FAN_RING = 360, FAN_SEP = 30;
   let vH = SIMPLE_V.minH;   // altezza di riga in verticale, dal nome più lungo
   let dataWarn = '';        // errori nei dati, mostrati in rosso sotto la barra
   let dataNote = '';        // segnalazioni non critiche, in colore normale
@@ -740,6 +759,9 @@
     persons.forEach(p => { p._group = null; });
     assignGroups(persons, childrenOf, roots);
 
+    if(isFan())  return layoutVentaglio(childrenOf, roots);
+    if(isTidy()) return layoutRadiale(childrenOf, roots);
+
     const RS = rowStep();
     const depths = new Map();
     let deepest = 0, xs = new Map();
@@ -845,6 +867,496 @@
     return { width, height, positions, childrenOf, roots };
   }
 
+  /* Dispone le persone su anelli concentrici. L'ampiezza angolare di ciascuno
+     è proporzionale al numero di discendenti terminali del suo ramo: è l'unica
+     ripartizione che non fa collassare i rami affollati né gonfia quelli
+     esauriti. Le radici si spartiscono il giro completo con lo stesso criterio. */
+  function layoutVentaglio(childrenOf, roots){
+    const foglie = new Map();
+    const conta = p => {
+      const c = childrenOf.get(p.id) || [];
+      const n = c.length ? c.reduce((s, x) => s + conta(x), 0) : 1;
+      foglie.set(p.id, n); return n;
+    };
+    roots.forEach(r => conta(r));
+
+    /* Un ventaglio ha un centro solo. Le radici secondarie — chi non ha un
+       genitore noto ma ha discendenza propria — non sono collegate all'albero
+       principale e verrebbero disegnate come spicchi staccati, senza senso in
+       questa forma: si mostra il solo ramo maggiore e le altre finiscono nella
+       nota in fondo alla pagina. */
+    let principale = roots[0];
+    roots.forEach(r => { if((foglie.get(r.id)||0) > (foglie.get(principale.id)||0)) principale = r; });
+    const escluse = roots.filter(r => r !== principale);
+
+    /* Quando un ramo è messo a fuoco non deve gonfiarsi fino a riempire tutto
+       il giro: conserva la fetta che gli spetta, cioè la sua quota di
+       discendenti sul totale dell'albero, con un minimo perché resti leggibile. */
+    const pieno = fanMezzo() ? Math.PI : Math.PI * 2;
+    let apertura = pieno;
+    if(focusId){
+      let totale = 0;
+      ALL_PERSONS.forEach(q => {
+        const suoi = ALL_PERSONS.filter(z => z.idPadre === q.id || z.idMadre === q.id);
+        if(!suoi.length) totale++;
+      });
+      const quota = totale ? (foglie.get(principale.id) || 1) / totale : 1;
+      apertura = Math.max(pieno * 0.16, Math.min(pieno, pieno * quota));
+    }
+    /* Il ventaglio intero parte dall'alto; la mezzaluna si apre verso l'alto,
+       come nelle carte a ventaglio stampate. */
+    const centro = fanMezzo() ? -Math.PI/2 : -Math.PI/2;
+    const a0 = centro - apertura/2;
+
+    const fan = []; let deepest = 0;
+    function posa(p, depth, x0, x1){
+      if(depth > deepest) deepest = depth;
+      fan.push({ p:p, depth:depth, a0:x0, a1:x1 });
+      const figli = childrenOf.get(p.id) || [];
+      if(!figli.length) return;
+      const mio = foglie.get(p.id) || 1;
+      let a = x0;
+      figli.forEach(f => {
+        const w = (x1 - x0) * ((foglie.get(f.id) || 1) / mio);
+        posa(f, depth + 1, a, a + w);
+        a += w;
+      });
+    }
+    posa(principale, 0, a0, a0 + apertura);
+    maxDepth = deepest;
+
+    if(escluse.length){
+      const nomi = escluse.map(r => r.id).join(', ');
+      dataNote = (dataNote ? dataNote + ' · ' : '')
+        + escluse.length + (escluse.length === 1 ? ' ramo non collegato' : ' rami non collegati')
+        + ' all\u2019albero principale non compaiono nel ventaglio: ' + nomi;
+    }
+
+    const R = FAN_HUB + (deepest + 1) * FAN_RING;
+    const M = 90;
+    /* Estremi effettivi del disegno: con la mezzaluna metà tela resterebbe
+       vuota, quindi si misura l'ingombro reale invece di assumere un quadrato. */
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    const tocca = (r, a) => {
+      const x = r*Math.cos(a), y = r*Math.sin(a);
+      if(x < minX) minX = x; if(x > maxX) maxX = x;
+      if(y < minY) minY = y; if(y > maxY) maxY = y;
+    };
+    fan.forEach(s => {
+      const rr0 = FAN_HUB + s.depth * FAN_RING, rr1 = rr0 + FAN_RING - FAN_SEP;
+      [s.a0, s.a1, (s.a0+s.a1)/2].forEach(a => { tocca(rr0, a); tocca(rr1, a); });
+      for(let q = -2; q <= 2; q++){                 // punti cardinali attraversati
+        const a = q * Math.PI/2;
+        if(a > Math.min(s.a0,s.a1) && a < Math.max(s.a0,s.a1)) tocca(rr1, a);
+      }
+    });
+    const cx = -minX + M, cy = -minY + M;
+    const positions = new Map();
+    fan.forEach(s => {
+      s.r0 = FAN_HUB + s.depth * FAN_RING;
+      s.r1 = s.r0 + FAN_RING - FAN_SEP;             // stacco fra un anello e l'altro
+      s.am = (s.a0 + s.a1) / 2;
+      s.rm = (s.r0 + s.r1) / 2;
+      s.px = cx + s.rm * Math.cos(s.am);
+      s.py = cy + s.rm * Math.sin(s.am);
+      positions.set(s.p.id, { x:s.px - FAN_RING*0.45, y:s.py - FAN_RING*0.22,
+                              w:FAN_RING*0.9, h:FAN_RING*0.44, depth:s.depth });
+    });
+    return { width:(maxX-minX)+2*M, height:(maxY-minY)+2*M, positions,
+             childrenOf, roots:[principale], fan, cx:cx, cy:cy };
+  }
+
+  /* ============ ALBERO RADIALE A RAMI RICHIUDIBILI ============
+     Qui le persone non sono settori di corona ma punti su un anello. Cambia una
+     cosa sostanziale: l'ampiezza angolare non dipende più dalla discendenza, ma
+     ogni foglia riceve uno spazio proprio. Chi muore senza figli smette di
+     essere una scheggia schiacciata fra i fratelli fecondi, e il suo nome ha
+     campo libero verso l'esterno perché oltre di lui non c'è nulla.
+     La separazione fra due foglie contigue vale 1 se hanno lo stesso padre e 2
+     se vengono da rami diversi, il tutto diviso per la profondità: così gli
+     anelli interni, che hanno poca circonferenza, ricevono proporzionalmente
+     più spazio di quelli esterni.                                              */
+  function layoutRadiale(childrenOf, roots){
+    const foglie = new Map();
+    const conta = p => {
+      const c = childrenOf.get(p.id) || [];
+      const n = c.length ? c.reduce((s, x) => s + conta(x), 0) : 1;
+      foglie.set(p.id, n); return n;
+    };
+    roots.forEach(r => conta(r));
+    let principale = roots[0];
+    roots.forEach(r => { if((foglie.get(r.id)||0) > (foglie.get(principale.id)||0)) principale = r; });
+    const escluse = roots.filter(r => r !== principale);
+
+    /* L'albero si apre intero: i rami si richiudono a mano, cliccando i
+       pallini, per isolare quello che interessa. */
+    tidyAvviato = true;
+
+    const figliVisibili = p => collassati.has(p.id) ? [] : (childrenOf.get(p.id) || []);
+
+    const seq = []; let deepest = 0;
+    (function scendi(p, depth, padre){
+      if(depth > deepest) deepest = depth;
+      const c = figliVisibili(p);
+      if(!c.length){ seq.push({ p:p, depth:depth, padre:padre }); return; }
+      c.forEach(f => scendi(f, depth + 1, p.id));
+    })(principale, 0, null);
+
+    let pos = 0; const grado = new Map();
+    seq.forEach((s, i) => {
+      if(i > 0){
+        const prec = seq[i-1];
+        pos += (s.padre === prec.padre ? 1 : 2) / Math.max(1, s.depth);
+      }
+      grado.set(s.p.id, pos);
+    });
+    /* Il giro intero parte dall'alto; la mezzaluna si apre verso l'alto, da
+       sinistra a destra, come una carta a ventaglio appesa al muro. */
+    const apertura = tidyMezzo() ? Math.PI : Math.PI * 2;
+    const partenza = tidyMezzo() ? -Math.PI : -Math.PI/2;
+    const stacco = tidyMezzo() ? 0 : 2 / Math.max(1, seq.length ? seq[0].depth || 1 : 1);
+    const scala = apertura / Math.max(0.001, pos + stacco);
+
+    const nodi = []; const angolo = new Map();
+    (function calcola(p, depth){
+      const c = figliVisibili(p);
+      let a;
+      if(!c.length){ a = partenza + (grado.get(p.id) || 0) * scala; }
+      else {
+        const est = c.map(f => calcola(f, depth + 1));
+        a = (est[0] + est[est.length - 1]) / 2;
+      }
+      angolo.set(p.id, a);
+      nodi.push({ p:p, depth:depth, a:a, r:TIDY_HUB + depth * TIDY_RING,
+                  chiuso: collassati.has(p.id) && (childrenOf.get(p.id) || []).length > 0,
+                  figli: c });
+      return a;
+    })(principale, 0);
+    maxDepth = deepest;
+
+    if(escluse.length){
+      dataNote = (dataNote ? dataNote + ' · ' : '')
+        + escluse.length + (escluse.length === 1 ? ' ramo non collegato' : ' rami non collegati')
+        + ' all\u2019albero principale non compare nella vista radiale: ' + escluse.map(r => r.id).join(', ');
+    }
+
+    /* Con la mezzaluna metà tela resterebbe vuota: si misura l'ingombro vero
+       dei nodi e si lascia attorno il margine che serve ai nomi esterni. */
+    const M = 470;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    nodi.forEach(n => {
+      const x = n.r * Math.cos(n.a), y = n.r * Math.sin(n.a);
+      if(x < minX) minX = x; if(x > maxX) maxX = x;
+      if(y < minY) minY = y; if(y > maxY) maxY = y;
+    });
+    const cx = -minX + M, cy = -minY + M;
+    const positions = new Map();
+    nodi.forEach(n => {
+      n.x = cx + n.r * Math.cos(n.a);
+      n.y = cy + n.r * Math.sin(n.a);
+      positions.set(n.p.id, { x:n.x - 120, y:n.y - 40, w:240, h:80, depth:n.depth });
+    });
+    return { width:(maxX-minX)+2*M, height:(maxY-minY)+2*M, positions,
+             childrenOf, roots:[principale], tidy:nodi, cx:cx, cy:cy };
+  }
+
+  /* Adatta un'etichetta dell'albero radiale: prima prova su una riga, poi
+     sacrifica l'anno, poi manda a capo su due righe spezzando all'ultimo spazio
+     utile, e solo come ultima risorsa accorcia. I nomi lunghi come
+     "Giobatta (treseman)" stanno per intero su due righe invece di essere
+     mozzati. Restituisce la lunghezza occupata, che serve per tagliare il ramo. */
+  function adattaTidy(tx, nome, anno, budget, fs){
+    const ax = tx.getAttribute('x');
+    const misura = el2 => (typeof el2.getComputedTextLength === 'function' ? el2.getComputedTextLength() : 0);
+    const pulisci = () => { while(tx.firstChild) tx.removeChild(tx.firstChild); };
+    const annoTspan = () => {
+      const s = sel('tspan', { 'font-size':(fs*0.78).toFixed(1), opacity:'.68',
+        'font-family':"'Source Sans 3','Source Sans Pro',sans-serif", 'font-weight':'400' });
+      s.textContent = ' ' + anno; return s;
+    };
+    const unaRiga = conAnno => {
+      pulisci();
+      tx.appendChild(document.createTextNode(nome));
+      if(conAnno && anno) tx.appendChild(annoTspan());
+      return misura(tx);
+    };
+    let L = unaRiga(true);
+    if(!L || L <= budget) return L || nome.length * fs * 0.6;
+    L = unaRiga(false);
+    if(L <= budget) return L;
+
+    /* Due righe, spezzando a uno spazio. Si tenta prima tenendo l'anno; se è
+       proprio l'anno a far sforare la seconda riga, lo si lascia cadere: meglio
+       il nome intero senza data che un nome mozzato. */
+    const parole = nome.split(/\s+/);
+    if(parole.length > 1){
+      for(const conAnno of [true, false]){
+        for(let k = parole.length - 1; k >= 1; k--){
+          const r1 = parole.slice(0, k).join(' '), r2 = parole.slice(k).join(' ');
+          pulisci();
+          const t1 = sel('tspan', { x:ax, dy:(-fs*0.56).toFixed(1) }); t1.textContent = r1;
+          const t2 = sel('tspan', { x:ax, dy:(fs*1.12).toFixed(1) });  t2.textContent = r2;
+          tx.appendChild(t1); tx.appendChild(t2);
+          if(conAnno && anno) t2.appendChild(annoTspan());
+          const l1 = misura(t1), l2 = misura(t2);
+          if(Math.max(l1, l2) <= budget) return Math.max(l1, l2);
+        }
+      }
+    }
+    /* accorciatura, ultima risorsa */
+    let n = nome.length, giri = 0;
+    while(n > 2 && giri++ < 80){
+      n--;
+      pulisci();
+      tx.appendChild(document.createTextNode(nome.slice(0, n).replace(/[ ,.;\-]+$/, '') + '\u2026'));
+      const l = misura(tx);
+      if(l <= budget) return l;
+    }
+    return budget;
+  }
+
+  const polare = (r, a) => [layout.cx + r*Math.cos(a), layout.cy + r*Math.sin(a)];
+
+  /* Arco concentrico: corre lungo la circonferenza del padre, da un angolo
+     all'altro, senza cambiare raggio. */
+  function arcoConcentrico(r, a0, a1){
+    if(Math.abs(a1 - a0) < 1e-4) return '';
+    const [x0,y0] = polare(r, a0), [x1,y1] = polare(r, a1);
+    const grande = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
+    const verso = a1 > a0 ? 1 : 0;
+    return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 ${grande} ${verso} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  }
+  /* Raggio dritto: dalla circonferenza del padre fino al figlio, lungo il
+     medesimo angolo. */
+  function raggio(a, r0, r1){
+    const [x0,y0] = polare(r0, a), [x1,y1] = polare(r1, a);
+    return `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  }
+
+  function disegnaRadiale(){
+    const norm = d => ((d % 360) + 360) % 360;
+    /* I rami vanno sotto ai nomi, ma la loro lunghezza dipende da quanto i nomi
+       occupano: si prenota il posto adesso e si riempie dopo la misurazione. */
+    const gRami = sel('g');
+    svg.appendChild(gRami);
+
+    const perId = new Map(layout.tidy.map(n => [n.p.id, n]));
+
+    layout.tidy.forEach(n => {
+      const col = colorOf(n.p), bg = tintFor(n.p);
+      const g = sel('g', null, 'node-card tidy' + (n.p.id === focusId ? ' focused' : ''));
+      g.dataset.id = n.p.id;
+      const rr = n.depth <= 2 ? 15 : 11;
+      n.rr = rr;
+      const dot = sel('circle', { class:'card-bg', cx:n.x, cy:n.y, r:rr,
+        fill: n.chiuso ? col : bg, stroke:col, 'stroke-width':2.6 });
+      dot.addEventListener('click', ev => {
+        ev.stopPropagation();
+        if(!(layout.childrenOf.get(n.p.id) || []).length){ openDetail(n.p.id); return; }
+        if(collassati.has(n.p.id)) collassati.delete(n.p.id); else collassati.add(n.p.id);
+        render();
+      });
+      g.appendChild(dot);
+
+      const fs = Math.max(21, Math.round(50 - n.depth * 1.9));
+      const sinistra = Math.cos(n.a) < 0;
+      const gradi = n.a * 180/Math.PI;
+      let rot, ancora, raggio, budget;
+      n.dentro = false; n.trasversale = false;
+
+      if(n.depth <= 2){
+        /* Le prime tre generazioni: nome prima del pallino, verso il centro, e
+           ruotato di 90° perché non si accavallino fra loro. Il ramo viene
+           interrotto dove il nome lo attraversa. */
+        rot = gradi + 90;
+        const d = norm(rot); if(d > 90 && d < 270) rot += 180;
+        ancora = 'middle';
+        raggio = n.r - rr - fs * 0.95;
+        budget = TIDY_RING * 2.2;
+        n.trasversale = true;
+      } else if(n.figli.length){
+        rot = sinistra ? gradi + 180 : gradi;
+        ancora = sinistra ? 'start' : 'end';
+        raggio = n.r - rr - 10;
+        budget = TIDY_RING * 0.86;
+        n.dentro = true;
+      } else {
+        rot = sinistra ? gradi + 180 : gradi;
+        ancora = sinistra ? 'end' : 'start';
+        raggio = n.r + rr + 10;
+        budget = TIDY_RING * 1.95;
+      }
+      const ax = layout.cx + raggio * Math.cos(n.a);
+      const ay = layout.cy + raggio * Math.sin(n.a);
+      const tx = sel('text', { x:ax, y:ay, fill:col, 'font-size':fs,
+        'text-anchor':ancora, 'dominant-baseline':'middle',
+        transform:`rotate(${rot.toFixed(2)} ${ax.toFixed(1)} ${ay.toFixed(1)})` }, 'fan-name tidy-name');
+      tx.addEventListener('click', ev => { ev.stopPropagation(); openDetail(n.p.id); });
+      g.appendChild(tx);
+      svg.appendChild(g);
+
+      n.fs = fs;
+      n.raggioEtichetta = raggio;
+      n.lung = adattaTidy(tx, personLabel(n.p), parseYear(n.p.dataNascita) || '', budget, fs);
+      n.righe = tx.querySelectorAll('tspan[x]').length > 1 ? 2 : 1;
+    });
+
+    /* I rami: un arco concentrico sulla circonferenza del padre che raccoglie
+       tutti i figli, e da lì un raggio dritto verso ciascuno. Il raggio si
+       ferma prima del nome del figlio, dove il nome starebbe sopra al ramo. */
+    const perColore = new Map();
+    const agg = (c, d) => { if(d) perColore.set(c, (perColore.get(c) || '') + d); };
+    layout.tidy.forEach(n => {
+      if(!n.figli.length) return;
+      const figli = n.figli.map(f => perId.get(f.id)).filter(Boolean);
+      if(!figli.length) return;
+      const angoli = figli.map(c => c.a);
+      const a0 = Math.min(...angoli, n.a), a1 = Math.max(...angoli, n.a);
+      agg(colorOf(n.p), arcoConcentrico(n.r, a0, a1));
+
+      figli.forEach(c => {
+        let rFine;
+        if(c.dentro){
+          rFine = Math.max(n.r + 6, c.raggioEtichetta - c.lung - 12);
+        } else if(c.trasversale){
+          const mezzo = c.fs * (c.righe > 1 ? 1.15 : 0.72) + 6;
+          rFine = Math.max(n.r + 6, c.raggioEtichetta - mezzo);
+          const rRipresa = c.raggioEtichetta + mezzo;
+          if(c.r - c.rr > rRipresa) agg(colorOf(c.p), raggio(c.a, rRipresa, c.r - c.rr));
+        } else {
+          rFine = c.r - c.rr;
+        }
+        if(rFine > n.r + 2) agg(colorOf(c.p), raggio(c.a, n.r, rFine));
+      });
+    });
+    perColore.forEach((d, c) => gRami.appendChild(sel('path', { d:d, stroke:c, 'stroke-width':2.6 }, 'link')));
+    if(fontiPronte) rifinisciVentaglio();
+  }
+
+  /* tracciato di un settore ad anello, con un filo di stacco fra l'uno e l'altro */
+  function settore(cx, cy, r0, r1, a0, a1){
+    const gap = Math.min(0.005, (a1 - a0) * 0.14);
+    const A0 = a0 + gap, A1 = a1 - gap;
+    if(A1 <= A0) return '';
+    const big = (A1 - A0) > Math.PI ? 1 : 0;
+    const P = (r, a) => [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+    const [x0,y0] = P(r0,A0), [x1,y1] = P(r1,A0), [x2,y2] = P(r1,A1), [x3,y3] = P(r0,A1);
+    return `M${x0} ${y0}L${x1} ${y1}A${r1} ${r1} 0 ${big} 1 ${x2} ${y2}`
+         + `L${x3} ${y3}A${r0} ${r0} 0 ${big} 0 ${x0} ${y0}Z`;
+  }
+
+  /* arco su cui far correre il testo, parallelo ai lati lunghi del settore */
+  function arcoTesto(cx, cy, r, a0, a1, verso){
+    const P = (a) => [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+    const A = verso > 0 ? a0 : a1, B = verso > 0 ? a1 : a0;
+    const [x0,y0] = P(A), [x1,y1] = P(B);
+    const big = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
+    return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r.toFixed(2)} ${r.toFixed(2)} 0 ${big} ${verso > 0 ? 1 : 0} ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  }
+
+  /* ============ TESTI DEL VENTAGLIO ============
+     Il conteggio dei caratteri è solo una stima: la larghezza vera dipende da
+     quali lettere compongono il nome. Peggio ancora, al primo disegno il
+     carattere web spesso non è ancora arrivato e il browser misura con quello
+     di ripiego, che ha metriche diverse: i nomi sembrano stare e poi, a
+     carattere caricato, sbordano nell'anello vicino. Per questo la misura viene
+     rifatta quando i caratteri sono pronti.                                    */
+  let fontiPronte = false;
+
+  function fitFan(tx){
+    const nome = tx.dataset.nome || '', anno = tx.dataset.anno || '';
+    const budget = parseFloat(tx.dataset.budget) || 0;
+    const fs = parseFloat(tx.dataset.fs) || 20;
+    const host = tx.querySelector('textPath') || tx;
+    const scrivi = (testo, conAnno) => {
+      while(host.firstChild) host.removeChild(host.firstChild);
+      host.appendChild(document.createTextNode(testo));
+      if(conAnno && anno){
+        const ts = sel('tspan', { 'font-size':(fs*0.78).toFixed(1), opacity:'.68',
+          'font-family':"'Source Sans 3','Source Sans Pro',sans-serif", 'font-weight':'400' });
+        ts.textContent = ' ' + anno;
+        host.appendChild(ts);
+      }
+    };
+    const misura = () => (typeof tx.getComputedTextLength === 'function' ? tx.getComputedTextLength() : 0);
+    scrivi(nome, true);
+    if(!budget || misura() <= budget) return;
+    scrivi(nome, false);                              // prima si sacrifica l'anno
+    if(misura() <= budget) return;
+    let n = nome.length, giri = 0;                    // poi si accorcia il nome
+    while(n > 2 && giri++ < 80){
+      n--;
+      scrivi(nome.slice(0, n).replace(/[ ,.;\-]+$/, '') + '\u2026', false);
+      if(misura() <= budget) return;
+    }
+    scrivi('', false);                                // se non entra, meglio nulla
+  }
+
+  function rifinisciVentaglio(){
+    /* Nel ventaglio i testi stanno su una riga sola; nell'albero radiale possono
+       andare a capo, quindi va rifatto il calcolo completo ridisegnando. */
+    if(isTidy()){ render(); return; }
+    svg.querySelectorAll('text.fan-name').forEach(fitFan);
+  }
+  if(typeof document !== 'undefined' && document.fonts && document.fonts.ready){
+    document.fonts.ready.then(() => { fontiPronte = true; if(isFan()) rifinisciVentaglio(); });
+  }
+
+  function disegnaVentaglio(){
+    const norm = d => ((d % 360) + 360) % 360;
+    const defs = sel('defs');
+    svg.appendChild(defs);
+
+    layout.fan.forEach((s, i) => {
+      const col = colorOf(s.p), bg = tintFor(s.p);
+      const g = sel('g', null, 'node-card fan' + (s.p.id === focusId ? ' focused' : ''));
+      g.dataset.id = s.p.id;
+      g.appendChild(sel('path', { class:'card-bg', d:settore(layout.cx, layout.cy, s.r0, s.r1, s.a0, s.a1),
+                                  fill:bg, stroke:col, 'stroke-width':2.4 }));
+      g.addEventListener('click', () => openDetail(s.p.id));
+      svg.appendChild(g);
+
+      const fs = Math.max(24, Math.round(72 - s.depth * 3.1));
+      const spessore = s.r1 - s.r0;
+      /* Margini di rispetto: lungo l'arco si lascia libero il 18%, in radiale
+         il 22%, così due nomi contigui non si sfiorano mai. */
+      const arco = (s.a1 - s.a0) * s.rm * 0.82;
+      const radiale = spessore * 0.78;
+      if(Math.max(arco, radiale) < fs * 1.7) return;      // settore troppo minuto
+
+      const anno = parseYear(s.p.dataNascita);
+      const nome = personLabel(s.p);
+
+      if(arco >= radiale){
+        const verso = Math.sin(s.am) > 0 ? -1 : 1;
+        const id = 'fa' + i;
+        defs.appendChild(sel('path', { id:id, fill:'none',
+          d:arcoTesto(layout.cx, layout.cy, s.rm, s.a0, s.a1, verso) }));
+        const tx = sel('text', { fill:col, 'font-size':fs, 'dominant-baseline':'middle' }, 'fan-name');
+        const tp = sel('textPath', { 'text-anchor':'middle', startOffset:'50%' });
+        tp.setAttribute('href', '#' + id);
+        tp.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#' + id);
+        tx.appendChild(tp);
+        tx.dataset.nome = nome; tx.dataset.anno = anno || ''; 
+        tx.dataset.budget = arco; tx.dataset.fs = fs;
+        g.appendChild(tx);
+        fitFan(tx);
+      } else {
+        let rot = s.am * 180/Math.PI;
+        const d = norm(rot);
+        if(d > 90 && d < 270) rot += 180;
+        const tx = sel('text', { x:s.px, y:s.py, fill:col, 'font-size':fs,
+          'text-anchor':'middle', 'dominant-baseline':'middle',
+          transform:`rotate(${rot.toFixed(2)} ${s.px.toFixed(1)} ${s.py.toFixed(1)})` }, 'fan-name');
+        tx.dataset.nome = nome; tx.dataset.anno = anno || '';
+        tx.dataset.budget = radiale; tx.dataset.fs = fs;
+        g.appendChild(tx);
+        fitFan(tx);
+      }
+    });
+    if(fontiPronte) rifinisciVentaglio();
+  }
+
   /* ============ RENDER ============ */
   const svgns = 'http://www.w3.org/2000/svg';
   function sel(tag, attrs, cls){
@@ -924,7 +1436,12 @@
   /* --- casella semplificata: solo fondo colorato, nome e anno --- */
   function drawSimple(g, p, W, H){
     const stroke = colorOf(p), bg = tintFor(p);
-    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:Math.min(W,H)*0.40, fill:bg }));
+    /* Filo sottile nella tinta piena del ramo: il fondo è la stessa tinta al
+       10%, troppo tenue per staccare la casella dalla carta. Il contorno le
+       ridà un bordo netto senza aggiungere un colore nuovo. */
+    const sw = 2.4, r = Math.min(W, H) * 0.40;
+    g.appendChild(sel('rect', { class:'card-bg', x:sw/2, y:sw/2, width:W-sw, height:H-sw,
+      rx:Math.max(0, r - sw/2), fill:bg, stroke:stroke, 'stroke-width':sw }));
     const n = sel('text', { x:W/2, y:H*0.44, class:'s-name', 'font-size':SIMPLE.nameFS, fill:stroke });
     n.textContent = truncName(personLabel(p));
     g.appendChild(n);
@@ -939,7 +1456,9 @@
   /* --- casella verticale: nome e anno ruotati, letti dal basso in alto --- */
   function drawSimpleV(g, p, W, H){
     const stroke = colorOf(p), bg = tintFor(p);
-    g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, rx:Math.min(W,H)*0.40, fill:bg }));
+    const sw = 2.4, r = Math.min(W, H) * 0.40;
+    g.appendChild(sel('rect', { class:'card-bg', x:sw/2, y:sw/2, width:W-sw, height:H-sw,
+      rx:Math.max(0, r - sw/2), fill:bg, stroke:stroke, 'stroke-width':sw }));
     const cy = H/2;
     const nx = W*0.38;
     const n = sel('text', { x:nx, y:cy, class:'s-name', 'font-size':SIMPLE_V.nameFS, fill:stroke,
@@ -1036,7 +1555,7 @@
 
   /* Corpo del nome del ramo dimezzato: prima dominava la barra e rubava
      l'attenzione ai nomi delle persone. */
-  const CHAR_W = 0.74, LABEL_PAD = 18, LABEL_FS_MAX = 29, LABEL_FS_MIN = 13;
+  const CHAR_W = 0.62, LABEL_PAD = 18, LABEL_FS_MAX = 29, LABEL_FS_MIN = 13;
   function labelMetrics(text, barLen){
     let fs = LABEL_FS_MAX;
     const width = () => text.length * fs * CHAR_W;
@@ -1052,6 +1571,19 @@
     svg.innerHTML = '';
     if(!layout) return;
     svg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+
+    if(isFan() || isTidy()){
+      if(isTidy()) disegnaRadiale(); else disegnaVentaglio();
+      updateFocusUI();
+      fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width);
+      if(resetZoom){ zoom = Math.max(fitZoom, initialZoom() * 0.5); applyZoom(); centerOn(oldestId()); }
+      else applyZoom();
+      applySearchFilter();
+      updateMeasures();
+      const pd = el('footnote'); if(pd) pd.textContent = dataNote;
+      return;
+    }
+
     const RS = rowStep();
 
     /* bande di lettura: le famiglie adiacenti ricevono un fondo alternato,
@@ -1141,15 +1673,21 @@
 
         addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${transY}`);
         if(Math.abs(f.tx - f.midP) > 0.5) addSeg(pCol, `M${f.midP} ${transY}L${f.tx} ${transY}`);
-        addSeg(pCol, `M${f.tx} ${transY}L${f.tx} ${distY}`);
 
         if(text && f.lastX - f.firstX > 1){
           const m = labelMetrics(text, f.lastX - f.firstX);
           const gA = f.tx - m.half, gB = f.tx + m.half;
+          /* Il nome del ramo si appoggia sull'incrocio: interrompe la barra
+             orizzontale e mangia anche l'ultimo tratto della calata verticale
+             che scende dal genitore, invece di limitarsi a poggiarci sopra. */
+          const meta = m.fs * 0.72;
+          const stopY = Math.max(transY, distY - meta);
+          if(stopY > transY + 0.5) addSeg(pCol, `M${f.tx} ${transY}L${f.tx} ${stopY}`);
           if(gA > f.firstX) addSeg(pCol, `M${f.firstX} ${distY}L${gA} ${distY}`);
           if(f.lastX > gB)  addSeg(pCol, `M${gB} ${distY}L${f.lastX} ${distY}`);
           labels.push({ text:text, x:f.tx, y:distY, fs:m.fs, color:pCol });
         } else {
+          addSeg(pCol, `M${f.tx} ${transY}L${f.tx} ${distY}`);
           addSeg(pCol, `M${f.firstX} ${distY}L${f.lastX} ${distY}`);
           if(text) labels.push({ text:text, x:f.tx, y:distY, fs:LABEL_FS_MIN + 8, color:pCol });
         }
@@ -1162,15 +1700,22 @@
       } else {
         const barY = f.bottomP + rowGap * 0.5;
         const barL = Math.min(f.firstX, f.midP), barR = Math.max(f.lastX, f.midP);
-        addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${barY}`);
         if(text && barR - barL > 1){
           const m = labelMetrics(text, Math.max(f.lastX - f.firstX, barR - barL));
           const cx = (f.firstX + f.lastX) / 2;
           const gA = cx - m.half, gB = cx + m.half;
+          /* La calata dal genitore si ferma prima della riga di testo: così il
+             nome del ramo copre l'incrocio fra il segmento verticale e quello
+             orizzontale, e si legge come un titolo appeso al nodo. */
+          const meta = m.fs * 0.72;
+          const dentro = f.midP > gA && f.midP < gB;
+          const stopY = dentro ? Math.max(f.bottomP, barY - meta) : barY;
+          addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${stopY}`);
           if(gA > barL) addSeg(pCol, `M${barL} ${barY}L${gA} ${barY}`);
           if(barR > gB) addSeg(pCol, `M${gB} ${barY}L${barR} ${barY}`);
           labels.push({ text:text, x:cx, y:barY, fs:m.fs, color:pCol });
         } else {
+          addSeg(pCol, `M${f.midP} ${f.bottomP}L${f.midP} ${barY}`);
           addSeg(pCol, `M${barL} ${barY}L${barR} ${barY}`);
           if(text) labels.push({ text:text, x:f.firstX, y:barY, fs:LABEL_FS_MIN + 8, color:pCol });
         }
@@ -1200,6 +1745,7 @@
       svg.appendChild(t);
     });
 
+    el('btn-align').style.opacity = isFan() ? '.35' : '';
     updateFocusUI();
     fitZoom = Math.max(0.004, (vp.clientWidth - 24) / layout.width);
     if(resetZoom){
@@ -1399,26 +1945,59 @@
   el('btn-colors').classList.add('on');
 
   el('btn-align').addEventListener('click', () => {
+    if(isFan()) return;                 // nel ventaglio non esistono righe da affiancare
     alignSiblings = !alignSiblings;
     el('btn-align').classList.toggle('on', alignSiblings);
     el('btn-align').title = alignSiblings ? 'Torna alla disposizione centrata' : 'Fratelli sempre affiancati';
     render(true);
   });
 
-  const SIMPLE_TITLES = [
-    'Solo nome e anno, in grande',
-    'Nome e anno in verticale (telo molto più corto)',
-    'Torna al cartiglio completo'
+  /* Quattro icone costruite sulla stessa griglia: il cartiglio è un riquadro
+     con due righe di testo, le due viste essenziali sono righe che scalano in
+     orizzontale e in verticale, il ventaglio è la stessa scala piegata in
+     archi attorno a un centro. */
+  /* Cinque icone, ognuna disegna la forma della casella che si otterrà:
+     un cartiglio incorniciato, una pastiglia larga, una pastiglia alta,
+     un disco ad anelli, una mezzaluna ad anelli. */
+  const IC_CARD = '<rect x="3.4" y="5.2" width="17.2" height="13.6" rx="2.4"/>'
+                + '<path d="M7 10h10M7 13.6h6.4"/>';
+  const IC_SIMPLE_H = '<rect x="2.4" y="7.6" width="19.2" height="8.8" rx="4.4"/>'
+                    + '<path d="M6.4 11.4h11.2M6.4 14.2h6"/>';
+  const IC_SIMPLE_V = '<rect x="7.6" y="2.4" width="8.8" height="19.2" rx="4.4"/>'
+                    + '<path d="M11.4 6.4v11.2M14.2 6.4v6"/>';
+  const IC_FAN = '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.6"/>'
+               + '<path d="M12 3v4.4M21 12h-4.4M12 21v-4.4M3 12h4.4"/>';
+  const IC_FAN_MEZZO = '<path d="M2.8 17.4a9.2 9.2 0 0 1 18.4 0"/>'
+                     + '<path d="M7.6 17.4a4.4 4.4 0 0 1 8.8 0"/><path d="M2.8 17.4h18.4"/>'
+                     + '<path d="M12 13v-4.8M7.1 14.6 4.6 12.1M16.9 14.6l2.5-2.5"/>';
+  const IC_TIDY = '<circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="4.3" r="1.6"/>'
+                + '<circle cx="18.6" cy="16.2" r="1.6"/><circle cx="5.4" cy="16.2" r="1.6"/>'
+                + '<path d="M12 10.1V5.9M13.4 13 17.2 15.2M10.6 13 6.8 15.2"/>';
+  const IC_TIDY_MEZZO = '<circle cx="12" cy="19.4" r="1.8"/><circle cx="4.4" cy="11" r="1.5"/>'
+                      + '<circle cx="12" cy="7.6" r="1.5"/><circle cx="19.6" cy="11" r="1.5"/>'
+                      + '<path d="M10.4 18.2 5.6 12.2M12 17.6v-8.4M13.6 18.2 18.4 12.2"/>';
+  const MODI = [
+    { icona:IC_CARD,       titolo:'Cartiglio completo',   dopo:'i soli nomi' },
+    { icona:IC_SIMPLE_H,   titolo:'Nome e anno',          dopo:'la verticale' },
+    { icona:IC_SIMPLE_V,   titolo:'Nome e anno verticali',dopo:'il ventaglio' },
+    { icona:IC_FAN,        titolo:'Ventaglio intero',     dopo:'la mezzaluna' },
+    { icona:IC_FAN_MEZZO,  titolo:'Ventaglio a mezzaluna',dopo:'l\u2019albero radiale' },
+    { icona:IC_TIDY,       titolo:'Albero radiale',       dopo:'l\u2019albero a mezzaluna' },
+    { icona:IC_TIDY_MEZZO, titolo:'Albero radiale a mezzaluna', dopo:'il cartiglio' }
   ];
-  el('btn-simple').addEventListener('click', () => {
-    cardMode = (cardMode + 1) % 3;                 // cartiglio -> orizzontale -> verticale
+  function applicaModo(){
+    const m = MODI[cardMode];
     el('btn-simple').classList.toggle('on', cardMode > 0);
-    el('btn-simple').title = SIMPLE_TITLES[cardMode];
-    el('ic-simple').innerHTML = cardMode === 2 ? IC_SIMPLE_V : IC_SIMPLE_H;
+    el('btn-simple').title = m.titolo + ' — premi per ' + m.dopo;
+    el('btn-simple').setAttribute('data-label', m.titolo);
+    el('ic-simple').innerHTML = m.icona;
+  }
+  el('btn-simple').addEventListener('click', () => {
+    cardMode = (cardMode + 1) % MODI.length;
+    applicaModo();
     render(true);
   });
-  const IC_SIMPLE_H = '<path d="M4 7h16M4 12h10M4 17h6"/>';
-  const IC_SIMPLE_V = '<path d="M7 20V4M12 20v-10M17 20v-6"/>';
+  applicaModo();
 
   /* ============ CONTROLLI ============ */
   function updateFocusUI(){
