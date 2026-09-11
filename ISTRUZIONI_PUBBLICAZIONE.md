@@ -62,7 +62,7 @@ Tutti i comandi stanno in **un'unica barra in cima alla finestra dell'albero**. 
 - **Icona a quattro angoli** — adatta la vista a tutta la larghezza dell'albero.
 - **− valore +** — il numero al centro è lo zoom in corso; cliccandolo torni al 100%. Su computer anche Ctrl+rotellina. **Su cellulare questi tre tasti non compaiono**: lo zoom si fa col pinch a due dita e lo spostamento trascinando con un dito.
 - **Icona schermo intero** — cambia verso quando entri ed esci.
-- **Icona a righe decrescenti** — cambia il modo di disegnare l'albero, ciclando su sette viste. Vedi sezione 8.
+- **Primo tasto della colonna** — cambia il modo di disegnare l'albero, ciclando su cinque viste. Vedi sezione 8.
 - **Icona a tre blocchi allineati** — cambia il criterio di disposizione. Vedi sezione 9.
 - **Icona a tavolozza** — accende e spegne i colori dei gruppi.
 - **Stampa** — apre il pannello per il plotter. Vedi sezione 10.
@@ -187,43 +187,47 @@ Le etichette rientrano anche nella ricerca.
 
 ---
 
-## 8. Sette modi di disegnare l'albero
+## 8. Cinque modi di disegnare l'albero
 
-L'icona con le **righe decrescenti** cicla su sette viste. L'icona cambia a ogni pressione e mostra la forma che si otterrà; passandoci sopra col puntatore compare il nome.
-
-### Viste in riga (1–3)
+Il **primo tasto** della colonna cicla su cinque viste. L'icona cambia a ogni pressione e mostra la forma che si otterrà; passandoci sopra col puntatore compare il nome.
 
 **1 — Cartiglio completo.** Cornice ornata ricalcata dal `blocco.pdf`, nome, entrambe le date, annotazioni, date del coniuge. La più ricca, adatta a leggere da vicino.
 
-**2 — Nome e anno, orizzontali.** Nessuna cornice, solo fondo colorato con bordi molto arrotondati e un filo nella tinta piena del ramo. Nome grande, data di nascita a capo. Serve a leggere **a zoom basso**, quando il cartiglio diventa un francobollo.
+**2 — Nome e anno, orizzontali.** Nessuna cornice, solo fondo colorato con angoli molto arrotondati e un filo nella tinta piena del ramo. Serve a leggere **a zoom basso**, quando il cartiglio diventa un francobollo.
 
-**3 — Nome e anno, verticali.** Come sopra ma con il testo che corre dal basso verso l'alto. La casella resta stretta qualunque sia il nome, quindi è la vista più efficiente per la stampa.
+**3 — Nome e anno, verticali.** Come sopra ma con il testo che corre dal basso verso l'alto. La casella resta stretta qualunque sia il nome: è la vista più efficiente per la stampa.
 
-### Ventagli a settori (4–5)
+**4 e 5 — Alberi radiali**, a giro intero e a mezzaluna. Le persone sono punti su anelli concentrici, come nei dendrogrammi radiali.
 
-Il capostipite al centro, un anello per generazione, ogni persona è un **settore di corona** largo in proporzione alla discendenza che contiene. **4** occupa il giro intero, **5** si apre a mezzaluna verso l'alto.
+> **Perché i ventagli a settori sono stati tolti.** Nelle vecchie viste a spicchi l'ampiezza dipendeva dalla discendenza: chi moriva senza figli valeva una foglia sola e diventava una scheggia schiacciata fra i fratelli fecondi — il caso di Domenica 1641 fra i figli di Pietro. Negli alberi radiali **ogni foglia riceve uno spazio proprio**, e il problema non si pone.
 
-I nomi corrono lungo l'arco quando il settore è largo, in direzione radiale quando è stretto. Il corpo cresce avvicinandosi al centro.
+### Come funzionano gli alberi radiali
 
-> **Limite noto.** Poiché l'ampiezza dipende dalla discendenza, chi muore senza figli vale una foglia sola e diventa una scheggia schiacciata fra i fratelli fecondi: è il caso di Domenica 1641 fra i figli di Pietro. Le viste 6 e 7 risolvono il problema.
+**Distanza fra gli anelli calcolata, non fissata.** Lo spazio fra due nomi vicini è un arco, e un arco è angolo per raggio. Fissando l'angolo, dimezzare l'apertura dimezzava l'arco e nella mezzaluna i nomi finivano uno sull'altro. Ora si parte dall'**altezza del testo**, che è la misura da rispettare, si ricava l'angolo che serve a ciascuna coppia di foglie, e se la somma non entra nell'apertura **si allontanano gli anelli finché entra**. Il disegno cresce invece di accavallarsi: la mezzaluna misura 15212 × 12837 contro 8640 × 8426 del giro intero, cioè circa il doppio del raggio per metà dell'apertura. È il prezzo da pagare per avere i nomi leggibili, e si paga in carta, non in leggibilità.
 
-### Alberi radiali (6–7)
+**Collegamenti a gomito.** Un arco concentrico corre sulla circonferenza del padre e raccoglie tutti i figli; da lì un raggio dritto scende verso ciascuno.
 
-Qui le persone non sono settori ma **punti su un anello**, come nei dendrogrammi radiali. Cambia una cosa sostanziale: l'ampiezza angolare non dipende più dalla discendenza, ma **ogni foglia riceve uno spazio proprio**. Domenica passa da 44 a 79 unità di arco, e la spaziatura si uniforma su tutte le generazioni.
+**Rami richiudibili.** Cliccando il **pallino** di una persona si richiude la sua discendenza; il pallino diventa pieno per segnalare che sotto c'è dell'altro. Cliccando il **nome** si apre la scheda.
 
-La separazione fra due foglie contigue vale 1 se hanno lo stesso padre e 2 se vengono da rami diversi, il tutto diviso per la profondità: così gli anelli interni, che hanno poca circonferenza, ricevono proporzionalmente più spazio di quelli esterni.
+**Collocazione dei nomi.** Chi non ha figli scrive verso l'esterno, dove ha campo libero e può tenersi l'anno. Chi ha discendenza scrive verso il centro, appoggiato sul ramo che lo lega al padre, e **il ramo viene interrotto** sotto il nome. Le prime tre generazioni, che sono una fila unica al centro, hanno il nome ruotato di 90° e posto prima del pallino.
 
-**6** occupa il giro intero, **7** si apre a mezzaluna. Nella mezzaluna l'ingombro viene misurato davvero invece di assumere un quadrato: 7169 × 6026 invece di 8487 × 8531, proporzione molto più vicina a un foglio.
+**Nomi lunghi.** «Giobatta (treseman)» va a capo su due righe invece di essere mozzato: si tenta una riga con anno, una riga senza anno, due righe con anno, due righe senza anno, e solo alla fine si accorcia.
 
-**Collegamenti a gomito.** Un arco concentrico corre sulla circonferenza del padre e raccoglie tutti i figli; da lì un raggio dritto scende verso ciascuno. Ottantasette archi e trecentottantasei raggi.
+> **Il ricalcolo a caratteri caricati, e un baco da non reintrodurre.** Il carattere web arriva in modo asincrono: al primo disegno il browser misura con quello di ripiego e i nomi sbordano — erano 219 su 385. Si ridisegna quindi una volta quando i caratteri sono pronti. **Il disegno non deve mai richiamare quella funzione**: in una versione precedente lo faceva, e si innescava una ricorsione infinita che bloccava il browser all'ingresso nella vista radiale. Una sentinella ora impedisce ogni rientro.
 
-**Rami richiudibili.** Cliccando il **pallino** di una persona si richiude la sua discendenza; il pallino diventa pieno per segnalare che sotto c'è dell'altro. Cliccando il **nome** si apre la scheda. Con 385 persone aperte tutte insieme conviene richiudere i rami che non interessano.
+## 8bis. Ordine dei comandi
 
-**Collocazione dei nomi.** Chi non ha figli scrive verso l'esterno, dove ha campo libero e può tenersi l'anno. Chi ha discendenza scrive verso il centro, appoggiato sul ramo che lo lega al padre — verso l'esterno finirebbe addosso ai figli — e **il ramo viene interrotto** sotto il nome. Le prime tre generazioni, che sono una fila unica al centro, hanno il nome ruotato di 90° e posto prima del pallino, altrimenti si accavallerebbero fra loro.
+Dall'alto: **modalità di visualizzazione**, **fratelli affiancati** (spento nelle due viste ad albero, dove non ci sono righe da affiancare), **adatta allo schermo**, **schermo intero**; poi ingrandimento, riduzione e colori; in fondo **vista completa** (solo quando un ramo è a fuoco) e **stampa**.
 
-**Nomi lunghi.** «Giobatta (treseman)» va a capo su due righe invece di essere mozzato. La procedura tenta nell'ordine: una riga con anno, una riga senza anno, due righe con anno, due righe senza anno, e solo alla fine accorcia. Su 385 nomi, 13 vanno a capo e appena 4 vengono accorciati.
+## 8ter. Vista di apertura
 
-> **Perché la misura del testo viene rifatta.** Il carattere web arriva dalla rete in modo asincrono: al primo disegno il browser misura con quello di ripiego, che ha metriche diverse, e i nomi che sembravano stare poi sbordano. Senza il ricalcolo a `document.fonts.ready`, **219 nomi su 385 uscivano dal proprio spazio**.
+Con cinque viste, raggiungere l'ultima costa quattro pressioni. La vista con cui la pagina si apre si cambia in una riga, in cima allo `<script>` di `index.html`:
+
+```js
+const VISTA_INIZIALE = 0;
+```
+
+I numeri sono elencati nel commento sopra la riga: 0 cartiglio, 1 nome e anno orizzontali, 2 verticali, 3 albero radiale, 4 albero radiale a mezzaluna.
 
 ## 9. Due modi di disporre l'albero
 
@@ -266,6 +270,8 @@ Nota controintuitiva: la vista **orizzontale è più lunga** del cartiglio, non 
 **I due comandi:**
 - **Altezza del telo (cm)** — la misura utile del rotolo. Cambiandola cambiano proporzionalmente lunghezza e dimensione delle caselle.
 - **Distanza fra le generazioni** — allontanando le righe l'albero diventa proporzionalmente meno lungo a parità di altezza, ma le caselle rimpiccioliscono.
+
+In stampa spariscono testata, comandi, pannelli **e il piede con le segnalazioni**: sul foglio resta il solo albero.
 
 Il riquadro delle misure diventa rosso quando il corpo del nome scende **sotto i 2 mm**, soglia oltre la quale la stampa non è comodamente leggibile. **Ripristina valori iniziali** riporta tutto ai valori di partenza.
 
