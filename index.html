@@ -443,9 +443,14 @@
   const GROUP_TINTS2 = GROUP_COLORS.map(h => tintOf(h, 1));   // banda leggermente più carica
 
   let colorsOn = true, alignSiblings = false;
-  /* 0 cartiglio · 1 nome e anno orizzontali · 2 verticali · 3 ventaglio intero
-     · 4 ventaglio a mezzaluna */
-  let cardMode = 0;
+  /* Vista con cui si apre la pagina. Con sette viste, raggiungere l'ultima
+     costa sei pressioni: se quella che interessa non è il cartiglio, conviene
+     cambiare questo numero.
+       0 cartiglio · 1 nome e anno orizzontali · 2 verticali
+       3 ventaglio intero · 4 ventaglio a mezzaluna
+       5 albero radiale · 6 albero radiale a mezzaluna                        */
+  const VISTA_INIZIALE = 0;
+  let cardMode = VISTA_INIZIALE;
   const isSimple = () => cardMode === 1 || cardMode === 2;
   const isVert   = () => cardMode === 2;
   const isFan    = () => cardMode === 3 || cardMode === 4;
@@ -1230,7 +1235,6 @@
       });
     });
     perColore.forEach((d, c) => gRami.appendChild(sel('path', { d:d, stroke:c, 'stroke-width':2.6 }, 'link')));
-    if(fontiPronte) rifinisciVentaglio();
   }
 
   /* tracciato di un settore ad anello, con un filo di stacco fra l'uno e l'altro */
@@ -1292,14 +1296,21 @@
     scrivi('', false);                                // se non entra, meglio nulla
   }
 
+  /* ATTENZIONE — questa funzione può ridisegnare l'albero, e il disegno non
+     deve mai richiamarla: si innescherebbe una ricorsione infinita che blocca
+     il browser. Viene chiamata solo dalla promessa dei caratteri, una volta
+     sola, e la sentinella qui sotto protegge da ogni rientro accidentale. */
+  let inRifinitura = false;
   function rifinisciVentaglio(){
-    /* Nel ventaglio i testi stanno su una riga sola; nell'albero radiale possono
-       andare a capo, quindi va rifatto il calcolo completo ridisegnando. */
-    if(isTidy()){ render(); return; }
-    svg.querySelectorAll('text.fan-name').forEach(fitFan);
+    if(inRifinitura) return;
+    inRifinitura = true;
+    try{
+      if(isTidy()) render();                 // i testi possono andare a capo
+      else svg.querySelectorAll('text.fan-name').forEach(fitFan);
+    } finally { inRifinitura = false; }
   }
   if(typeof document !== 'undefined' && document.fonts && document.fonts.ready){
-    document.fonts.ready.then(() => { fontiPronte = true; if(isFan()) rifinisciVentaglio(); });
+    document.fonts.ready.then(() => { fontiPronte = true; if(isFan() || isTidy()) rifinisciVentaglio(); });
   }
 
   function disegnaVentaglio(){
@@ -1354,7 +1365,6 @@
         fitFan(tx);
       }
     });
-    if(fontiPronte) rifinisciVentaglio();
   }
 
   /* ============ RENDER ============ */
