@@ -395,8 +395,18 @@
   const BW = 150;
   let BH = 219;
   const CARD = { pad:9, nameFS:24, nameFS2:20, dateFS:18, noteFS:15, noteMax:5, spFS:16 };
-  const ORN_S = 291.9 / 177.45;                  // scala fissa dei dettagli dell'ornamento
+  const ORN_S = 291.9 / 177.45;                  // spessori delle tracce dell'ornamento (invariati)
+  const ORN_G = ORN_S * 0.5;                     // ingombro di riccioli e decori: metà di un tempo
+  /* Capostipiti: chi non ha genitore ma ha discendenti. Nel cartiglio sono
+     disegnati quattro volte più grandi e in rosso, per aprire l'albero. */
+  const CAPO_SCALA = 4;
+  const CAPO_ROSSO = '#a3201c';
   const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
+  /* Nel cartiglio a colonna le caselle sono strette e 52 fra due famiglie
+     diverse si confondeva con i 30 fra fratelli: i cugini parevano fratelli.
+     Qui lo stacco fra famiglie è più che triplo di quello fra fratelli. */
+  const COUSIN_GAP_CARTIGLIO = 110;
+  const cousinGap = () => cardMode === 0 ? COUSIN_GAP_CARTIGLIO : COUSIN_GAP;
   /* Margine sopra la prima generazione: senza, il cartiglio del capostipite
      resta incollato al bordo superiore del disegno e in stampa tocca la cimosa
      del telo. Vale anche per l'esportazione in PDF. */
@@ -625,7 +635,7 @@
     return y ? String(y) : '';
   }
   function nodeW(p){
-    if(cardMode === 0) return BW;
+    if(cardMode === 0) return (p && p._capo) ? BW * CAPO_SCALA : BW;
     if(cardMode === 2) return SIMPLE_V.W;
     const n = truncName(personLabel(p)), y = birthLine(p);
     const wn = n.length * SIMPLE.nameFS * 0.630;   // Libre Baskerville è largo
@@ -644,6 +654,8 @@
     vH = Math.max(SIMPLE_V.minH, m + 2*SIMPLE_V.pad);
   }
   function rowStep(){ return nodeH() + rowGap; }
+  // altezza della singola casella: i capostipiti nel cartiglio sono più alti
+  function nodeHof(p){ return (cardMode === 0 && p && p._capo) ? BH * CAPO_SCALA : nodeH(); }
 
   /* ============ LAYOUT ============ */
   function parseYear(v){
@@ -770,7 +782,8 @@
         : ' persone senza genitore e senza figli non sono mostrate: ') + lista;
     }
 
-    persons.forEach(p => { p._group = null; });
+    persons.forEach(p => { p._group = null; p._capo = false; });
+    roots.forEach(r => { if((childrenOf.get(r.id) || []).length) r._capo = true; });
     assignGroups(persons, childrenOf, roots);
 
     if(isTidy()) return layoutRadiale(childrenOf, roots);
@@ -789,7 +802,7 @@
         rowCursor[depth] = x + nodeW(p) + SIB_GAP;
         const figli = childrenOf.get(p.id) || [];
         if(figli.length){
-          if(rowCursor[depth+1] != null) rowCursor[depth+1] += (COUSIN_GAP - SIB_GAP);
+          if(rowCursor[depth+1] != null) rowCursor[depth+1] += (cousinGap() - SIB_GAP);
           figli.forEach(f => visit(f, depth+1));
         }
       }
@@ -839,7 +852,7 @@
         let acc = null; const centers = [];
         for(const f of figli){
           const sub = build(f, depth + 1);
-          if(!acc) acc = sub; else mergeBlocks(acc, sub, SIB_GAP, COUSIN_GAP);
+          if(!acc) acc = sub; else mergeBlocks(acc, sub, SIB_GAP, cousinGap());
           centers.push(sub.cx);
         }
         const cx = (centers[0] + centers[centers.length - 1]) / 2;
@@ -867,10 +880,16 @@
     let minX = Infinity;
     xs.forEach(v => { if(v < minX) minX = v; });
     const positions = new Map();
+    /* Il capostipite ingrandito cresce verso l'alto: il suo piede resta sulla
+       riga della prima generazione, così le linee verso i figli non cambiano.
+       Tutto il disegno scende di quanto serve a fargli posto. */
+    let extraTop = 0;
+    xs.forEach((v, id) => { const p = localById.get(id); extraTop = Math.max(extraTop, nodeHof(p) - nodeH()); });
     xs.forEach((v, id) => {
       const p = localById.get(id);
       const d = depths.get(id) || 0;
-      positions.set(id, { x: v - minX + 40, y: TOP_PAD + d * RS, w: nodeW(p), h: nodeH(), depth: d });
+      const h = nodeHof(p);
+      positions.set(id, { x: v - minX + 40, y: TOP_PAD + extraTop + d * RS - (h - nodeH()), w: nodeW(p), h: h, depth: d });
     });
     let width = 0, height = 0;
     positions.forEach(q => {
@@ -1381,9 +1400,10 @@
   }
 
   function drawCard(g, p, W, H){
-    const s = ORN_S;
-    const px = v => +(v*s).toFixed(2);
-    const stroke = colorOf(p), bg = tintFor(p);
+    const px = v => +(v*ORN_G).toFixed(2);      // posizioni dei decori
+    const sw = v => +(v*ORN_S).toFixed(2);      // spessori delle tracce
+    const stroke = p._capo ? CAPO_ROSSO : colorOf(p);
+    const bg = p._capo ? tintOf(CAPO_ROSSO, 0) : tintFor(p);
 
     g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, fill:bg }));
 
@@ -1391,31 +1411,31 @@
        casella cambia, i riccioli e gli spessori restano quelli di sempre. */
     const orn = () => {
       const q = sel('g', null, 'card-orn');
-      const P = d => q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2), d:d }));
+      const P = d => q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':sw(2), d:d }));
       P(`M${px(-4.14)} ${px(-4.86)}C${px(-3.07)} ${px(-3.97)} ${px(-1.72)} ${px(-3.48)} ${px(-0.32)} ${px(-3.48)}`
        +`L${W+px(0.32)} ${px(-3.48)}C${W+px(1.72)} ${px(-3.48)} ${W+px(3.07)} ${px(-3.97)} ${W+px(4.14)} ${px(-4.86)}`);
       P(`M${px(11.2)} ${px(-3.48)}C${px(0.25)} ${px(-3.48)} 0 ${px(-6.44)} 0 ${px(-12.17)}`);
       P(`M${W-px(11.2)} ${px(-3.48)}C${W-px(0.25)} ${px(-3.48)} ${W} ${px(-6.44)} ${W} ${px(-12.17)}`);
       P(`M${px(1.2)} ${px(-3.48)}C${px(-1.99)} ${px(-3.48)} ${px(-7.5)} ${px(-1.53)} ${px(-7.5)} ${px(5.21)}`);
       P(`M${W-px(1.2)} ${px(-3.48)}C${W+px(1.99)} ${px(-3.48)} ${W+px(7.5)} ${px(-1.53)} ${W+px(7.5)} ${px(5.21)}`);
-      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(13.75), y1:px(-6.5), x2:W-px(13.75), y2:px(-6.5) }));
-      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:+(W*0.2465).toFixed(2), y1:px(-8.9), x2:+(W*0.7535).toFixed(2), y2:px(-8.9) }));
-      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:0, cy:px(3.01), r:px(2.17) }));
-      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:W, cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.25), x1:px(13.75), y1:px(-6.5), x2:W-px(13.75), y2:px(-6.5) }));
+      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.25), x1:+(W*0.2465).toFixed(2), y1:px(-8.9), x2:+(W*0.7535).toFixed(2), y2:px(-8.9) }));
+      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':sw(.9), cx:0, cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':sw(.9), cx:W, cy:px(3.01), r:px(2.17) }));
       return q;
     };
     g.appendChild(orn());
     const bot = orn(); bot.setAttribute('transform', `translate(0,${H}) scale(1,-1)`); g.appendChild(bot);
 
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.9), x1:0, y1:px(5), x2:0, y2:H-px(5) }));
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.9), x1:W, y1:px(5), x2:W, y2:H-px(5) }));
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(-2.45), y1:px(10), x2:px(-2.45), y2:H-px(10) }));
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:W+px(2.45), y1:px(10), x2:W+px(2.45), y2:H-px(10) }));
+    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.9), x1:0, y1:px(5), x2:0, y2:H-px(5) }));
+    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.9), x1:W, y1:px(5), x2:W, y2:H-px(5) }));
+    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.25), x1:px(-2.45), y1:px(10), x2:px(-2.45), y2:H-px(10) }));
+    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.25), x1:W+px(2.45), y1:px(10), x2:W+px(2.45), y2:H-px(10) }));
 
     const pad = CARD.pad;
     impaginaCartiglio(p, W).items.forEach(it => {
       if(it.k === 'rule'){
-        g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(it.w), x1:pad, y1:it.y, x2:W-pad, y2:it.y }));
+        g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(it.w), x1:pad, y1:it.y, x2:W-pad, y2:it.y }));
         return;
       }
       const cls = it.k === 'name' ? 'name' : it.k === 'note' ? 'note-text' : 'date';
@@ -1609,7 +1629,12 @@
       const g = sel('g', { transform:`translate(${pos.x},${pos.y})` },
         'node-card' + (isSimple() ? ' simple' : '') + (p.id === focusId ? ' focused' : ''));
       g.dataset.id = p.id;
-      (cardMode === 2 ? drawSimpleV : cardMode === 1 ? drawSimple : drawCard)(g, p, pos.w, pos.h);
+      if(cardMode === 0 && p._capo){
+        const inner = sel('g', { transform:`scale(${CAPO_SCALA})` });
+        drawCard(inner, p, BW, BH);
+        g.appendChild(inner);
+        g.classList.add('capo');
+      } else (cardMode === 2 ? drawSimpleV : cardMode === 1 ? drawSimple : drawCard)(g, p, pos.w, pos.h);
       g.addEventListener('click', () => openDetail(p.id));
       svg.appendChild(g);
     });
@@ -1783,7 +1808,8 @@
     const hCm = parseFloat(el('print-height').value) || 100;
     const scale = hCm / layout.height;
     let wSum = 0, n = 0;
-    layout.positions.forEach(q => { wSum += q.w; n++; });
+    // i capostipiti ingranditi non fanno media: falserebbero la casella tipo
+    layout.positions.forEach(q => { if(q.h > nodeH() * 1.5) return; wSum += q.w; n++; });
     const typW = n ? wSum/n : BW;
     el('m-length').textContent = ((layout.width * scale)/100).toFixed(1).replace('.', ',') + ' m';
     el('m-card').textContent = (typW*scale).toFixed(1).replace('.', ',') + ' × ' + (nodeH()*scale).toFixed(1).replace('.', ',') + ' cm';
