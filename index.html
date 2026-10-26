@@ -398,8 +398,9 @@
   const ORN_S = 291.9 / 177.45;                  // spessori delle tracce dell'ornamento (invariati)
   const ORN_G = ORN_S * 0.5;                     // ingombro di riccioli e decori: metà di un tempo
   /* Capostipiti: chi non ha genitore ma ha discendenti. Nel cartiglio sono
-     disegnati quattro volte più grandi e in rosso, per aprire l'albero. */
-  const CAPO_SCALA = 4;
+     disegnati in rosso, per aprire l'albero. CAPO_SCALA li ingrandisce:
+     1 = stessa grandezza delle altre caselle (provato 4, troppo ingombrante). */
+  const CAPO_SCALA = 1;
   const CAPO_ROSSO = '#a3201c';
   const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
   /* Nel cartiglio a colonna le caselle sono strette e 52 fra due famiglie
