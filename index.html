@@ -387,7 +387,15 @@
   const SHEET_NAME = "";
   const PAGE_TITLE = "I Lizzi in Friuli";
 
-  const BW = 291.9, BH = 219.0;                 // cartiglio completo
+  /* Cartiglio completo a colonna: nome, nascita, morte, annotazione, nascita e
+     morte del coniuge, una riga sotto l'altra. La larghezza è metà di quella
+     di un tempo (291,9), così il telo si accorcia e la scala di stampa cresce.
+     L'altezza non è fissa: la calcola altezzaCartiglio() sulla persona più
+     carica dell'intero foglio, perché tutte le righe restino allineate. */
+  const BW = 150;
+  let BH = 219;
+  const CARD = { pad:9, nameFS:24, nameFS2:20, dateFS:18, noteFS:15, noteMax:5, spFS:16 };
+  const ORN_S = 291.9 / 177.45;                  // scala fissa dei dettagli dell'ornamento
   const SIB_GAP = 30, COUSIN_GAP = 52, ROOT_GAP = 240;
   /* Margine sopra la prima generazione: senza, il cartiglio del capostipite
      resta incollato al bordo superiore del disegno e in stampa tocca la cimosa
@@ -1184,10 +1192,10 @@
   function rifinisciVentaglio(){
     if(inRifinitura) return;
     inRifinitura = true;
-    try { if(isTidy()) render(); } finally { inRifinitura = false; }
+    try { if(isTidy() || cardMode === 0) render(); } finally { inRifinitura = false; }
   }
   if(typeof document !== 'undefined' && document.fonts && document.fonts.ready){
-    document.fonts.ready.then(() => { fontiPronte = true; if(isTidy()) rifinisciVentaglio(); });
+    document.fonts.ready.then(() => { fontiPronte = true; if(isTidy() || cardMode === 0) rifinisciVentaglio(); });
   }
 
   /* ============ RENDER ============ */
@@ -1308,33 +1316,92 @@
     }
   }
 
-  /* --- cartiglio completo --- */
+  /* --- cartiglio completo, a colonna --- */
+  /* Misura del testo con i caratteri veri: con un conteggio di lettere le
+     maiuscole e le «m» sforavano. Prima che i web font siano pronti la misura
+     usa il ripiego; al loro arrivo l'albero viene ridisegnato. */
+  const misuraCtx = document.createElement('canvas').getContext('2d');
+  function larghezzaTesto(str, fs, serif){
+    misuraCtx.font = serif ? `700 ${fs}px 'Libre Baskerville', Georgia, serif`
+                           : `400 ${fs}px 'Source Sans 3', 'Source Sans Pro', sans-serif`;
+    return misuraCtx.measureText(str).width;
+  }
+  function aCapo(str, fs, serif, maxW, maxLines){
+    if(!str) return [];
+    const words = str.trim().split(/\s+/), lines = []; let cur = '', i = 0;
+    for(; i < words.length; i++){
+      const cand = cur ? cur + ' ' + words[i] : words[i];
+      if(larghezzaTesto(cand, fs, serif) > maxW && cur){
+        lines.push(cur); cur = words[i];
+        if(lines.length >= maxLines){ cur = ''; break; }
+      } else cur = cand;
+    }
+    if(cur) lines.push(cur);
+    if(i < words.length){
+      let last = lines[lines.length-1];
+      while(last && larghezzaTesto(last + '…', fs, serif) > maxW) last = last.replace(/\s*\S+$/, '');
+      lines[lines.length-1] = (last || '').replace(/[.,;:]*$/,'') + '…';
+    }
+    return lines;
+  }
+
+  /* Disposizione del cartiglio: restituisce gli elementi da disegnare e
+     l'altezza che il contenuto richiede. La usano sia il disegno sia il
+     calcolo dell'altezza comune, così le due cose non divergono mai. */
+  function impaginaCartiglio(p, W){
+    const pad = CARD.pad, inner = W - 2*pad, out = [];
+    const label = personLabel(p);
+    let fs = CARD.nameFS, lines = aCapo(label, fs, true, inner, 1);
+    if(lines.length && lines[0].endsWith('…')){ fs = CARD.nameFS2; lines = aCapo(label, fs, true, inner, 2); }
+    let y = fs + 8;
+    lines.forEach((ln, i) => out.push({ k:'name', x:W/2, y:y + i*fs*1.2, t:ln, fs:fs }));
+    y += (lines.length-1)*fs*1.2 + 12;
+    out.push({ k:'rule', y:y, w:.75 });
+    y += 4;
+    if(p.dataNascita){ y += CARD.dateFS*1.3; out.push({ k:'date', x:pad, y:y, t:'n. ' + fmtDate(p.dataNascita), fs:CARD.dateFS }); }
+    if(p.dataMorte){   y += CARD.dateFS*1.3; out.push({ k:'date', x:pad, y:y, t:'‡ ' + fmtDate(p.dataMorte), fs:CARD.dateFS }); }
+    const nt = splitNote(p.note);
+    if(nt.text || nt.n || nt.d){
+      y += 9;
+      out.push({ k:'rule', y:y, w:.25 });
+      y += 3;
+      aCapo(fmtDate(nt.text), CARD.noteFS, false, inner, CARD.noteMax).forEach(ln => {
+        y += CARD.noteFS*1.38; out.push({ k:'note', x:pad, y:y, t:ln, fs:CARD.noteFS });
+      });
+      if(nt.n || nt.d) y += 5;
+      if(nt.n){ y += CARD.spFS*1.32; out.push({ k:'date', x:pad, y:y, t:'n. ' + fmtDate(nt.n), fs:CARD.spFS }); }
+      if(nt.d){ y += CARD.spFS*1.32; out.push({ k:'date', x:pad, y:y, t:'‡ ' + fmtDate(nt.d), fs:CARD.spFS }); }
+    }
+    return { items:out, h:y + 14 };
+  }
+  function altezzaCartiglio(persons){
+    let h = 0;
+    persons.forEach(p => { h = Math.max(h, impaginaCartiglio(p, BW).h); });
+    return Math.ceil(Math.max(h, 120));
+  }
+
   function drawCard(g, p, W, H){
-    const s = W / 177.45;
+    const s = ORN_S;
     const px = v => +(v*s).toFixed(2);
     const stroke = colorOf(p), bg = tintFor(p);
 
     g.appendChild(sel('rect', { class:'card-bg', x:0, y:0, width:W, height:H, fill:bg }));
 
+    /* Ornamento del sito con i dettagli a scala fissa: la larghezza della
+       casella cambia, i riccioli e gli spessori restano quelli di sempre. */
     const orn = () => {
       const q = sel('g', null, 'card-orn');
-      q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
-        d:`M${px(-4.14)} ${px(-4.86)}`
-         +`C${px(-3.07)} ${px(-3.97)} ${px(-1.72)} ${px(-3.48)} ${px(-0.32)} ${px(-3.48)}`
-         +`L${px(177.77)} ${px(-3.48)}`
-         +`C${px(179.17)} ${px(-3.48)} ${px(180.55)} ${px(-3.97)} ${px(181.62)} ${px(-4.86)}` }));
-      q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
-        d:`M${px(11.2)} ${px(-3.48)}C${px(0.25)} ${px(-3.48)} 0 ${px(-6.44)} 0 ${px(-12.17)}` }));
-      q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
-        d:`M${px(166.25)} ${px(-3.48)}C${px(177.2)} ${px(-3.48)} ${px(177.45)} ${px(-6.44)} ${px(177.45)} ${px(-12.17)}` }));
-      q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
-        d:`M${px(1.2)} ${px(-3.48)}C${px(-1.99)} ${px(-3.48)} ${px(-7.5)} ${px(-1.53)} ${px(-7.5)} ${px(5.21)}` }));
-      q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2),
-        d:`M${px(176.25)} ${px(-3.48)}C${px(179.44)} ${px(-3.48)} ${px(184.95)} ${px(-1.53)} ${px(184.95)} ${px(5.21)}` }));
-      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(13.75), y1:px(-6.5), x2:px(163.75), y2:px(-6.5) }));
-      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(43.75), y1:px(-8.9), x2:px(133.75), y2:px(-8.9) }));
+      const P = d => q.appendChild(sel('path', { class:'card-frame', stroke:stroke, 'stroke-width':px(2), d:d }));
+      P(`M${px(-4.14)} ${px(-4.86)}C${px(-3.07)} ${px(-3.97)} ${px(-1.72)} ${px(-3.48)} ${px(-0.32)} ${px(-3.48)}`
+       +`L${W+px(0.32)} ${px(-3.48)}C${W+px(1.72)} ${px(-3.48)} ${W+px(3.07)} ${px(-3.97)} ${W+px(4.14)} ${px(-4.86)}`);
+      P(`M${px(11.2)} ${px(-3.48)}C${px(0.25)} ${px(-3.48)} 0 ${px(-6.44)} 0 ${px(-12.17)}`);
+      P(`M${W-px(11.2)} ${px(-3.48)}C${W-px(0.25)} ${px(-3.48)} ${W} ${px(-6.44)} ${W} ${px(-12.17)}`);
+      P(`M${px(1.2)} ${px(-3.48)}C${px(-1.99)} ${px(-3.48)} ${px(-7.5)} ${px(-1.53)} ${px(-7.5)} ${px(5.21)}`);
+      P(`M${W-px(1.2)} ${px(-3.48)}C${W+px(1.99)} ${px(-3.48)} ${W+px(7.5)} ${px(-1.53)} ${W+px(7.5)} ${px(5.21)}`);
+      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(13.75), y1:px(-6.5), x2:W-px(13.75), y2:px(-6.5) }));
+      q.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:+(W*0.2465).toFixed(2), y1:px(-8.9), x2:+(W*0.7535).toFixed(2), y2:px(-8.9) }));
       q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:0, cy:px(3.01), r:px(2.17) }));
-      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:px(177.45), cy:px(3.01), r:px(2.17) }));
+      q.appendChild(sel('circle', { class:'card-dot', stroke:stroke, fill:bg, 'stroke-width':px(.9), cx:W, cy:px(3.01), r:px(2.17) }));
       return q;
     };
     g.appendChild(orn());
@@ -1345,45 +1412,16 @@
     g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:px(-2.45), y1:px(10), x2:px(-2.45), y2:H-px(10) }));
     g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:W+px(2.45), y1:px(10), x2:W+px(2.45), y2:H-px(10) }));
 
-    const padX = px(4.05);
-    const label = personLabel(p);
-    let nameLines = wrap(label, 16, 1);
-    let fs = 24, step = 28;
-    if(label.length > 16){ nameLines = wrap(label, 22, 2); fs = 18; step = 21; }
-    let y = fs + 8;
-    nameLines.forEach((ln, i) => {
-      const t = sel('text', { x:W/2, y:y + i*step, class:'name', 'font-size':fs, fill:stroke });
-      t.textContent = ln; g.appendChild(t);
+    const pad = CARD.pad;
+    impaginaCartiglio(p, W).items.forEach(it => {
+      if(it.k === 'rule'){
+        g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(it.w), x1:pad, y1:it.y, x2:W-pad, y2:it.y }));
+        return;
+      }
+      const cls = it.k === 'name' ? 'name' : it.k === 'note' ? 'note-text' : 'date';
+      const t = sel('text', { x:it.x, y:it.y, class:cls, 'font-size':it.fs, fill:stroke, opacity: it.k === 'name' ? 1 : (it.k === 'note' ? .92 : .95) });
+      t.textContent = it.t; g.appendChild(t);
     });
-    y += (nameLines.length-1)*step + 12;
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.75), x1:padX, y1:y, x2:W-padX, y2:y }));
-    y += 25;
-    if(p.dataNascita){
-      const t = sel('text', { x:padX, y:y, class:'date birth', 'font-size':18, fill:stroke, opacity:.95 });
-      t.textContent = 'n. ' + fmtDate(p.dataNascita); g.appendChild(t);
-    }
-    if(p.dataMorte){
-      const t = sel('text', { x:W-padX, y:y, class:'date death', 'font-size':18, fill:stroke, opacity:.95 });
-      t.textContent = '‡ ' + fmtDate(p.dataMorte); g.appendChild(t);
-    }
-    y += 11;
-    g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':px(.25), x1:padX, y1:y, x2:W-padX, y2:y }));
-
-    const nt = splitNote(p.note);
-    const hasSpouseDates = !!(nt.n || nt.d);
-    const noteTop = y + 24;
-    const limit = (hasSpouseDates ? H - 46 : H - 14);
-    const maxLines = Math.max(0, Math.floor((limit - noteTop)/22) + 1);
-    const noteLines = wrap(fmtDate(nt.text), 36, maxLines);
-    noteLines.forEach((ln, i) => {
-      const t = sel('text', { x:padX, y: noteTop + i*22, class:'note-text', 'font-size':15, fill:stroke, opacity:.92 });
-      t.textContent = ln; g.appendChild(t);
-    });
-    if(hasSpouseDates){
-      const spouseY = Math.min(H - 16, noteTop + noteLines.length*22 + 4);
-      if(nt.n){ const t = sel('text', { x:padX, y:spouseY, class:'date birth', 'font-size':16, fill:stroke, opacity:.95 }); t.textContent = 'n. ' + fmtDate(nt.n); g.appendChild(t); }
-      if(nt.d){ const t = sel('text', { x:W-padX, y:spouseY, class:'date death', 'font-size':16, fill:stroke, opacity:.95 }); t.textContent = '‡ ' + fmtDate(nt.d); g.appendChild(t); }
-    }
   }
 
   /* Corpo del nome del ramo dimezzato: prima dominava la barra e rubava
@@ -1400,6 +1438,7 @@
     const keep = branchSet();
     shownPersons = keep ? ALL_PERSONS.filter(p => keep.has(p.id)) : ALL_PERSONS;
     if(isVert()) computeVH(shownPersons);
+    if(cardMode === 0) BH = altezzaCartiglio(ALL_PERSONS);
     layout = buildLayout(shownPersons);
     svg.innerHTML = '';
     if(!layout) return;
