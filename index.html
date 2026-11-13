@@ -1365,39 +1365,97 @@
     return lines;
   }
 
+  /* A capo senza mai troncare: tutte le parole trovano posto. Una parola più
+     larga della riga intera (rara nelle annotazioni) viene spezzata a lettere. */
+  function aCapoTutto(str, fs, serif, maxW){
+    if(!str) return [];
+    const words = [];
+    str.trim().split(/\s+/).forEach(w => {
+      if(larghezzaTesto(w, fs, serif) <= maxW){ words.push(w); return; }
+      let pezzo = '';
+      for(const ch of w){
+        if(pezzo && larghezzaTesto(pezzo + ch, fs, serif) > maxW){ words.push(pezzo); pezzo = ch; }
+        else pezzo += ch;
+      }
+      if(pezzo) words.push(pezzo);
+    });
+    const lines = []; let cur = '';
+    words.forEach(w => {
+      const cand = cur ? cur + ' ' + w : w;
+      if(cur && larghezzaTesto(cand, fs, serif) > maxW){ lines.push(cur); cur = w; }
+      else cur = cand;
+    });
+    if(cur) lines.push(cur);
+    return lines;
+  }
+  /* Il nome non si tronca mai: una riga a corpo pieno, altrimenti due righe a
+     corpo ridotto; se una parola sola è ancora troppo larga (Giovanbattista,
+     Annapalmira…) o servirebbero tre righe, il corpo scende finché entra. */
+  function righeNome(label, inner){
+    const larga = (ls, fs) => ls.some(l => larghezzaTesto(l, fs, true) > inner);
+    let fs = CARD.nameFS, lines = aCapo(label, fs, true, inner, 1);
+    if(lines.length === 1 && !lines[0].endsWith('…') && !larga(lines, fs)) return { fs, lines };
+    fs = CARD.nameFS2;
+    const prova = f => label.trim().split(/\s+/).some(w => larghezzaTesto(w, f, true) > inner)
+                       ? null : aCapoTutto(label, f, true, inner);
+    lines = prova(fs);
+    while((!lines || lines.length > 2) && fs > 11){ fs -= 0.5; lines = prova(fs); }
+    if(!lines) lines = aCapoTutto(label, fs, true, inner);
+    return { fs, lines };
+  }
+
   /* Disposizione del cartiglio: restituisce gli elementi da disegnare e
      l'altezza che il contenuto richiede. La usano sia il disegno sia il
-     calcolo dell'altezza comune, così le due cose non divergono mai. */
-  function impaginaCartiglio(p, W){
+     calcolo dell'altezza comune, così le due cose non divergono mai.
+     k stringe l'interlinea (1 = normale); noteFS è il corpo dell'annotazione;
+     noteMax, se indicato, conta solo le prime righe dell'annotazione e serve
+     a stabilire l'altezza comune, come prima. Il testo non viene mai troncato. */
+  function impaginaCartiglio(p, W, k = 1, noteFS = CARD.noteFS, noteMax = Infinity){
     const pad = CARD.pad, inner = W - 2*pad, out = [];
-    const label = personLabel(p);
-    let fs = CARD.nameFS, lines = aCapo(label, fs, true, inner, 1);
-    if(lines.length && lines[0].endsWith('…')){ fs = CARD.nameFS2; lines = aCapo(label, fs, true, inner, 2); }
+    const nm = righeNome(personLabel(p), inner), fs = nm.fs;
     let y = fs + 8;
-    lines.forEach((ln, i) => out.push({ k:'name', x:W/2, y:y + i*fs*1.2, t:ln, fs:fs }));
-    y += (lines.length-1)*fs*1.2 + 12;
+    nm.lines.forEach((ln, i) => out.push({ k:'name', x:W/2, y:y + i*fs*1.2*k, t:ln, fs:fs }));
+    y += (nm.lines.length-1)*fs*1.2*k + 12;
     out.push({ k:'rule', y:y, w:.75 });
     y += 4;
-    if(p.dataNascita){ y += CARD.dateFS*1.3; out.push({ k:'date', x:pad, y:y, t:'n. ' + fmtDate(p.dataNascita), fs:CARD.dateFS }); }
-    if(p.dataMorte){   y += CARD.dateFS*1.3; out.push({ k:'date', x:pad, y:y, t:'‡ ' + fmtDate(p.dataMorte), fs:CARD.dateFS }); }
+    const righe = (txt, f, passo) => aCapoTutto(txt, f, false, inner).forEach(ln => {
+      y += f*passo*k; out.push({ k:'date', x:pad, y:y, t:ln, fs:f });
+    });
+    if(p.dataNascita) righe('n. ' + fmtDate(p.dataNascita), CARD.dateFS, 1.3);
+    if(p.dataMorte)   righe('‡ ' + fmtDate(p.dataMorte), CARD.dateFS, 1.3);
     const nt = splitNote(p.note);
     if(nt.text || nt.n || nt.d){
       y += 9;
       out.push({ k:'rule', y:y, w:.25 });
       y += 3;
-      aCapo(fmtDate(nt.text), CARD.noteFS, false, inner, CARD.noteMax).forEach(ln => {
-        y += CARD.noteFS*1.38; out.push({ k:'note', x:pad, y:y, t:ln, fs:CARD.noteFS });
+      aCapoTutto(fmtDate(nt.text), noteFS, false, inner).slice(0, noteMax).forEach(ln => {
+        y += noteFS*1.38*k; out.push({ k:'note', x:pad, y:y, t:ln, fs:noteFS });
       });
       if(nt.n || nt.d) y += 5;
-      if(nt.n){ y += CARD.spFS*1.32; out.push({ k:'date', x:pad, y:y, t:'n. ' + fmtDate(nt.n), fs:CARD.spFS }); }
-      if(nt.d){ y += CARD.spFS*1.32; out.push({ k:'date', x:pad, y:y, t:'‡ ' + fmtDate(nt.d), fs:CARD.spFS }); }
+      if(nt.n) righe('n. ' + fmtDate(nt.n), CARD.spFS, 1.32);
+      if(nt.d) righe('‡ ' + fmtDate(nt.d), CARD.spFS, 1.32);
     }
     return { items:out, h:y + 14 };
   }
+  /* Se il testo intero non sta nell'altezza comune si stringe l'interlinea,
+     a passi, fino a righe quasi accostate; solo se ancora non basta cala di
+     poco il corpo dell'annotazione. */
+  const PASSI_K = [1, .95, .9, .86, .82, .79, .76];
+  function impaginaAdattata(p, W, H){
+    let r;
+    for(const k of PASSI_K){ r = impaginaCartiglio(p, W, k); if(r.h <= H) return r; }
+    for(let f = CARD.noteFS - 1; f >= 11; f--){ r = impaginaCartiglio(p, W, PASSI_K[PASSI_K.length-1], f); if(r.h <= H) return r; }
+    return r;
+  }
   function altezzaCartiglio(persons){
+    /* L'altezza comune resta quella di prima (annotazione contata fino a
+       CARD.noteMax righe); cresce solo se una scheda, anche stretta al
+       massimo, non ci sta. */
     let h = 0;
-    persons.forEach(p => { h = Math.max(h, impaginaCartiglio(p, BW).h); });
-    return Math.ceil(Math.max(h, 120));
+    persons.forEach(p => { h = Math.max(h, impaginaCartiglio(p, BW, 1, CARD.noteFS, CARD.noteMax).h); });
+    h = Math.ceil(Math.max(h, 120));
+    persons.forEach(p => { h = Math.max(h, Math.ceil(impaginaAdattata(p, BW, h).h)); });
+    return h;
   }
 
   function drawCard(g, p, W, H){
@@ -1434,7 +1492,7 @@
     g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(.25), x1:W+px(2.45), y1:px(10), x2:W+px(2.45), y2:H-px(10) }));
 
     const pad = CARD.pad;
-    impaginaCartiglio(p, W).items.forEach(it => {
+    impaginaAdattata(p, W, H).items.forEach(it => {
       if(it.k === 'rule'){
         g.appendChild(sel('line', { class:'card-frame', stroke:stroke, 'stroke-width':sw(it.w), x1:pad, y1:it.y, x2:W-pad, y2:it.y }));
         return;
